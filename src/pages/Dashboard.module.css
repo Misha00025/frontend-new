@@ -4,3 +4,22 @@
     min-height: 100vh;
     background-color: var(--bg-primary);
   }
+
+  .groupHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .groupTitle {
+    display: flex;
+    align-items: center;
+  }
+  
+  .groupIconLarge {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+  }

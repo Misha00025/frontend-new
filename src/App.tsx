@@ -7,6 +7,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import './styles/globals.css';
+import Groups from './pages/Groups';
+import { GroupProvider } from './contexts/GroupContext';
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
@@ -21,6 +23,7 @@ const AppContent: React.FC = () => {
         <Sidebar />
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/groups" element={<Groups />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
@@ -33,7 +36,9 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AppContent />
+        <GroupProvider>
+          <AppContent />
+        </GroupProvider>
       </AuthProvider>
     </ThemeProvider>
   );

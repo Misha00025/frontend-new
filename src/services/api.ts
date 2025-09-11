@@ -1,4 +1,5 @@
 import { LoginData, AuthResponse, RefreshResponse } from '../types/auth';
+import { Group, GroupsResponse } from '../types/group';
 import { storage } from '../utils/storage';
 
 const API_BASE = 'https://thedun.ru';
@@ -56,4 +57,23 @@ export const refreshToken = async (): Promise<boolean> => {
     storage.clearTokens();
     return false;
   }
+};
+
+export const groupAPI = {
+  getGroups: async (): Promise<Group[]> => {
+    const response = await makeAuthenticatedRequest('/api/groups');
+    if (!response.ok) {
+      throw new Error('Failed to fetch groups');
+    }
+    const data: GroupsResponse = await response.json();
+    return data.groups;
+  },
+
+  getGroup: async (groupId: number): Promise<Group> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch group');
+    }
+    return response.json();
+  },
 };
