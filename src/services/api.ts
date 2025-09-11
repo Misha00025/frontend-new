@@ -1,4 +1,5 @@
 import { LoginData, AuthResponse, RefreshResponse } from '../types/auth';
+import { storage } from '../utils/storage';
 
 const API_BASE = 'https://thedun.ru';
 
@@ -19,4 +20,39 @@ export const authAPI = {
     });
     return response.json();
   },
+};
+
+export const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
+  const accessToken = storage.getAccessToken();
+  
+  // Добавляем токен в заголовки, если он есть
+  const headers = {
+    ...options.headers,
+    ...(accessToken ? { 'Authorization': accessToken } : {}),
+  };
+  
+  const response = await fetch(`${API_BASE}${endpoint}`, {
+    ...options,
+    headers,
+  });
+  
+  return response;
+};
+
+// Отдельная функция для обработки обновления токена
+export const refreshToken = async (): Promise<boolean> => {
+  try {
+    const refreshToken = storage.getRefreshToken();
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+    
+    const refreshData = await authAPI.refresh(refreshToken);
+    storage.setAccessToken(refreshData.accessToken);
+    return true;
+  } catch (error) {
+    console.error('Token refresh failed:', error);
+    storage.clearTokens();
+    return false;
+  }
 };

@@ -1,5 +1,10 @@
 export const storage = {
-    setToken: (token: string) => localStorage.setItem('token', token),
-    getToken: () => localStorage.getItem('token'),
-    clearToken: () => localStorage.removeItem('token'),
-  };
+  setAccessToken: (token: string) => localStorage.setItem('accessToken', token),
+  getAccessToken: () => localStorage.getItem('accessToken'),
+  setRefreshToken: (token: string) => localStorage.setItem('refreshToken', token),
+  getRefreshToken: () => localStorage.getItem('refreshToken'),
+  clearTokens: () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+  },
+};
