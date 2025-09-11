@@ -27,6 +27,7 @@ export const makeAuthenticatedRequest = async (endpoint: string, options: Reques
   
   // Добавляем токен в заголовки, если он есть
   const headers = {
+    'Content-Type': 'application/json',
     ...options.headers,
     ...(accessToken ? { 'Authorization': accessToken } : {}),
   };
