@@ -1,6 +1,7 @@
 import { LoginData, AuthResponse, RefreshResponse } from '../types/auth';
 import { Group, GroupsResponse } from '../types/group';
 import { storage } from '../utils/storage';
+import { GroupUser, GroupUsersResponse, SearchUsersResponse, User } from '../types/groupUsers';
 
 const API_BASE = 'https://thedun.ru';
 
@@ -75,5 +76,48 @@ export const groupAPI = {
       throw new Error('Failed to fetch group');
     }
     return response.json();
+  },
+};
+
+
+export const groupUsersAPI = {
+  searchUsers: async (nickname: string): Promise<User[]> => {
+    const response = await makeAuthenticatedRequest(`/api/users?nickname=${encodeURIComponent(nickname)}`);
+    if (!response.ok) {
+      throw new Error('Failed to search users');
+    }
+    const data: SearchUsersResponse = await response.json();
+    return data.users;
+  },
+
+  getGroupUsers: async (groupId: number): Promise<GroupUser[]> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/users`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch group users');
+    }
+    const data: GroupUsersResponse = await response.json();
+    return data.users;
+  },
+
+  addUserToGroup: async (groupId: number, userId: number, isAdmin: boolean): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/users/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ isAdmin }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add user to group');
+    }
+  },
+
+  removeUserFromGroup: async (groupId: number, userId: number): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/users/${userId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to remove user from group');
+    }
   },
 };

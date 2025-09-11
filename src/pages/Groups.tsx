@@ -12,7 +12,11 @@ const Groups: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { setSelectedGroup } = useGroup();
   const navigate = useNavigate();
-  setSelectedGroup(null)
+
+  // Сбрасываем выбранную группу при входе на страницу групп
+  useEffect(() => {
+    setSelectedGroup(null);
+  }, [setSelectedGroup]);
 
   useEffect(() => {
     const fetchGroups = async () => {
