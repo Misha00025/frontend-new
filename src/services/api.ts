@@ -14,6 +14,8 @@ import {
   CreateCharacterRequest,
   UpdateCharacterRequest
 } from '../types/characters';
+import { CharacterUser, CharacterUsersResponse } from '../types/characterUsers';
+
 
 const API_BASE = 'https://thedun.ru';
 
@@ -234,6 +236,39 @@ export const charactersAPI = {
     });
     if (!response.ok) {
       throw new Error('Failed to delete character');
+    }
+  },
+};
+
+export const characterUsersAPI = {
+  getCharacterUsers: async (groupId: number, characterId: number): Promise<CharacterUser[]> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/users`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch character users');
+    }
+    const data: CharacterUsersResponse = await response.json();
+    return data.users;
+  },
+
+  addUserToCharacter: async (groupId: number, characterId: number, userId: number, canWrite: boolean): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/users/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ canWrite }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add user to character');
+    }
+  },
+
+  removeUserFromCharacter: async (groupId: number, characterId: number, userId: number): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/users/${userId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to remove user from character');
     }
   },
 };

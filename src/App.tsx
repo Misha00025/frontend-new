@@ -14,6 +14,7 @@ import GroupUsers from './pages/GroupUsers';
 import CharacterTemplates from './pages/CharacterTemplates';
 import Characters from './pages/Characters';
 import Character from './pages/Character';
+import CharacterUsers from './pages/CharacterUsers';
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
@@ -34,6 +35,7 @@ const AppContent: React.FC = () => {
           <Route path="/group/:groupId/templates" element={<CharacterTemplates />} />
           <Route path="/group/:groupId/characters" element={<Characters />} />
           <Route path="/group/:groupId/character/:characterId" element={<Character />} />
+          <Route path="/group/:groupId/character/:characterId/users" element={<CharacterUsers />} />
           <Route path="/group/:groupId/items" element={<div>Предметы (в разработке)</div>} />
           <Route path="/group/:groupId/notes" element={<div>Заметки (в разработке)</div>} />
           <Route path="/profile" element={<Profile />} />

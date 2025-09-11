@@ -17,18 +17,19 @@ export const navigationConfig: NavigationConfig = {
   ],
   character: [
     { id: 'character', label: 'Карточка', path: '/group/:groupId/character/:characterId', icon: '👤' },
-    { id: 'back', label: 'Назад к персонажам', path: '/groups/:groupId/characters', icon: '←', isBackButton: true },
+    { id: 'character-users', label: 'Игроки', path: '/group/:groupId/character/:characterId/users', icon: '👥' },
+    { id: 'back', label: 'Назад к персонажам', path: '/group/:groupId/characters', icon: '←', isBackButton: true },
   ],
 };
 
 const replacePath = (path: string, groupId?: string, characterId?: string) => {
   let newPath = path;
-  if (groupId && newPath.includes(':groupId')) {
+  if (groupId) {
     newPath = newPath.replace(':groupId', groupId);
   }
-  if (characterId && newPath.includes(':characterId')) {
+  if (characterId) {
     newPath = newPath.replace(':characterId', characterId);
-  }
+  }  
   return newPath;
 };
 
