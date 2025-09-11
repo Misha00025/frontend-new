@@ -1,15 +1,18 @@
-import { useState, useCallback } from 'react';
+// src/hooks/useProfile.ts
+import { useState, useCallback, useEffect } from 'react';
 import { WhoAmIResponse, UserProfile } from '../types/auth';
 import { makeAuthenticatedRequest, refreshToken } from '../services/api';
 
-export const useProfile = () => {
+export const useProfile = (fetchOnMount: boolean = false) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(fetchOnMount);
   const [error, setError] = useState<string | null>(null);
+  const [profileNotFound, setProfileNotFound] = useState(false);
 
   const fetchProfile = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError(null);
+    setProfileNotFound(false);
     
     try {
       // Первый запрос: whoami
@@ -22,8 +25,7 @@ export const useProfile = () => {
           throw new Error('Session expired. Please login again.');
         }
         // Повторяем запрос после обновления токена
-        await fetchProfile();
-        return;
+        return fetchProfile();
       }
       
       if (!whoamiResponse.ok) {
@@ -35,6 +37,11 @@ export const useProfile = () => {
       // Второй запрос: данные пользователя
       const profileResponse = await makeAuthenticatedRequest(`/api/users/${whoamiData.id}`);
       
+      if (profileResponse.status === 404) {
+        setProfileNotFound(true);
+        return;
+      }
+      
       if (profileResponse.status === 401) {
         // Попытка обновить токен
         const refreshSuccess = await refreshToken();
@@ -42,8 +49,7 @@ export const useProfile = () => {
           throw new Error('Session expired. Please login again.');
         }
         // Повторяем запрос после обновления токена
-        await fetchProfile();
-        return;
+        return fetchProfile();
       }
       
       if (!profileResponse.ok) {
@@ -51,6 +57,7 @@ export const useProfile = () => {
       }
       
       const profileData: UserProfile = await profileResponse.json();
+      setProfileNotFound(false);
       setProfile(profileData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -59,5 +66,11 @@ export const useProfile = () => {
     }
   }, []);
 
-  return { profile, loading, error, fetchProfile };
+  useEffect(() => {
+    if (fetchOnMount) {
+      fetchProfile();
+    }
+  }, [fetchOnMount, fetchProfile]);
+
+  return { profile, loading, error, profileNotFound, fetchProfile };
 };

@@ -1,4 +1,4 @@
-import { LoginData, AuthResponse, RefreshResponse } from '../types/auth';
+import { LoginData, AuthResponse, RefreshResponse, UserProfile } from '../types/auth';
 import { Group, GroupsResponse } from '../types/group';
 import { storage } from '../utils/storage';
 import { GroupUser, GroupUsersResponse, SearchUsersResponse, User } from '../types/groupUsers';
@@ -47,6 +47,22 @@ export const authAPI = {
       headers: { 'Refresh-Token': token },
     });
     return response.json();
+  },
+
+  register: async (credentials: { username: string, password: string }): Promise<void> => {
+    const response = await fetch(`${API_BASE}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials),
+    });
+    
+    if (response.status === 409) {
+      throw new Error('Username already exists');
+    }
+    
+    if (!response.ok) {
+      throw new Error('Registration failed');
+    }
   },
 };
 
@@ -378,5 +394,27 @@ export const characterItemsAPI = {
     if (!response.ok) {
       throw new Error('Failed to delete character item');
     }
+  },
+};
+
+export const userAPI = {
+  createProfile: async (profileData: { nickname: string, visibleName: string, imageLink?: string }): Promise<UserProfile> => {
+    const response = await makeAuthenticatedRequest('/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(profileData),
+    });
+    
+    if (response.status === 409) {
+      throw new Error('Nickname already exists');
+    }
+    
+    if (!response.ok) {
+      throw new Error('Failed to create profile');
+    }
+    
+    return response.json();
   },
 };

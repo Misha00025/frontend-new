@@ -22,3 +22,9 @@ export interface UserProfile {
   visibleName: string;
   imageLink: string | null;
 }
+
+export interface CreateProfileRequest {
+  nickname: string;
+  visibleName: string;
+  imageLink?: string;
+}

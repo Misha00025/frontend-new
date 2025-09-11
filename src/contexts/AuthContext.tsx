@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+// src/contexts/AuthContext.tsx
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { AuthResponse, RefreshResponse } from '../types/auth';
 import { authAPI } from '../services/api';
 import { storage } from '../utils/storage';
@@ -6,12 +7,13 @@ import { storage } from '../utils/storage';
 interface AuthContextType {
   accessToken: string | null;
   login: (username: string, password: string) => Promise<void>;
+  register: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -40,15 +42,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const loginData: AuthResponse = await authAPI.login({ username, password });
       
-      // Сохраняем refreshToken
       storage.setRefreshToken(loginData.token);
       
-      // Получаем и сохраняем accessToken
       const refreshData: RefreshResponse = await authAPI.refresh(loginData.token);
       setAccessToken(refreshData.accessToken);
       storage.setAccessToken(refreshData.accessToken);
     } catch (error) {
       console.error('Login failed:', error);
+      throw error;
+    }
+  };
+
+  const register = async (username: string, password: string) => {
+    try {
+      await authAPI.register({ username, password });
+      await login(username, password);
+    } catch (error) {
+      console.error('Registration failed:', error);
       throw error;
     }
   };
@@ -59,7 +69,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, login, logout }}>
+    <AuthContext.Provider value={{ 
+      accessToken, 
+      login,
+      register,
+      logout
+    }}>
       {children}
     </AuthContext.Provider>
   );
