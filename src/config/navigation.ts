@@ -9,6 +9,7 @@ export const navigationConfig: NavigationConfig = {
   group: [
     { id: 'group-dashboard', label: 'Группа', path: '/group/:groupId', icon: '👥' },
     { id: 'users', label: 'Пользователи', path: '/group/:groupId/users', icon: '👥' },
+    { id: 'templates', label: 'Шаблоны', path: '/group/:groupId/templates', icon: '📋' },
     { id: 'characters', label: 'Персонажи', path: '/group/:groupId/characters', icon: '🎭' },
     { id: 'items', label: 'Предметы', path: '/group/:groupId/items', icon: '🎒' },
     { id: 'notes', label: 'Заметки', path: '/group/:groupId/notes', icon: '📝' },

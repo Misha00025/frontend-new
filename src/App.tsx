@@ -11,6 +11,7 @@ import Groups from './pages/Groups';
 import { GroupProvider } from './contexts/GroupContext';
 import GroupDashboard from './pages/GroupDashboard';
 import GroupUsers from './pages/GroupUsers';
+import CharacterTemplates from './pages/CharacterTemplates';
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
@@ -30,6 +31,7 @@ const AppContent: React.FC = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/group/:groupId/users" element={<GroupUsers />} />
+          <Route path="/group/:groupId/templates" element={<CharacterTemplates />} />
         </Routes>
       </div>
     </Router>

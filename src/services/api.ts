@@ -2,6 +2,12 @@ import { LoginData, AuthResponse, RefreshResponse } from '../types/auth';
 import { Group, GroupsResponse } from '../types/group';
 import { storage } from '../utils/storage';
 import { GroupUser, GroupUsersResponse, SearchUsersResponse, User } from '../types/groupUsers';
+import {
+  CharacterTemplate,
+  CharacterTemplatesResponse,
+  CreateTemplateRequest,
+  UpdateTemplateRequest
+} from '../types/characterTemplates';
 
 const API_BASE = 'https://thedun.ru';
 
@@ -118,6 +124,55 @@ export const groupUsersAPI = {
     });
     if (!response.ok) {
       throw new Error('Failed to remove user from group');
+    }
+  },
+};
+
+
+export const characterTemplatesAPI = {
+  getTemplates: async (groupId: number): Promise<CharacterTemplate[]> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch templates');
+    }
+    const data: CharacterTemplatesResponse = await response.json();
+    return data.templates;
+  },
+
+  createTemplate: async (groupId: number, templateData: CreateTemplateRequest): Promise<CharacterTemplate> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(templateData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create template');
+    }
+    return response.json();
+  },
+
+  updateTemplate: async (groupId: number, templateId: number, templateData: UpdateTemplateRequest): Promise<CharacterTemplate> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates/${templateId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(templateData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update template');
+    }
+    return response.json();
+  },
+
+  deleteTemplate: async (groupId: number, templateId: number): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates/${templateId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete template');
     }
   },
 };
