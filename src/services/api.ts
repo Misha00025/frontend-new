@@ -1,5 +1,5 @@
 import { LoginData, AuthResponse, RefreshResponse, UserProfile } from '../types/auth';
-import { Group, GroupsResponse } from '../types/group';
+import { CreateGroupRequest, Group, GroupsResponse } from '../types/group';
 import { storage } from '../utils/storage';
 import { GroupUser, GroupUsersResponse, SearchUsersResponse, User } from '../types/groupUsers';
 import {
@@ -117,6 +117,22 @@ export const groupAPI = {
     if (!response.ok) {
       throw new Error('Failed to fetch group');
     }
+    return response.json();
+  },
+
+  createGroup: async (groupData: CreateGroupRequest): Promise<Group> => {
+    const response = await makeAuthenticatedRequest('/api/groups', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(groupData),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create group');
+    }
+    
     return response.json();
   },
 };

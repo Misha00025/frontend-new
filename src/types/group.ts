@@ -7,3 +7,9 @@ export interface Group {
   export interface GroupsResponse {
     groups: Group[];
   }
+
+  export interface CreateGroupRequest {
+    name: string;
+    description?: string;
+    icon?: string;
+  }

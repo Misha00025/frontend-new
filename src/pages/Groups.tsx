@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Group } from '../types/group';
 import { groupAPI } from '../services/api';
 import { useGroup } from '../contexts/GroupContext';
+import CreateGroupModal from '../components/CreateGroupModal/CreateGroupModal';
 import buttonStyles from '../styles/components/Button.module.css';
 import styles from './Groups.module.css';
 
@@ -10,32 +11,37 @@ const Groups: React.FC = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const { setSelectedGroup } = useGroup();
   const navigate = useNavigate();
 
-  // Сбрасываем выбранную группу при входе на страницу групп
   useEffect(() => {
+    loadGroups();
     setSelectedGroup(null);
   }, [setSelectedGroup]);
 
-  useEffect(() => {
-    const fetchGroups = async () => {
+  const loadGroups = async () => {
+    try {
       setLoading(true);
-      try {
-        const data = await groupAPI.getGroups();
-        setGroups(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load groups');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGroups();
-  }, []);
+      const data = await groupAPI.getGroups();
+      setGroups(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load groups');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSelectGroup = (group: Group) => {
+    setSelectedGroup(group);
     navigate(`/group/${group.id}`);
+  };
+
+  const handleGroupCreated = (newGroup: Group) => {
+    // Добавляем новую группу в список и выбираем её
+    setGroups(prev => [...prev, newGroup]);
+    setSelectedGroup(newGroup);
+    navigate(`/group/${newGroup.id}`);
   };
 
   if (loading) return <div className={styles.container}>Загрузка...</div>;
@@ -44,6 +50,16 @@ const Groups: React.FC = () => {
   return (
     <div className={styles.container}>
       <h1>Мои группы</h1>
+
+      <div className={styles.actions}>
+        <button 
+          className={buttonStyles.button}
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          Создать группу
+        </button>
+      </div>
+
       <div className={styles.groupsList}>
         {groups.map(group => (
           <div key={group.id} className={styles.groupCard}>
@@ -60,6 +76,12 @@ const Groups: React.FC = () => {
           </div>
         ))}
       </div>
+
+      <CreateGroupModal 
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onGroupCreated={handleGroupCreated}
+      />
     </div>
   );
 };
