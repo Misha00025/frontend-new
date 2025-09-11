@@ -1,18 +1,22 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useGroup } from '../../contexts/GroupContext';
+import { getNavigationItems } from '../../config/navigation';
 import buttonStyles from '../../styles/components/Button.module.css';
 import styles from './Sidebar.module.css';
 
 const Sidebar: React.FC = () => {
   const { logout } = useAuth();
-  const { selectedGroup, setSelectedGroup } = useGroup();
-  const location = useLocation();
-
-  const handleBack = () => {
-    setSelectedGroup(null);
-  };
+  const { selectedGroup } = useGroup();
+  const { groupId } = useParams<{ groupId: string }>();
+  
+  // Определяем контекст навигации
+  const navigationContext = selectedGroup || groupId ? 'group' : 'default';
+  
+  // Приводим ID группы к строке для использования в навигации
+  const groupIdForNavigation = selectedGroup?.id?.toString() || groupId;
+  const navigationItems = getNavigationItems(navigationContext, groupIdForNavigation);
 
   return (
     <div className={styles.sidebar}>
@@ -20,48 +24,17 @@ const Sidebar: React.FC = () => {
         <h2>MyApp</h2>
       </div>
       
-      {selectedGroup && (
-        <button className={styles.backButton} onClick={handleBack}>
-          ← Назад
-        </button>
-      )}
-      
       <nav className={styles.nav}>
-        <Link 
-          to="/dashboard" 
-          className={`${styles.link} ${location.pathname === '/dashboard' ? styles.active : ''}`}
-        >
-          {selectedGroup ? selectedGroup.name : 'Главная'}
-        </Link>
-        
-        {/* Показываем эти ссылки только когда группа не выбрана */}
-        {!selectedGroup && (
-          <>
-            <Link 
-              to="/groups" 
-              className={`${styles.link} ${location.pathname === '/groups' ? styles.active : ''}`}
-            >
-              Группы
-            </Link>
-            <Link 
-              to="/profile" 
-              className={`${styles.link} ${location.pathname === '/profile' ? styles.active : ''}`}
-            >
-              Профиль
-            </Link>
-          </>
-        )}
-        
-        {/* Здесь в будущем можно добавить ссылки для работы с выбранной группой */}
-        {selectedGroup && (
-          <>
-            {/* Пример будущих ссылок:
-            <Link to="/characters" className={styles.link}>Персонажи</Link>
-            <Link to="/items" className={styles.link}>Предметы</Link>
-            <Link to="/notes" className={styles.link}>Заметки</Link>
-            */}
-          </>
-        )}
+        {navigationItems.map(item => (
+          <Link
+            key={item.id}
+            to={item.path}
+            className={styles.link}
+          >
+            <span className={styles.icon}>{item.icon}</span>
+            {item.label}
+          </Link>
+        ))}
       </nav>
       
       <div className={styles.footer}>

@@ -12,6 +12,7 @@ const Groups: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { setSelectedGroup } = useGroup();
   const navigate = useNavigate();
+  setSelectedGroup(null)
 
   useEffect(() => {
     const fetchGroups = async () => {

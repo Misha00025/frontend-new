@@ -7,4 +7,7 @@ export const storage = {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
   },
+  setSelectedGroupId: (groupId: string) => localStorage.setItem('selectedGroupId', groupId),
+  getSelectedGroupId: () => localStorage.getItem('selectedGroupId'),
+  clearSelectedGroupId: () => localStorage.removeItem('selectedGroupId'),
 };
