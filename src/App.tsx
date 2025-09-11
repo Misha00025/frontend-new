@@ -9,6 +9,7 @@ import Profile from './pages/Profile';
 import './styles/globals.css';
 import Groups from './pages/Groups';
 import { GroupProvider } from './contexts/GroupContext';
+import GroupDashboard from './pages/GroupDashboard';
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
@@ -24,6 +25,7 @@ const AppContent: React.FC = () => {
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/groups" element={<Groups />} />
+          <Route path="/group/:groupId" element={<GroupDashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>

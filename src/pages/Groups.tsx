@@ -30,8 +30,7 @@ const Groups: React.FC = () => {
   }, []);
 
   const handleSelectGroup = (group: Group) => {
-    setSelectedGroup(group);
-    navigate('/dashboard'); // Перенаправляем на главную страницу
+    navigate(`/group/${group.id}`);
   };
 
   if (loading) return <div className={styles.container}>Загрузка...</div>;
