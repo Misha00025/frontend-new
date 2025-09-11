@@ -15,6 +15,12 @@ import {
   UpdateCharacterRequest
 } from '../types/characters';
 import { CharacterUser, CharacterUsersResponse } from '../types/characterUsers';
+import {
+  GroupItem,
+  GroupItemsResponse,
+  CreateGroupItemRequest,
+  UpdateGroupItemRequest
+} from '../types/groupItems';
 
 
 const API_BASE = 'https://thedun.ru';
@@ -269,6 +275,54 @@ export const characterUsersAPI = {
     });
     if (!response.ok) {
       throw new Error('Failed to remove user from character');
+    }
+  },
+};
+
+export const groupItemsAPI = {
+  getItems: async (groupId: number): Promise<GroupItem[]> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/items`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch group items');
+    }
+    const data: GroupItemsResponse = await response.json();
+    return data.items;
+  },
+
+  createItem: async (groupId: number, itemData: CreateGroupItemRequest): Promise<GroupItem> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/items`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(itemData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create group item');
+    }
+    return response.json();
+  },
+
+  updateItem: async (groupId: number, itemId: number, itemData: UpdateGroupItemRequest): Promise<GroupItem> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/items/${itemId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(itemData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update group item');
+    }
+    return response.json();
+  },
+
+  deleteItem: async (groupId: number, itemId: number): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/items/${itemId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete group item');
     }
   },
 };

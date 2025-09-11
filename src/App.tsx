@@ -15,6 +15,7 @@ import CharacterTemplates from './pages/CharacterTemplates';
 import Characters from './pages/Characters';
 import Character from './pages/Character';
 import CharacterUsers from './pages/CharacterUsers';
+import GroupItems from './pages/GroupItems';
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
@@ -33,6 +34,7 @@ const AppContent: React.FC = () => {
           <Route path="/group/:groupId" element={<GroupDashboard />} />
           <Route path="/group/:groupId/users" element={<GroupUsers />} />
           <Route path="/group/:groupId/templates" element={<CharacterTemplates />} />
+          <Route path="/group/:groupId/items" element={<GroupItems />} />
           <Route path="/group/:groupId/characters" element={<Characters />} />
           <Route path="/group/:groupId/character/:characterId" element={<Character />} />
           <Route path="/group/:groupId/character/:characterId/users" element={<CharacterUsers />} />
