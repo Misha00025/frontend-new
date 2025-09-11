@@ -8,6 +8,12 @@ import {
   CreateTemplateRequest,
   UpdateTemplateRequest
 } from '../types/characterTemplates';
+import {
+  CharacterShort,
+  Character,
+  CreateCharacterRequest,
+  UpdateCharacterRequest
+} from '../types/characters';
 
 const API_BASE = 'https://thedun.ru';
 
@@ -173,6 +179,61 @@ export const characterTemplatesAPI = {
     });
     if (!response.ok) {
       throw new Error('Failed to delete template');
+    }
+  },
+};
+
+export const charactersAPI = {
+  getCharacters: async (groupId: number): Promise<CharacterShort[]> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch characters');
+    }
+    return response.json();
+  },
+
+  getCharacter: async (groupId: number, characterId: number): Promise<Character> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch character');
+    }
+    return response.json();
+  },
+
+  createCharacter: async (groupId: number, characterData: CreateCharacterRequest): Promise<Character> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(characterData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create character');
+    }
+    return response.json();
+  },
+
+  updateCharacter: async (groupId: number, characterId: number, characterData: UpdateCharacterRequest): Promise<Character> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(characterData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update character');
+    }
+    return response.json();
+  },
+
+  deleteCharacter: async (groupId: number, characterId: number): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete character');
     }
   },
 };

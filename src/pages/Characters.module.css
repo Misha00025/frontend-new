@@ -1,0 +1,52 @@
+.container {
+    padding: 2rem;
+    margin-left: 250px;
+    min-height: 100vh;
+    background-color: var(--bg-primary);
+  }
+  
+  .actions {
+    margin-bottom: 2rem;
+  }
+  
+  .form {
+    background-color: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 2rem;
+  }
+  
+  .formGroup {
+    margin-bottom: 1rem;
+  }
+  
+  .formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+  
+  .formActions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .charactersList {
+    margin-top: 2rem;
+  }
+  
+  .characterCard {
+    background-color: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 1.5rem;
+  }
+  
+  .error {
+    color: red;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background-color: #ffeeee;
+    border-radius: var(--border-radius-sm);
+  }

@@ -1,0 +1,33 @@
+export interface CharacterShort {
+    id: number;
+    name: string;
+    description: string;
+  }
+  
+  export interface Character {
+    id: number;
+    name: string;
+    description: string;
+    fields: Record<string, CharacterField>;
+    group: {
+      id: number;
+      name: string;
+      icon: string | null;
+    };
+  }
+  
+  export interface CharacterField {
+    name: string;
+    value: number;
+    description: string;
+  }
+  
+  export interface CreateCharacterRequest {
+    name: string;
+    description: string;
+    templateId: number;
+  }
+  
+  export interface UpdateCharacterRequest {
+    fields: Record<string, Partial<CharacterField> | null>;
+  }
