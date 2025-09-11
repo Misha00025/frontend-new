@@ -16,6 +16,7 @@ import Characters from './pages/Characters';
 import Character from './pages/Character';
 import CharacterUsers from './pages/CharacterUsers';
 import GroupItems from './pages/GroupItems';
+import CharacterItems from './pages/CharacterItems';
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
@@ -35,11 +36,11 @@ const AppContent: React.FC = () => {
           <Route path="/group/:groupId/users" element={<GroupUsers />} />
           <Route path="/group/:groupId/templates" element={<CharacterTemplates />} />
           <Route path="/group/:groupId/items" element={<GroupItems />} />
+          <Route path="/group/:groupId/notes" element={<div>Заметки (в разработке)</div>} />
           <Route path="/group/:groupId/characters" element={<Characters />} />
           <Route path="/group/:groupId/character/:characterId" element={<Character />} />
           <Route path="/group/:groupId/character/:characterId/users" element={<CharacterUsers />} />
-          <Route path="/group/:groupId/items" element={<div>Предметы (в разработке)</div>} />
-          <Route path="/group/:groupId/notes" element={<div>Заметки (в разработке)</div>} />
+          <Route path="/group/:groupId/character/:characterId/items" element={<CharacterItems />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>

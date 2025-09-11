@@ -18,6 +18,7 @@ export const navigationConfig: NavigationConfig = {
   character: [
     { id: 'character', label: 'Карточка', path: '/group/:groupId/character/:characterId', icon: '👤' },
     { id: 'character-users', label: 'Игроки', path: '/group/:groupId/character/:characterId/users', icon: '👥' },
+    { id: 'character-items', label: 'Предметы', path: '/group/:groupId/character/:characterId/items', icon: '🎒' },
     { id: 'back', label: 'Назад к персонажам', path: '/group/:groupId/characters', icon: '←', isBackButton: true },
   ],
 };

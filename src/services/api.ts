@@ -21,6 +21,12 @@ import {
   CreateGroupItemRequest,
   UpdateGroupItemRequest
 } from '../types/groupItems';
+import {
+  CharacterItem,
+  CharacterItemsResponse,
+  CreateCharacterItemRequest,
+  UpdateCharacterItemRequest
+} from '../types/characterItems';
 
 
 const API_BASE = 'https://thedun.ru';
@@ -323,6 +329,54 @@ export const groupItemsAPI = {
     });
     if (!response.ok) {
       throw new Error('Failed to delete group item');
+    }
+  },
+};
+
+export const characterItemsAPI = {
+  getCharacterItems: async (groupId: number, characterId: number): Promise<CharacterItem[]> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/items`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch character items');
+    }
+    const data: CharacterItemsResponse = await response.json();
+    return data.items;
+  },
+
+  createCharacterItem: async (groupId: number, characterId: number, itemData: CreateCharacterItemRequest): Promise<CharacterItem> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/items`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(itemData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create character item');
+    }
+    return response.json();
+  },
+
+  updateCharacterItem: async (groupId: number, characterId: number, itemId: number, itemData: UpdateCharacterItemRequest): Promise<CharacterItem> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/items/${itemId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(itemData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update character item');
+    }
+    return response.json();
+  },
+
+  deleteCharacterItem: async (groupId: number, characterId: number, itemId: number): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/items/${itemId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete character item');
     }
   },
 };
