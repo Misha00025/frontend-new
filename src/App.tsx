@@ -30,12 +30,14 @@ const AppContent: React.FC = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/group/:groupId" element={<GroupDashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/group/:groupId/users" element={<GroupUsers />} />
           <Route path="/group/:groupId/templates" element={<CharacterTemplates />} />
           <Route path="/group/:groupId/characters" element={<Characters />} />
           <Route path="/group/:groupId/character/:characterId" element={<Character />} />
+          <Route path="/group/:groupId/items" element={<div>Предметы (в разработке)</div>} />
+          <Route path="/group/:groupId/notes" element={<div>Заметки (в разработке)</div>} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </div>
     </Router>

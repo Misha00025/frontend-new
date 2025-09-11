@@ -9,4 +9,5 @@ export interface NavigationItem {
   export interface NavigationConfig {
     default: NavigationItem[];
     group: NavigationItem[];
+    character: NavigationItem[];
   }

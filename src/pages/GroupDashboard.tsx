@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Group } from '../types/group';
 import { groupAPI } from '../services/api';
 import { useGroup } from '../contexts/GroupContext';
-import buttonStyles from '../styles/components/Button.module.css';
 import styles from './GroupDashboard.module.css';
 
 const GroupDashboard: React.FC = () => {
