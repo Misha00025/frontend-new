@@ -1,25 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { GroupItem, CreateGroupItemRequest } from '../types/groupItems';
+import { GroupItem, CreateGroupItemRequest, UpdateGroupItemRequest } from '../types/groupItems';
 import { groupItemsAPI } from '../services/api';
+import GroupItemModal from '../components/GroupItemModal/GroupItemModal';
 import buttonStyles from '../styles/components/Button.module.css';
-import inputStyles from '../styles/components/Input.module.css';
-import styles from './GroupItems.module.css';
+import commonStyles from '../styles/common.module.css';
+import uiStyles from '../styles/ui.module.css';
 
 const GroupItems: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const [items, setItems] = useState<GroupItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<GroupItem | null>(null);
-
-  const [formData, setFormData] = useState<CreateGroupItemRequest>({
-    name: '',
-    description: '',
-    price: 0,
-    image_link: '',
-  });
 
   useEffect(() => {
     if (groupId) {
@@ -39,28 +33,15 @@ const GroupItems: React.FC = () => {
     }
   };
 
-  const handleCreateItem = async () => {
-    try {
-      await groupItemsAPI.createItem(parseInt(groupId!), formData);
-      setShowCreateForm(false);
-      setFormData({ name: '', description: '', price: 0, image_link: '' });
-      loadItems();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create item');
-    }
+  const handleCreateItem = async (itemData: CreateGroupItemRequest) => {
+    await groupItemsAPI.createItem(parseInt(groupId!), itemData);
+    loadItems();
   };
 
-  const handleUpdateItem = async () => {
+  const handleUpdateItem = async (itemData: UpdateGroupItemRequest) => {
     if (!editingItem) return;
-
-    try {
-      await groupItemsAPI.updateItem(parseInt(groupId!), editingItem.id, formData);
-      setEditingItem(null);
-      setFormData({ name: '', description: '', price: 0, image_link: '' });
-      loadItems();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update item');
-    }
+    await groupItemsAPI.updateItem(parseInt(groupId!), editingItem.id, itemData);
+    loadItems();
   };
 
   const handleDeleteItem = async (itemId: number) => {
@@ -76,114 +57,47 @@ const GroupItems: React.FC = () => {
 
   const handleEditItem = (item: GroupItem) => {
     setEditingItem(item);
-    setFormData({
-      name: item.name,
-      description: item.description,
-      price: item.price,
-      image_link: item.image_link || '',
-    });
+    setIsModalOpen(true);
   };
 
-  const handleCancelEdit = () => {
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
     setEditingItem(null);
-    setShowCreateForm(false);
-    setFormData({ name: '', description: '', price: 0, image_link: '' });
   };
 
-  if (loading) return <div className={styles.container}>Загрузка...</div>;
+  if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
 
   return (
-    <div className={styles.container}>
+    <div className={commonStyles.container}>
       <h1>Предметы группы</h1>
 
-      {error && <div className={styles.error}>{error}</div>}
+      {error && <div className={commonStyles.error}>{error}</div>}
 
-      <div className={styles.actions}>
+      <div className={commonStyles.actions}>
         <button 
           className={buttonStyles.button}
-          onClick={() => setShowCreateForm(true)}
+          onClick={() => setIsModalOpen(true)}
         >
           Создать предмет
         </button>
       </div>
 
-      {(showCreateForm || editingItem) && (
-        <div className={styles.form}>
-          <h2>{editingItem ? 'Редактирование предмета' : 'Создание предмета'}</h2>
-          
-          <div className={styles.formGroup}>
-            <label>Название:</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className={inputStyles.input}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Описание:</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className={inputStyles.input}
-              rows={3}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Цена:</label>
-            <input
-              type="number"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-              className={inputStyles.input}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Ссылка на изображение (опционально):</label>
-            <input
-              type="text"
-              value={formData.image_link || ''}
-              onChange={(e) => setFormData({ ...formData, image_link: e.target.value })}
-              className={inputStyles.input}
-            />
-          </div>
-
-          <div className={styles.formActions}>
-            <button 
-              onClick={editingItem ? handleUpdateItem : handleCreateItem}
-              className={buttonStyles.button}
-            >
-              {editingItem ? 'Сохранить' : 'Создать'}
-            </button>
-            <button 
-              onClick={handleCancelEdit}
-              className={buttonStyles.button}
-            >
-              Отмена
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className={styles.itemsList}>
+      <div className={commonStyles.list}>
         <h2>Список предметов</h2>
         {items.length === 0 ? (
           <p>Предметов пока нет</p>
         ) : (
           items.map(item => (
-            <div key={item.id} className={styles.itemCard}>
+            <div key={item.id} className={uiStyles.itemCard}>
               {item.image_link && (
-                <img src={item.image_link} alt={item.name} className={styles.itemImage} />
+                <img src={item.image_link} alt={item.name} className={uiStyles.itemImage} />
               )}
-              <div className={styles.itemInfo}>
+              <div className={uiStyles.itemInfo}>
                 <h3>{item.name}</h3>
                 <p>{item.description}</p>
-                <p className={styles.itemPrice}>Цена: {item.price}</p>
+                <p className={uiStyles.itemPrice}>Цена: {item.price}</p>
               </div>
-              <div className={styles.itemActions}>
+              <div className={uiStyles.itemActions}>
                 <button 
                   onClick={() => handleEditItem(item)}
                   className={buttonStyles.button}
@@ -201,6 +115,14 @@ const GroupItems: React.FC = () => {
           ))
         )}
       </div>
+
+      <GroupItemModal 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSave={editingItem ? handleUpdateItem : handleCreateItem}
+        editingItem={editingItem}
+        title={editingItem ? 'Редактирование предмета' : 'Создание предмета'}
+      />
     </div>
   );
 };
