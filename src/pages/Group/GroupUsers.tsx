@@ -4,7 +4,8 @@ import { GroupUser, User } from '../../types/groupUsers';
 import { groupUsersAPI } from '../../services/api';
 import buttonStyles from '../../styles/components/Button.module.css';
 import inputStyles from '../../styles/components/Input.module.css';
-import styles from './GroupUsers.module.css';
+import styles from '../../styles/common.module.css';
+import stylesUi from '../../styles/ui.module.css';
 
 const GroupUsers: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -94,16 +95,16 @@ const GroupUsers: React.FC = () => {
         </div>
 
         {searchResults.length > 0 && (
-          <div className={styles.searchResults}>
+          <div className={stylesUi.searchResults}>
             <h3>Результаты поиска:</h3>
             {searchResults.map(user => (
-              <div key={user.id} className={styles.userCard}>
+              <div key={user.id} className={stylesUi.userCard}>
                 <img src={user.imageLink || '/default-avatar.png'} alt={user.nickname} className={styles.avatar} />
-                <div className={styles.userInfo}>
+                <div className={stylesUi.userInfo}>
                   <h4>{user.visibleName}</h4>
                   <p>@{user.nickname}</p>
                 </div>
-                <div className={styles.actions}>
+                <div className={stylesUi.actions}>
                   <button onClick={() => handleAddUser(user, false)} className={buttonStyles.button}>
                     Добавить
                   </button>
@@ -122,15 +123,15 @@ const GroupUsers: React.FC = () => {
         {groupUsers.length === 0 ? (
           <p>В группе пока нет пользователей</p>
         ) : (
-          <div className={styles.usersList}>
+          <div className={stylesUi.usersList}>
             {groupUsers.map(groupUser => (
-              <div key={groupUser.user.id} className={styles.userCard}>
-                <img src={groupUser.user.imageLink || '/default-avatar.png'} alt={groupUser.user.nickname} className={styles.avatar} />
-                <div className={styles.userInfo}>
+              <div key={groupUser.user.id} className={stylesUi.userCard}>
+                <img src={groupUser.user.imageLink || '/default-avatar.png'} alt={groupUser.user.nickname} className={stylesUi.avatar} />
+                <div className={stylesUi.userInfo}>
                   <h4>{groupUser.user.visibleName}</h4>
                   <p>@{groupUser.user.nickname} {groupUser.isAdmin && '(Администратор)'}</p>
                 </div>
-                <div className={styles.actions}>
+                <div className={stylesUi.actions}>
                   <button 
                     onClick={() => handleRemoveUser(groupUser.user.id)} 
                     className={buttonStyles.button}

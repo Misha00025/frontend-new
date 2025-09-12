@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useProfile } from '../hooks/useProfile';
-import styles from './Profile.module.css';
+import styles from '../styles/common.module.css';
 
 const Profile: React.FC = () => {
   const { profile, loading, error, fetchProfile } = useProfile();

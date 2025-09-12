@@ -6,7 +6,8 @@ import { characterUsersAPI } from '../../services/api';
 import { groupUsersAPI } from '../../services/api';
 import buttonStyles from '../../styles/components/Button.module.css';
 import inputStyles from '../../styles/components/Input.module.css';
-import styles from './CharacterUsers.module.css';
+import styles from '../../styles/common.module.css';
+import stylesUi from '../../styles/ui.module.css';
 
 const CharacterUsers: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -99,13 +100,13 @@ const CharacterUsers: React.FC = () => {
           <div className={styles.searchResults}>
             <h3>Результаты поиска:</h3>
             {searchResults.map(user => (
-              <div key={user.id} className={styles.userCard}>
-                <img src={user.imageLink || '/default-avatar.png'} alt={user.nickname} className={styles.avatar} />
-                <div className={styles.userInfo}>
+              <div key={user.id} className={stylesUi.userCard}>
+                <img src={user.imageLink || '/default-avatar.png'} alt={user.nickname} className={stylesUi.avatar} />
+                <div className={stylesUi.userInfo}>
                   <h4>{user.visibleName}</h4>
                   <p>@{user.nickname}</p>
                 </div>
-                <div className={styles.actions}>
+                <div className={stylesUi.actions}>
                   <button onClick={() => handleAddUser(user, false)} className={buttonStyles.button}>
                     Добавить (чтение)
                   </button>
@@ -124,15 +125,15 @@ const CharacterUsers: React.FC = () => {
         {characterUsers.length === 0 ? (
           <p>К персонажу пока не добавлены игроки</p>
         ) : (
-          <div className={styles.usersList}>
+          <div className={stylesUi.usersList}>
             {characterUsers.map(characterUser => (
-              <div key={characterUser.user.id} className={styles.userCard}>
-                <img src={characterUser.user.imageLink || '/default-avatar.png'} alt={characterUser.user.nickname} className={styles.avatar} />
-                <div className={styles.userInfo}>
+              <div key={characterUser.user.id} className={stylesUi.userCard}>
+                <img src={characterUser.user.imageLink || '/default-avatar.png'} alt={characterUser.user.nickname} className={stylesUi.avatar} />
+                <div className={stylesUi.userInfo}>
                   <h4>{characterUser.user.visibleName}</h4>
                   <p>@{characterUser.user.nickname} {characterUser.canWrite ? '(Редактор)' : '(Читатель)'}</p>
                 </div>
-                <div className={styles.actions}>
+                <div className={stylesUi.actions}>
                   <button 
                     onClick={() => handleRemoveUser(characterUser.user.id)} 
                     className={buttonStyles.button}

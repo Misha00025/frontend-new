@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Group } from '../../types/group';
 import { groupAPI } from '../../services/api';
 import { useGroup } from '../../contexts/GroupContext';
-import styles from './GroupDashboard.module.css';
+import styles from '../../styles/common.module.css';
 
 const GroupDashboard: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
