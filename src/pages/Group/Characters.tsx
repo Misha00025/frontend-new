@@ -9,6 +9,8 @@ import CharacterModal from '../../components/Modals/CharacterModal/CharacterModa
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';
+import List from '../../components/List/List';
+import CharacterCard from '../../components/Cards/CharacterCard';
 
 const Characters: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -47,14 +49,13 @@ const Characters: React.FC = () => {
     }
   };
 
-  const handleCreateCharacter = async (characterData: CreateCharacterRequest) => {
+  const handleCreateCharacter = async (characterData: any) => {
     try {
       const newCharacter = await charactersAPI.createCharacter(parseInt(groupId!), characterData);
-      // Перенаправляем на страницу созданного персонажа
       navigate(`/group/${groupId}/character/${newCharacter.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create character');
-      throw err; // Пробрасываем ошибку для обработки в модальном окне
+      throw err;
     }
   };
 
@@ -85,25 +86,15 @@ const Characters: React.FC = () => {
         )}
       </div>
 
-      <div className={commonStyles.list}>
-        <h2>Список персонажей</h2>
-        {characters.length === 0 ? (
-          <p>Персонажей пока нет</p>
-        ) : (
-          characters.map(character => (
-            <div key={character.id} className={uiStyles.card}>
-              <h3>{character.name}</h3>
-              <p>{character.description}</p>
-              <button 
-                onClick={() => handleSelectCharacter(character.id)}
-                className={buttonStyles.button}
-              >
-                Выбрать
-              </button>
-            </div>
-          ))
-        )}
-      </div>
+      <List layout="grid" gap="large">
+        {characters.map(character => (
+          <CharacterCard
+            key={character.id}
+            character={character}
+            onSelect={() => handleSelectCharacter(character.id)}
+          />
+        ))}
+      </List>
 
       <CharacterModal 
         isOpen={isModalOpen}

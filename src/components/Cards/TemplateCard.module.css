@@ -1,0 +1,59 @@
+.templateCard {
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.templateName {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.templateDescription {
+  margin: 0 0 1rem 0;
+  color: var(--text-secondary);
+}
+
+.fields {
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.fields h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+}
+
+.field {
+  margin-bottom: 0.25rem;
+  padding: 0.25rem;
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.9rem;
+}
+
+.fieldName {
+  font-weight: bold;
+}
+
+.fieldKey {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.fieldValue {
+  color: var(--accent-color);
+}
+
+.fieldDescription {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.templateActions {
+  display: flex;
+  gap: 0.5rem;
+}

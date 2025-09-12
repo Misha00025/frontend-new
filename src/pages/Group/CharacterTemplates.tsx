@@ -6,6 +6,8 @@ import CharacterTemplateModal from '../../components/Modals/CharacterModal/Chara
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';
+import List from '../../components/List/List';
+import TemplateCard from '../../components/Cards/TemplateCard';
 
 const CharacterTemplates: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -33,12 +35,12 @@ const CharacterTemplates: React.FC = () => {
     }
   };
 
-  const handleCreateTemplate = async (templateData: CreateTemplateRequest) => {
+  const handleCreateTemplate = async (templateData: any) => {
     await characterTemplatesAPI.createTemplate(parseInt(groupId!), templateData);
     loadTemplates();
   };
 
-  const handleUpdateTemplate = async (templateData: UpdateTemplateRequest) => {
+  const handleUpdateTemplate = async (templateData: any) => {
     if (!editingTemplate) return;
     await characterTemplatesAPI.updateTemplate(parseInt(groupId!), editingTemplate.id, templateData);
     loadTemplates();
@@ -82,43 +84,16 @@ const CharacterTemplates: React.FC = () => {
         </button>
       </div>
 
-      <div className={commonStyles.list}>
-        <h2>Список шаблонов</h2>
-        {templates.length === 0 ? (
-          <p>Шаблонов пока нет</p>
-        ) : (
-          templates.map(template => (
-            <div key={template.id} className={uiStyles.card}>
-              <h3>{template.name}</h3>
-              <p>{template.description}</p>
-              
-              <div className={uiStyles.fields}>
-                <h4>Поля:</h4>
-                {Object.entries(template.fields).map(([key, field]) => (
-                  <div key={key} className={uiStyles.field}>
-                    <strong>{field.name}</strong> ({key}): {field.value} - {field.description}
-                  </div>
-                ))}
-              </div>
-
-              <div className={uiStyles.actions}>
-                <button 
-                  onClick={() => handleEditTemplate(template)}
-                  className={buttonStyles.button}
-                >
-                  Редактировать
-                </button>
-                <button 
-                  onClick={() => handleDeleteTemplate(template.id)}
-                  className={buttonStyles.button}
-                >
-                  Удалить
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      <List layout="grid" gap="large">
+        {templates.map(template => (
+          <TemplateCard
+            key={template.id}
+            template={template}
+            onEdit={() => handleEditTemplate(template)}
+            onDelete={() => handleDeleteTemplate(template.id)}
+          />
+        ))}
+      </List>
 
       <CharacterTemplateModal 
         isOpen={isModalOpen}
