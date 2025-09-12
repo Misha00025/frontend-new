@@ -111,7 +111,53 @@
   }
 
   .fields {
+    margin-top: 2rem;
+  }
+
+  .fieldCard {
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 1.5rem;
+    background-color: var(--bg-secondary);
+  }
+
+  .fieldHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .fieldHeader h3 {
+    margin: 0;
+  }
+
+  .fieldKey {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .fieldDescription {
+    margin: 0.5rem 0;
+    color: var(--text-secondary);
+  }
+
+  .fieldValue {
     margin: 1rem 0;
+    font-size: 1.2rem;
+  }
+
+  .fieldActions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
   }
 
   .field {
