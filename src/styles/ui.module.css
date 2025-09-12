@@ -102,3 +102,27 @@
   .keyInputGroup button {
     white-space: nowrap;
   }
+
+  .card {
+    background-color: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 1.5rem;
+  }
+
+  .fields {
+    margin: 1rem 0;
+  }
+
+  .field {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background-color: var(--bg-primary);
+    border-radius: var(--border-radius-sm);
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
