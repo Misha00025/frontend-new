@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { User } from '../types/groupUsers';
-import { CharacterUser } from '../types/characterUsers';
-import { characterUsersAPI } from '../services/api';
-import { groupUsersAPI } from '../services/api';
-import buttonStyles from '../styles/components/Button.module.css';
-import inputStyles from '../styles/components/Input.module.css';
+import { User } from '../../types/groupUsers';
+import { CharacterUser } from '../../types/characterUsers';
+import { characterUsersAPI } from '../../services/api';
+import { groupUsersAPI } from '../../services/api';
+import buttonStyles from '../../styles/components/Button.module.css';
+import inputStyles from '../../styles/components/Input.module.css';
 import styles from './CharacterUsers.module.css';
 
 const CharacterUsers: React.FC = () => {

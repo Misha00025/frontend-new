@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { CharacterTemplate, CreateTemplateRequest, TemplateField } from '../types/characterTemplates';
-import { characterTemplatesAPI } from '../services/api';
-import buttonStyles from '../styles/components/Button.module.css';
-import inputStyles from '../styles/components/Input.module.css';
+import { CharacterTemplate, CreateTemplateRequest, TemplateField } from '../../types/characterTemplates';
+import { characterTemplatesAPI } from '../../services/api';
+import buttonStyles from '../../styles/components/Button.module.css';
+import inputStyles from '../../styles/components/Input.module.css';
 import styles from './CharacterTemplates.module.css';
 
 // Функция для генерации ключа на основе названия поля

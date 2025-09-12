@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CharacterShort } from '../types/characters';
-import { CreateCharacterRequest } from '../types/characters';
-import { CharacterTemplate } from '../types/characterTemplates';
-import { charactersAPI } from '../services/api';
-import { characterTemplatesAPI } from '../services/api';
-import buttonStyles from '../styles/components/Button.module.css';
-import inputStyles from '../styles/components/Input.module.css';
+import { CharacterShort } from '../../types/characters';
+import { CreateCharacterRequest } from '../../types/characters';
+import { CharacterTemplate } from '../../types/characterTemplates';
+import { charactersAPI } from '../../services/api';
+import { characterTemplatesAPI } from '../../services/api';
+import buttonStyles from '../../styles/components/Button.module.css';
+import inputStyles from '../../styles/components/Input.module.css';
 import styles from './Characters.module.css';
 
 const Characters: React.FC = () => {

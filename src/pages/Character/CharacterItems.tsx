@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { CharacterItem, CreateCharacterItemRequest } from '../types/characterItems';
-import { GroupItem } from '../types/groupItems';
-import { characterItemsAPI } from '../services/api';
-import { groupItemsAPI } from '../services/api';
-import buttonStyles from '../styles/components/Button.module.css';
-import inputStyles from '../styles/components/Input.module.css';
+import { CharacterItem, CreateCharacterItemRequest } from '../../types/characterItems';
+import { GroupItem } from '../../types/groupItems';
+import { characterItemsAPI } from '../../services/api';
+import { groupItemsAPI } from '../../services/api';
+import buttonStyles from '../../styles/components/Button.module.css';
+import inputStyles from '../../styles/components/Input.module.css';
 import styles from './CharacterItems.module.css';
 
 const CharacterItems: React.FC = () => {

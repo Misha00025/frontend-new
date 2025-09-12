@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { GroupUser, User } from '../types/groupUsers';
-import { groupUsersAPI } from '../services/api';
-import buttonStyles from '../styles/components/Button.module.css';
-import inputStyles from '../styles/components/Input.module.css';
+import { GroupUser, User } from '../../types/groupUsers';
+import { groupUsersAPI } from '../../services/api';
+import buttonStyles from '../../styles/components/Button.module.css';
+import inputStyles from '../../styles/components/Input.module.css';
 import styles from './GroupUsers.module.css';
 
 const GroupUsers: React.FC = () => {

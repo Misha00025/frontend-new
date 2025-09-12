@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Character as CharacterData, UpdateCharacterRequest, CharacterField } from '../types/characters';
-import { charactersAPI } from '../services/api';
-import buttonStyles from '../styles/components/Button.module.css';
-import inputStyles from '../styles/components/Input.module.css';
+import { Character as CharacterData, UpdateCharacterRequest, CharacterField } from '../../types/characters';
+import { charactersAPI } from '../../services/api';
+import buttonStyles from '../../styles/components/Button.module.css';
+import inputStyles from '../../styles/components/Input.module.css';
 import styles from './Character.module.css';
 
 // Функция для генерации ключа на основе названия поля
