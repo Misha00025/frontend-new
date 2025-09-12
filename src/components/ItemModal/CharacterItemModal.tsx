@@ -1,0 +1,217 @@
+import React, { useState, useEffect } from 'react';
+import { CharacterItem, CreateCharacterItemRequest, UpdateCharacterItemRequest } from '../../types/characterItems';
+import { GroupItem } from '../../types/groupItems';
+import buttonStyles from '../../styles/components/Button.module.css';
+import inputStyles from '../../styles/components/Input.module.css';
+import styles from './CharacterItemModal.module.css';
+
+interface CharacterItemModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (itemData: CreateCharacterItemRequest | UpdateCharacterItemRequest) => Promise<void>;
+  editingItem?: CharacterItem | null;
+  title: string;
+  groupItems: GroupItem[];
+}
+
+const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
+  isOpen,
+  onClose,
+  onSave,
+  editingItem,
+  title,
+  groupItems
+}) => {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState(1);
+  const [price, setPrice] = useState(0);
+  const [imageLink, setImageLink] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [creationMode, setCreationMode] = useState<'new' | 'existing'>('new');
+  const [selectedGroupItem, setSelectedGroupItem] = useState<GroupItem | null>(null);
+
+  // Заполняем форму данными при редактировании
+  useEffect(() => {
+    if (editingItem) {
+      setName(editingItem.name);
+      setDescription(editingItem.description);
+      setAmount(editingItem.amount);
+      setPrice(editingItem.price);
+      setImageLink(editingItem.image_link || '');
+      setCreationMode('new'); // При редактировании всегда используем режим "новый"
+    } else {
+      // Сброс формы при создании нового предмета
+      setName('');
+      setDescription('');
+      setAmount(1);
+      setPrice(0);
+      setImageLink('');
+      setSelectedGroupItem(null);
+    }
+  }, [editingItem, isOpen]);
+
+  // Обработчик выбора предмета из группы
+  const handleGroupItemSelect = (item: GroupItem) => {
+    setSelectedGroupItem(item);
+    setName(item.name);
+    setDescription(item.description);
+    setPrice(item.price);
+    setImageLink(item.image_link || '');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const itemData = {
+        name,
+        description,
+        amount,
+        price,
+        image_link: imageLink || undefined,
+      };
+
+      await onSave(itemData);
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save item');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className={styles.overlay}>
+      <div className={styles.modal}>
+        <h2>{title}</h2>
+        
+        {error && <div className={styles.error}>{error}</div>}
+        
+        {!editingItem && (
+          <div className={styles.formGroup}>
+            <label>Способ добавления:</label>
+            <div className={styles.radioGroup}>
+              <label>
+                <input
+                  type="radio"
+                  value="new"
+                  checked={creationMode === 'new'}
+                  onChange={() => setCreationMode('new')}
+                />
+                Создать новый
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="existing"
+                  checked={creationMode === 'existing'}
+                  onChange={() => setCreationMode('existing')}
+                />
+                Добавить готовый
+              </label>
+            </div>
+          </div>
+        )}
+
+        {creationMode === 'existing' && !editingItem && (
+          <div className={styles.formGroup}>
+            <label>Выберите предмет из группы:</label>
+            <select
+              value={selectedGroupItem?.id || ''}
+              onChange={(e) => {
+                const item = groupItems.find(item => item.id === parseInt(e.target.value));
+                if (item) handleGroupItemSelect(item);
+              }}
+              className={inputStyles.input}
+            >
+              <option value="">Выберите предмет</option>
+              {groupItems.map(item => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className={styles.formGroup}>
+            <label>Название:</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={inputStyles.input}
+              required
+              disabled={creationMode === 'existing' && !editingItem}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Описание:</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className={inputStyles.input}
+              rows={3}
+              required
+              disabled={creationMode === 'existing' && !editingItem}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Количество:</label>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(Number(e.target.value))}
+              className={inputStyles.input}
+              required
+              min="1"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Цена за единицу:</label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              className={inputStyles.input}
+              required
+              disabled={creationMode === 'existing' && !editingItem}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Ссылка на изображение (опционально):</label>
+            <input
+              type="text"
+              value={imageLink}
+              onChange={(e) => setImageLink(e.target.value)}
+              className={inputStyles.input}
+              disabled={creationMode === 'existing' && !editingItem}
+            />
+          </div>
+
+          <div className={styles.buttons}>
+            <button type="button" onClick={onClose} className={buttonStyles.button}>
+              Отмена
+            </button>
+            <button type="submit" className={buttonStyles.button} disabled={loading}>
+              {loading ? 'Сохранение...' : 'Сохранить'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default CharacterItemModal;
