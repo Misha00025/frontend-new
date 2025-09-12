@@ -8,7 +8,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1001; /* Выше чем основное модальное окно */
 }
 
 .modal {
@@ -16,7 +16,7 @@
   padding: 2rem;
   border-radius: var(--border-radius-md);
   width: 90%;
-  max-width: 800px;
+  max-width: 500px;
   max-height: 80vh;
   overflow-y: auto;
 }
@@ -31,51 +31,24 @@
   font-weight: bold;
 }
 
-.fieldsSection {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background-color: var(--bg-secondary);
-  border-radius: var(--border-radius-md);
-}
-
-.fieldCard {
-  border: 1px solid var(--border-color);
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: var(--border-radius-md);
-  background-color: var(--bg-primary);
-}
-
-.fieldHeader {
+.keyInputGroup {
   display: flex;
+  gap: 0.5rem;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
 }
 
-.fieldHeader h4 {
-  margin: 0;
+.keyInputGroup input {
+  flex: 1;
 }
 
-.fieldKey {
+.keyInputGroup button {
+  white-space: nowrap;
+}
+
+.helpText {
   color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.fieldDescription {
-  margin: 0.5rem 0;
-  color: var(--text-secondary);
-}
-
-.fieldValue {
-  margin: 0.5rem 0;
-  font-weight: bold;
-}
-
-.fieldActions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 }
 
 .buttons {

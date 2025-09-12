@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CharacterTemplate, CreateTemplateRequest, UpdateTemplateRequest, TemplateField } from '../../types/characterTemplates';
+import TemplateFieldModal from '../CharacterFieldModal/TemplateFieldModal';
 import buttonStyles from '../../styles/components/Button.module.css';
 import inputStyles from '../../styles/components/Input.module.css';
 import styles from './CharacterTemplateModal.module.css';
@@ -25,14 +26,8 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
   const [fieldKeys, setFieldKeys] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Функция для генерации ключа на основе названия поля
-  const generateFieldKey = (fieldName: string): string => {
-    return fieldName
-      .toLowerCase()
-      .replace(/\s+/g, '_')
-      .replace(/[^a-zа-я0-9_]/g, '');
-  };
+  const [isFieldModalOpen, setIsFieldModalOpen] = useState(false);
+  const [editingField, setEditingField] = useState<{ key: string; field: TemplateField } | null>(null);
 
   // Заполняем форму данными при редактировании
   useEffect(() => {
@@ -88,7 +83,6 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
   const addField = () => {
     const fieldKey = `field_${Date.now()}`;
     const fieldName = `Новое поле ${Object.keys(fields).length + 1}`;
-    const generatedKey = generateFieldKey(fieldName);
     
     setFields(prev => ({
       ...prev,
@@ -101,8 +95,12 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     
     setFieldKeys(prev => ({
       ...prev,
-      [fieldKey]: generatedKey,
+      [fieldKey]: fieldKey,
     }));
+
+    // Открываем модальное окно для редактирования нового поля
+    setEditingField({ key: fieldKey, field: { name: fieldName, value: 0, description: '' } });
+    setIsFieldModalOpen(true);
   };
 
   const removeField = (fieldKey: string) => {
@@ -116,161 +114,132 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     setFieldKeys(newFieldKeys);
   };
 
-  const updateField = (fieldKey: string, field: TemplateField) => {
+  const editField = (fieldKey: string) => {
+    setEditingField({ key: fieldKey, field: fields[fieldKey] });
+    setIsFieldModalOpen(true);
+  };
+
+  const handleSaveField = (field: TemplateField, fieldKey: string) => {
+    // Обновляем поле
     setFields(prev => ({
       ...prev,
-      [fieldKey]: field,
+      [editingField!.key]: field,
     }));
-  };
 
-  const updateFieldKey = (tempKey: string, newKey: string) => {
-    setFieldKeys(prev => ({
-      ...prev,
-      [tempKey]: newKey,
-    }));
-  };
-
-  const updateFieldName = (tempKey: string, newName: string) => {
-    const newFieldKeys = { ...fieldKeys };
-    
-    // Если ключ еще не задан вручную, генерируем его автоматически
-    if (!newFieldKeys[tempKey] || newFieldKeys[tempKey] === generateFieldKey(fields[tempKey].name)) {
-      newFieldKeys[tempKey] = generateFieldKey(newName);
+    // Если изменился ключ, обновляем его
+    if (fieldKey !== editingField!.key) {
+      const newFieldKeys = { ...fieldKeys };
+      newFieldKeys[fieldKey] = fieldKey;
+      
+      // Если ключ изменился, удаляем старый ключ
+      if (fieldKey !== editingField!.key) {
+        delete newFieldKeys[editingField!.key];
+        
+        // Также нужно перенести поле под новый ключ
+        const newFields = { ...fields };
+        newFields[fieldKey] = field;
+        delete newFields[editingField!.key];
+        setFields(newFields);
+      }
+      
+      setFieldKeys(newFieldKeys);
     }
-    
-    setFieldKeys(newFieldKeys);
-    
-    // Обновляем поле в fields
-    updateField(tempKey, {
-      ...fields[tempKey],
-      name: newName,
-    });
   };
 
-  const generateKeyFromName = (tempKey: string) => {
-    const fieldName = fields[tempKey]?.name || '';
-    const generatedKey = generateFieldKey(fieldName);
-    
-    setFieldKeys(prev => ({
-      ...prev,
-      [tempKey]: generatedKey,
-    }));
+  const handleCloseFieldModal = () => {
+    setIsFieldModalOpen(false);
+    setEditingField(null);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
-        <h2>{title}</h2>
-        
-        {error && <div className={styles.error}>{error}</div>}
-        
-        <form onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
-            <label>Название шаблона:</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className={inputStyles.input}
-              required
-            />
-          </div>
+    <>
+      <div className={styles.overlay}>
+        <div className={styles.modal}>
+          <h2>{title}</h2>
+          
+          {error && <div className={styles.error}>{error}</div>}
+          
+          <form onSubmit={handleSubmit}>
+            <div className={styles.formGroup}>
+              <label>Название шаблона:</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className={inputStyles.input}
+                required
+              />
+            </div>
 
-          <div className={styles.formGroup}>
-            <label>Описание шаблона:</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className={inputStyles.input}
-              rows={3}
-              required
-            />
-          </div>
+            <div className={styles.formGroup}>
+              <label>Описание шаблона:</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className={inputStyles.input}
+                rows={3}
+                required
+              />
+            </div>
 
-          <div className={styles.fieldsSection}>
-            <h3>Поля шаблона:</h3>
-            <button type="button" onClick={addField} className={buttonStyles.button}>
-              Добавить поле
-            </button>
+            <div className={styles.fieldsSection}>
+              <h3>Поля шаблона:</h3>
+              <button type="button" onClick={addField} className={buttonStyles.button}>
+                Добавить поле
+              </button>
 
-            {Object.entries(fields).map(([tempKey, field]) => (
-              <div key={tempKey} className={styles.field}>
-                <div className={styles.formGroup}>
-                  <label>Ключ поля:</label>
-                  <div className={styles.keyInputGroup}>
-                    <input
-                      type="text"
-                      value={fieldKeys[tempKey] || ''}
-                      onChange={(e) => updateFieldKey(tempKey, e.target.value)}
-                      className={inputStyles.input}
-                      placeholder="Введите ключ поля"
-                    />
+              {Object.entries(fields).map(([key, field]) => (
+                <div key={key} className={styles.fieldCard}>
+                  <div className={styles.fieldHeader}>
+                    <h4>{field.name}</h4>
+                    <span className={styles.fieldKey}>({fieldKeys[key]})</span>
+                  </div>
+                  <p className={styles.fieldDescription}>{field.description}</p>
+                  <p className={styles.fieldValue}>Значение по умолчанию: {field.value}</p>
+                  
+                  <div className={styles.fieldActions}>
                     <button 
                       type="button" 
-                      onClick={() => generateKeyFromName(tempKey)}
+                      onClick={() => editField(key)}
                       className={buttonStyles.button}
                     >
-                      Сгенерировать
+                      Настроить
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => removeField(key)}
+                      className={buttonStyles.button}
+                    >
+                      Удалить
                     </button>
                   </div>
                 </div>
+              ))}
+            </div>
 
-                <div className={styles.formGroup}>
-                  <label>Название поля:</label>
-                  <input
-                    type="text"
-                    value={field.name}
-                    onChange={(e) => updateFieldName(tempKey, e.target.value)}
-                    className={inputStyles.input}
-                    required
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label>Значение по умолчанию:</label>
-                  <input
-                    type="number"
-                    value={field.value}
-                    onChange={(e) => updateField(tempKey, { ...field, value: parseInt(e.target.value) || 0 })}
-                    className={inputStyles.input}
-                    required
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label>Описание поля:</label>
-                  <textarea
-                    value={field.description}
-                    onChange={(e) => updateField(tempKey, { ...field, description: e.target.value })}
-                    className={inputStyles.input}
-                    rows={2}
-                  />
-                </div>
-
-                <button 
-                  type="button" 
-                  onClick={() => removeField(tempKey)}
-                  className={buttonStyles.button}
-                >
-                  Удалить поле
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div className={styles.buttons}>
-            <button type="button" onClick={onClose} className={buttonStyles.button}>
-              Отмена
-            </button>
-            <button type="submit" className={buttonStyles.button} disabled={loading}>
-              {loading ? 'Сохранение...' : 'Сохранить'}
-            </button>
-          </div>
-        </form>
+            <div className={styles.buttons}>
+              <button type="button" onClick={onClose} className={buttonStyles.button}>
+                Отмена
+              </button>
+              <button type="submit" className={buttonStyles.button} disabled={loading}>
+                {loading ? 'Сохранение...' : 'Сохранить шаблон'}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+
+      <TemplateFieldModal 
+        isOpen={isFieldModalOpen}
+        onClose={handleCloseFieldModal}
+        onSave={handleSaveField}
+        field={editingField?.field || null}
+        fieldKey={editingField?.key || ''}
+        title={editingField ? 'Редактирование поля' : 'Создание поля'}
+      />
+    </>
   );
 };
 
