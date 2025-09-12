@@ -12,7 +12,7 @@ import Dashboard from './pages/Dashboard';
 import Groups from './pages/Groups';
 import GroupDashboard from './pages/Group/GroupDashboard';
 import GroupUsers from './pages/Group/GroupUsers';
-import CharacterTemplates from './pages/Character/CharacterTemplates';
+import CharacterTemplates from './pages/Group/CharacterTemplates';
 import Characters from './pages/Group/Characters';
 import Character from './pages/Character/Character';
 import CharacterUsers from './pages/Character/CharacterUsers';
