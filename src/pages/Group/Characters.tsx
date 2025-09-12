@@ -5,7 +5,7 @@ import { CreateCharacterRequest } from '../../types/characters';
 import { CharacterTemplate } from '../../types/characterTemplates';
 import { charactersAPI } from '../../services/api';
 import { characterTemplatesAPI } from '../../services/api';
-import CharacterModal from '../../components/CharacterModal/CharacterModal';
+import CharacterModal from '../../components/Modals/CharacterModal/CharacterModal';
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';

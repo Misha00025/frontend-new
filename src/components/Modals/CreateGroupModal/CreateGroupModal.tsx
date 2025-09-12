@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { CreateGroupRequest, Group } from '../../types/group';
-import { groupAPI } from '../../services/api';
-import buttonStyles from '../../styles/components/Button.module.css';
-import inputStyles from '../../styles/components/Input.module.css';
+import { CreateGroupRequest, Group } from '../../../types/group';
+import { groupAPI } from '../../../services/api';
+import buttonStyles from '../../../styles/components/Button.module.css';
+import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CreateGroupModal.module.css';
 
 interface CreateGroupModalProps {

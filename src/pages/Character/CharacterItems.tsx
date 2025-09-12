@@ -4,7 +4,7 @@ import { CharacterItem, CreateCharacterItemRequest, UpdateCharacterItemRequest }
 import { GroupItem } from '../../types/groupItems';
 import { characterItemsAPI } from '../../services/api';
 import { groupItemsAPI } from '../../services/api';
-import CharacterItemModal from '../../components/ItemModal/CharacterItemModal';
+import CharacterItemModal from '../../components/Modals/ItemModal/CharacterItemModal';
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';

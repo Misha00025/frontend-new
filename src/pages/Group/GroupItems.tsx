@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupItem } from '../../types/groupItems';
 import { groupItemsAPI } from '../../services/api';
-import GroupItemModal from '../../components/ItemModal/GroupItemModal';
+import GroupItemModal from '../../components/Modals/ItemModal/GroupItemModal';
 import ItemCard from '../../components/Cards/ItemCard';
 import List from '../../components/List/List';
 import buttonStyles from '../../styles/components/Button.module.css';

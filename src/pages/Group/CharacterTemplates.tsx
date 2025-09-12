@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterTemplate, CreateTemplateRequest, TemplateField, UpdateTemplateRequest } from '../../types/characterTemplates';
 import { characterTemplatesAPI } from '../../services/api';
-import CharacterTemplateModal from '../../components/CharacterModal/CharacterTemplateModal';
+import CharacterTemplateModal from '../../components/Modals/CharacterModal/CharacterTemplateModal';
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';

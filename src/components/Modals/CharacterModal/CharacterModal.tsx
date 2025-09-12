@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterTemplate } from '../../types/characterTemplates';
-import { CreateCharacterRequest } from '../../types/characters';
-import buttonStyles from '../../styles/components/Button.module.css';
-import inputStyles from '../../styles/components/Input.module.css';
+import { CharacterTemplate } from '../../../types/characterTemplates';
+import { CreateCharacterRequest } from '../../../types/characters';
+import buttonStyles from '../../../styles/components/Button.module.css';
+import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CharacterModal.module.css';
 
 interface CharacterModalProps {

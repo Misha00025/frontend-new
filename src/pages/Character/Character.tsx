@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Character as CharacterData, UpdateCharacterRequest, CharacterField } from '../../types/characters';
 import { charactersAPI } from '../../services/api';
-import CharacterFieldModal from '../../components/CharacterFieldModal/CharacterFieldModal';
+import CharacterFieldModal from '../../components/Modals/CharacterFieldModal/CharacterFieldModal';
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Group } from '../types/group';
 import { groupAPI } from '../services/api';
 import { useGroup } from '../contexts/GroupContext';
-import CreateGroupModal from '../components/CreateGroupModal/CreateGroupModal';
+import CreateGroupModal from '../components/Modals/CreateGroupModal/CreateGroupModal';
 import GroupCard from '../components/Cards/GroupCard';
 import List from '../components/List/List';
 import buttonStyles from '../styles/components/Button.module.css';

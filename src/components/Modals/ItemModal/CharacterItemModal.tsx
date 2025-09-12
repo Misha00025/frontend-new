@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterItem, CreateCharacterItemRequest, UpdateCharacterItemRequest } from '../../types/characterItems';
-import { GroupItem } from '../../types/groupItems';
-import buttonStyles from '../../styles/components/Button.module.css';
-import inputStyles from '../../styles/components/Input.module.css';
+import { CharacterItem, CreateCharacterItemRequest, UpdateCharacterItemRequest } from '../../../types/characterItems';
+import { GroupItem } from '../../../types/groupItems';
+import buttonStyles from '../../../styles/components/Button.module.css';
+import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CharacterItemModal.module.css';
 
 interface CharacterItemModalProps {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { GroupItem, CreateGroupItemRequest, UpdateGroupItemRequest } from '../../types/groupItems';
-import buttonStyles from '../../styles/components/Button.module.css';
-import inputStyles from '../../styles/components/Input.module.css';
+import { GroupItem, CreateGroupItemRequest, UpdateGroupItemRequest } from '../../../types/groupItems';
+import buttonStyles from '../../../styles/components/Button.module.css';
+import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './GroupItemModal.module.css';
 
 interface GroupItemModalProps {
