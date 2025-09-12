@@ -4,8 +4,10 @@ import { Group } from '../types/group';
 import { groupAPI } from '../services/api';
 import { useGroup } from '../contexts/GroupContext';
 import CreateGroupModal from '../components/CreateGroupModal/CreateGroupModal';
+import GroupCard from '../components/Cards/GroupCard';
+import List from '../components/List/List';
 import buttonStyles from '../styles/components/Button.module.css';
-import styles from './Groups.module.css';
+import commonStyles from '../styles/common.module.css';
 
 const Groups: React.FC = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -18,7 +20,7 @@ const Groups: React.FC = () => {
   useEffect(() => {
     loadGroups();
     setSelectedGroup(null);
-  }, [setSelectedGroup]);
+  }, []);
 
   const loadGroups = async () => {
     try {
@@ -38,20 +40,19 @@ const Groups: React.FC = () => {
   };
 
   const handleGroupCreated = (newGroup: Group) => {
-    // Добавляем новую группу в список и выбираем её
     setGroups(prev => [...prev, newGroup]);
     setSelectedGroup(newGroup);
     navigate(`/group/${newGroup.id}`);
   };
 
-  if (loading) return <div className={styles.container}>Загрузка...</div>;
-  if (error) return <div className={styles.container}>Ошибка: {error}</div>;
+  if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
+  if (error) return <div className={commonStyles.container}>Ошибка: {error}</div>;
 
   return (
-    <div className={styles.container}>
+    <div className={commonStyles.container}>
       <h1>Мои группы</h1>
 
-      <div className={styles.actions}>
+      <div className={commonStyles.actions}>
         <button 
           className={buttonStyles.button}
           onClick={() => setIsCreateModalOpen(true)}
@@ -60,22 +61,15 @@ const Groups: React.FC = () => {
         </button>
       </div>
 
-      <div className={styles.groupsList}>
+      <List layout="grid" gap="large">
         {groups.map(group => (
-          <div key={group.id} className={styles.groupCard}>
-            {group.icon && (
-              <img src={group.icon} alt={group.name} className={styles.groupIcon} />
-            )}
-            <h3>{group.name}</h3>
-            <button 
-              className={buttonStyles.button}
-              onClick={() => handleSelectGroup(group)}
-            >
-              Выбрать
-            </button>
-          </div>
+          <GroupCard
+            key={group.id}
+            group={group}
+            onSelect={handleSelectGroup}
+          />
         ))}
-      </div>
+      </List>
 
       <CreateGroupModal 
         isOpen={isCreateModalOpen}

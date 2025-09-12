@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { GroupItem, CreateGroupItemRequest, UpdateGroupItemRequest } from '../../types/groupItems';
+import { GroupItem } from '../../types/groupItems';
 import { groupItemsAPI } from '../../services/api';
 import GroupItemModal from '../../components/ItemModal/GroupItemModal';
+import ItemCard from '../../components/Cards/ItemCard';
+import List from '../../components/List/List';
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
-import uiStyles from '../../styles/ui.module.css';
 
 const GroupItems: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -33,12 +34,12 @@ const GroupItems: React.FC = () => {
     }
   };
 
-  const handleCreateItem = async (itemData: CreateGroupItemRequest) => {
+  const handleCreateItem = async (itemData: any) => {
     await groupItemsAPI.createItem(parseInt(groupId!), itemData);
     loadItems();
   };
 
-  const handleUpdateItem = async (itemData: UpdateGroupItemRequest) => {
+  const handleUpdateItem = async (itemData: any) => {
     if (!editingItem) return;
     await groupItemsAPI.updateItem(parseInt(groupId!), editingItem.id, itemData);
     loadItems();
@@ -82,39 +83,16 @@ const GroupItems: React.FC = () => {
         </button>
       </div>
 
-      <div className={commonStyles.list}>
-        <h2>Список предметов</h2>
-        {items.length === 0 ? (
-          <p>Предметов пока нет</p>
-        ) : (
-          items.map(item => (
-            <div key={item.id} className={uiStyles.itemCard}>
-              {item.image_link && (
-                <img src={item.image_link} alt={item.name} className={uiStyles.itemImage} />
-              )}
-              <div className={uiStyles.itemInfo}>
-                <h3>{item.name}</h3>
-                <p>{item.description}</p>
-                <p className={uiStyles.itemPrice}>Цена: {item.price}</p>
-              </div>
-              <div className={uiStyles.itemActions}>
-                <button 
-                  onClick={() => handleEditItem(item)}
-                  className={buttonStyles.button}
-                >
-                  Редактировать
-                </button>
-                <button 
-                  onClick={() => handleDeleteItem(item.id)}
-                  className={buttonStyles.button}
-                >
-                  Удалить
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      <List layout="grid" gap="small">
+        {items.map(item => (
+          <ItemCard
+            key={item.id}
+            item={item}
+            onEdit={() => handleEditItem(item)}
+            onDelete={() => handleDeleteItem(item.id)}
+          />
+        ))}
+      </List>
 
       <GroupItemModal 
         isOpen={isModalOpen}

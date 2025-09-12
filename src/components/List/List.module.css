@@ -1,0 +1,29 @@
+.list {
+  display: flex;
+}
+
+.layout-vertical {
+  flex-direction: column;
+}
+
+.layout-horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.gap-small {
+  gap: 0.5rem;
+}
+
+.gap-medium {
+  gap: 1rem;
+}
+
+.gap-large {
+  gap: 1.5rem;
+}
