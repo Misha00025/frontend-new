@@ -41,7 +41,7 @@ const CompleteRegistration: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to create profile');
     } finally {
       setLoading(false);
-      navigate('/dashboard');
+      window.location.reload();
     }
   };
 

@@ -57,8 +57,8 @@ export const useProfile = (fetchOnMount: boolean = false) => {
       }
       
       const profileData: UserProfile = await profileResponse.json();
-      setProfileNotFound(false);
       setProfile(profileData);
+      setProfileNotFound(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {

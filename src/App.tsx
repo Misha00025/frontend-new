@@ -32,6 +32,10 @@ const AppContent: React.FC = () => {
       if (profileNotFound && location.pathname !== '/complete-registration') {
         navigate('/complete-registration', { replace: true });
       }
+      else if (!profileNotFound && location.pathname === '/complete-registration')
+      {
+        navigate('/profile', { replace: true })
+      }
     }
   }, [accessToken, loading, profileNotFound, navigate, location.pathname]);
 
