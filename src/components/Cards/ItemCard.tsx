@@ -28,8 +28,10 @@ const ItemCard: React.FC<ItemCardProps> = ({
       )}
       
       <div className={styles.itemInfo}>
-        <h3 className={styles.itemName}>{item.name}</h3>
-        <p className={styles.itemDescription}>{item.description}</p>
+        <h3 className={styles.itemName} title={item.name}>{item.name}</h3>
+        <div className={styles.descriptionContainer}>
+          <p className={styles.itemDescription}>{item.description}</p>
+        </div>
         
         <div className={styles.itemDetails}>
           <span className={styles.itemText}>Цена: {item.price}</span><br/>
@@ -47,13 +49,21 @@ const ItemCard: React.FC<ItemCardProps> = ({
       {showActions && (
         <div className={styles.itemActions}>
           {onEdit && (
-            <button className={buttonStyles.button} onClick={onEdit}>
-              Редактировать
+            <button 
+              className={`${buttonStyles.button} ${styles.iconButton}`} 
+              onClick={onEdit}
+              title="Редактировать"
+            >
+              <span className={styles.editIcon}></span>
             </button>
           )}
           {onDelete && (
-            <button className={buttonStyles.button} onClick={onDelete}>
-              Удалить
+            <button 
+              className={`${buttonStyles.button} ${styles.iconButton}`} 
+              onClick={onDelete}
+              title="Удалить"
+            >
+              <span className={styles.deleteIcon}></span>
             </button>
           )}
         </div>
