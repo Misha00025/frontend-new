@@ -4,6 +4,7 @@ import TemplateFieldModal from '../CharacterFieldModal/TemplateFieldModal';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CharacterTemplateModal.module.css';
+import IconButton from '../../Buttons/IconButton';
 
 interface CharacterTemplateModalProps {
   isOpen: boolean;
@@ -36,14 +37,12 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
       setDescription(editingTemplate.description);
       setFields(editingTemplate.fields);
       
-      // Инициализируем ключи полей
       const initialFieldKeys: Record<string, string> = {};
       Object.keys(editingTemplate.fields).forEach(key => {
         initialFieldKeys[key] = key;
       });
       setFieldKeys(initialFieldKeys);
     } else {
-      // Сброс формы при создании нового шаблона
       setName('');
       setDescription('');
       setFields({});
@@ -120,22 +119,18 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
   };
 
   const handleSaveField = (field: TemplateField, fieldKey: string) => {
-    // Обновляем поле
     setFields(prev => ({
       ...prev,
       [editingField!.key]: field,
     }));
 
-    // Если изменился ключ, обновляем его
     if (fieldKey !== editingField!.key) {
       const newFieldKeys = { ...fieldKeys };
       newFieldKeys[fieldKey] = fieldKey;
       
-      // Если ключ изменился, удаляем старый ключ
       if (fieldKey !== editingField!.key) {
         delete newFieldKeys[editingField!.key];
         
-        // Также нужно перенести поле под новый ключ
         const newFields = { ...fields };
         newFields[fieldKey] = field;
         delete newFields[editingField!.key];
@@ -200,20 +195,20 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
                   <p className={styles.fieldValue}>Значение по умолчанию: {field.value}</p>
                   
                   <div className={styles.fieldActions}>
-                    <button 
-                      type="button" 
-                      onClick={() => editField(key)}
-                      className={buttonStyles.button}
-                    >
-                      Настроить
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={() => removeField(key)}
-                      className={buttonStyles.button}
-                    >
-                      Удалить
-                    </button>
+                    <IconButton 
+                      icon="edit" 
+                      onClick={()=> editField(key)}
+                      title="Редактировать"
+                      size="small"
+                      variant="primary"
+                    />
+                    <IconButton 
+                      icon="delete" 
+                      onClick={()=> removeField(key)}
+                      title="Удалить"
+                      size="small"
+                      variant="primary"
+                    />
                   </div>
                 </div>
               ))}

@@ -21,6 +21,7 @@ const IconButton: React.FC<IconButtonProps> = ({
 }) => {
   return (
     <button
+      type='button'
       className={`${buttonStyles.button} ${styles.iconButton} ${styles[size]} ${styles[variant]}`}
       onClick={onClick}
       title={title}
