@@ -12,7 +12,7 @@ export const navigationConfig: NavigationConfig = {
     { id: 'templates', label: 'Шаблоны', path: '/group/:groupId/templates', icon: '📋' },
     { id: 'characters', label: 'Персонажи', path: '/group/:groupId/characters', icon: '🎭' },
     { id: 'items', label: 'Предметы', path: '/group/:groupId/items', icon: '🎒' },
-    { id: 'notes', label: 'Заметки', path: '/group/:groupId/notes', icon: '📝' },
+    // { id: 'notes', label: 'Заметки', path: '/group/:groupId/notes', icon: '📝' },
     { id: 'back', label: 'Назад к группам', path: '/groups', icon: '←', isBackButton: true },
   ],
   character: [

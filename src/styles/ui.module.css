@@ -34,47 +34,6 @@
     gap: 0.5rem;
   }
   
-  /* Стили для карточек предметов */
-  .itemCard {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .itemImage {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: var(--border-radius-md);
-  }
-  
-  .itemInfo {
-    flex: 1;
-  }
-  
-  .itemInfo h3 {
-    margin-top: 0;
-  }
-  
-  .itemPrice {
-    font-weight: bold;
-    color: var(--accent-color);
-  }
-  
-  .itemAmount {
-    margin: 0.25rem 0;
-  }
-  
-  .itemTotalPrice {
-    font-weight: bold;
-    color: var(--accent-color);
-  }
-  
-  .itemActions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
   /* Стили для групп радиокнопок */
   .radioGroup {
     display: flex;

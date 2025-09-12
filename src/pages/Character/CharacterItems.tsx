@@ -8,6 +8,8 @@ import CharacterItemModal from '../../components/Modals/ItemModal/CharacterItemM
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';
+import ItemCard from '../../components/Cards/ItemCard';
+import List from '../../components/List/List';
 
 const CharacterItems: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -100,34 +102,17 @@ const CharacterItems: React.FC = () => {
         {items.length === 0 ? (
           <p>Предметов пока нет</p>
         ) : (
-          items.map(item => (
-            <div key={item.id} className={uiStyles.itemCard}>
-              {item.image_link && (
-                <img src={item.image_link} alt={item.name} className={uiStyles.itemImage} />
-              )}
-              <div className={uiStyles.itemInfo}>
-                <h3>{item.name}</h3>
-                <p>{item.description}</p>
-                <p className={uiStyles.itemAmount}>Количество: {item.amount}</p>
-                <p className={uiStyles.itemPrice}>Цена за единицу: {item.price}</p>
-                <p className={uiStyles.itemTotalPrice}>Общая стоимость: {item.amount * item.price}</p>
-              </div>
-              <div className={uiStyles.itemActions}>
-                <button 
-                  onClick={() => handleEditItem(item)}
-                  className={buttonStyles.button}
-                >
-                  Редактировать
-                </button>
-                <button 
-                  onClick={() => handleDeleteItem(item.id)}
-                  className={buttonStyles.button}
-                >
-                  Удалить
-                </button>
-              </div>
-            </div>
-          ))
+          <List layout="grid" gap="small">
+            {items.map(item => (
+            <ItemCard
+              key={item.id}
+              item={item}
+              onEdit={() => handleEditItem(item)}
+              onDelete={() => handleDeleteItem(item.id)}
+              showAmount={true}
+            />
+            ))}
+          </List>
         )}
       </div>
 

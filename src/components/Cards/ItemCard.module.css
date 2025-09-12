@@ -1,46 +1,37 @@
 .itemCard {
-  display: flex;
-  gap: 1rem;
-  background-color: var(--bg-secondary);
-  padding: 1.5rem;
-  border-radius: var(--border-radius-md);
-  margin-bottom: 1.5rem;
-}
+    display: flex;
+    gap: 1rem;
+    background-color: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: var(--border-radius-md);
+  }
+  
+  .itemImage {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: var(--border-radius-md);
+  }
+  
+  .itemInfo {
+    flex: 1;
+  }
+  
+  .itemInfo h3 {
+    margin-top: 0;
+  }
 
-.itemImage {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: var(--border-radius-md);
-}
+  .itemText {
+    font-weight: bold;
+  }
 
-.itemInfo {
-  flex: 1;
-}
-
-.itemInfo h3 {
-  margin-top: 0;
-}
-
-.itemAmount, .itemPrice, .itemTotalPrice {
-  margin: 0.25rem 0;
-}
-
-.itemTotalPrice {
-  font-weight: bold;
-  color: var(--accent-color);
-}
-
-.itemActions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.error {
-  color: red;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  background-color: #ffeeee;
-  border-radius: var(--border-radius-sm);
-}
+  .itemAccent {
+    font-weight: bold;
+    color: var(--accent-color);
+  }
+  
+  .itemActions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }

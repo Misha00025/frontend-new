@@ -32,14 +32,14 @@ const ItemCard: React.FC<ItemCardProps> = ({
         <p className={styles.itemDescription}>{item.description}</p>
         
         <div className={styles.itemDetails}>
-          <span className={styles.itemPrice}>Цена: {item.price}</span>
+          <span className={styles.itemText}>Цена: {item.price}</span><br/>
           {showAmount && isCharacterItem && (
-            <span className={styles.itemAmount}>Количество: {item.amount}</span>
+            <div><span className={styles.itemText}>Количество: {item.amount}</span></div>
           )}
           {showAmount && isCharacterItem && (
-            <span className={styles.itemTotal}>
+            <div><span className={styles.itemAccent}>
               Общая стоимость: {item.amount * item.price}
-            </span>
+            </span></div>
           )}
         </div>
       </div>
