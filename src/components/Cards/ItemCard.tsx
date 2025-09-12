@@ -1,7 +1,7 @@
 import React from 'react';
 import { GroupItem } from '../../types/groupItems';
 import { CharacterItem } from '../../types/characterItems';
-import buttonStyles from '../../styles/components/Button.module.css';
+import IconButton from '../Buttons/IconButton';
 import styles from './ItemCard.module.css';
 
 interface ItemCardProps {
@@ -49,22 +49,22 @@ const ItemCard: React.FC<ItemCardProps> = ({
       {showActions && (
         <div className={styles.itemActions}>
           {onEdit && (
-            <button 
-              className={`${buttonStyles.button} ${styles.iconButton}`} 
+            <IconButton 
+              icon="edit" 
               onClick={onEdit}
               title="Редактировать"
-            >
-              <span className={styles.editIcon}></span>
-            </button>
+              size="small"
+              variant="primary"
+            />
           )}
           {onDelete && (
-            <button 
-              className={`${buttonStyles.button} ${styles.iconButton}`} 
+            <IconButton 
+              icon="delete" 
               onClick={onDelete}
               title="Удалить"
-            >
-              <span className={styles.deleteIcon}></span>
-            </button>
+              size="small"
+              variant="danger"
+            />
           )}
         </div>
       )}
