@@ -6,6 +6,7 @@ import buttonStyles from '../../styles/components/Button.module.css';
 import inputStyles from '../../styles/components/Input.module.css';
 import styles from '../../styles/common.module.css';
 import stylesUi from '../../styles/ui.module.css';
+import { useActionPermissions } from '../../hooks/useActionPermissions';
 
 const GroupUsers: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -15,6 +16,7 @@ const GroupUsers: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const { canManageGroupUsers } = useActionPermissions();
 
   useEffect(() => {
     if (groupId) {
@@ -79,44 +81,46 @@ const GroupUsers: React.FC = () => {
       {error && <div className={styles.error}>{error}</div>}
       {success && <div className={styles.success}>{success}</div>}
 
-      <div className={styles.section}>
-        <h2>Добавить пользователя</h2>
-        <div className={styles.searchBox}>
-          <input
-            type="text"
-            placeholder="Введите никнейм пользователя"
-            value={searchNickname}
-            onChange={(e) => setSearchNickname(e.target.value)}
-            className={inputStyles.input}
-          />
-          <button onClick={handleSearch} className={buttonStyles.button}>
-            Поиск
-          </button>
-        </div>
-
-        {searchResults.length > 0 && (
-          <div className={stylesUi.searchResults}>
-            <h3>Результаты поиска:</h3>
-            {searchResults.map(user => (
-              <div key={user.id} className={stylesUi.userCard}>
-                <img src={user.imageLink || '/default-avatar.png'} alt={user.nickname} className={styles.avatar} />
-                <div className={stylesUi.userInfo}>
-                  <h4>{user.visibleName}</h4>
-                  <p>@{user.nickname}</p>
-                </div>
-                <div className={stylesUi.actions}>
-                  <button onClick={() => handleAddUser(user, false)} className={buttonStyles.button}>
-                    Добавить
-                  </button>
-                  <button onClick={() => handleAddUser(user, true)} className={buttonStyles.button}>
-                    Добавить как администратора
-                  </button>
-                </div>
-              </div>
-            ))}
+      {canManageGroupUsers && (
+        <div className={styles.section}>
+          <h2>Добавить пользователя</h2>
+          <div className={styles.searchBox}>
+            <input
+              type="text"
+              placeholder="Введите никнейм пользователя"
+              value={searchNickname}
+              onChange={(e) => setSearchNickname(e.target.value)}
+              className={inputStyles.input}
+            />
+              <button onClick={handleSearch} className={buttonStyles.button}>
+                Поиск
+              </button>
           </div>
-        )}
-      </div>
+          
+          {searchResults.length > 0 && (
+            <div className={stylesUi.searchResults}>
+              <h3>Результаты поиска:</h3>
+              {searchResults.map(user => (
+                <div key={user.id} className={stylesUi.userCard}>
+                  <img src={user.imageLink || '/default-avatar.png'} alt={user.nickname} className={styles.avatar} />
+                  <div className={stylesUi.userInfo}>
+                    <h4>{user.visibleName}</h4>
+                    <p>@{user.nickname}</p>
+                  </div>
+                  <div className={stylesUi.actions}>
+                    <button onClick={() => handleAddUser(user, false)} className={buttonStyles.button}>
+                      Добавить
+                    </button>
+                    <button onClick={() => handleAddUser(user, true)} className={buttonStyles.button}>
+                      Добавить как администратора
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className={styles.section}>
         <h2>Пользователи группы</h2>
@@ -131,14 +135,16 @@ const GroupUsers: React.FC = () => {
                   <h4>{groupUser.user.visibleName}</h4>
                   <p>@{groupUser.user.nickname} {groupUser.isAdmin && '(Администратор)'}</p>
                 </div>
-                <div className={stylesUi.actions}>
-                  <button 
-                    onClick={() => handleRemoveUser(groupUser.user.id)} 
-                    className={buttonStyles.button}
-                  >
-                    Удалить
-                  </button>
-                </div>
+                {canManageGroupUsers && (
+                  <div className={stylesUi.actions}>
+                    <button 
+                      onClick={() => handleRemoveUser(groupUser.user.id)} 
+                      className={buttonStyles.button}
+                    >
+                      Удалить
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>

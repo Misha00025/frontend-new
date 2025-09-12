@@ -8,6 +8,7 @@ import buttonStyles from '../../styles/components/Button.module.css';
 import inputStyles from '../../styles/components/Input.module.css';
 import styles from '../../styles/common.module.css';
 import stylesUi from '../../styles/ui.module.css';
+import { useActionPermissions } from '../../hooks/useActionPermissions';
 
 const CharacterUsers: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -17,6 +18,7 @@ const CharacterUsers: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const { canManageCharacterUsers } = useActionPermissions();
 
   useEffect(() => {
     if (groupId && characterId) {
@@ -80,46 +82,46 @@ const CharacterUsers: React.FC = () => {
 
       {error && <div className={styles.error}>{error}</div>}
       {success && <div className={styles.success}>{success}</div>}
-
-      <div className={styles.section}>
-        <h2>Добавить игрока</h2>
-        <div className={styles.searchBox}>
-          <input
-            type="text"
-            placeholder="Введите никнейм пользователя"
-            value={searchNickname}
-            onChange={(e) => setSearchNickname(e.target.value)}
-            className={inputStyles.input}
-          />
-          <button onClick={handleSearch} className={buttonStyles.button}>
-            Поиск
-          </button>
-        </div>
-
-        {searchResults.length > 0 && (
-          <div className={styles.searchResults}>
-            <h3>Результаты поиска:</h3>
-            {searchResults.map(user => (
-              <div key={user.id} className={stylesUi.userCard}>
-                <img src={user.imageLink || '/default-avatar.png'} alt={user.nickname} className={stylesUi.avatar} />
-                <div className={stylesUi.userInfo}>
-                  <h4>{user.visibleName}</h4>
-                  <p>@{user.nickname}</p>
-                </div>
-                <div className={stylesUi.actions}>
-                  <button onClick={() => handleAddUser(user, false)} className={buttonStyles.button}>
-                    Добавить (чтение)
-                  </button>
-                  <button onClick={() => handleAddUser(user, true)} className={buttonStyles.button}>
-                    Добавить (редактирование)
-                  </button>
-                </div>
-              </div>
-            ))}
+      {canManageCharacterUsers && (
+        <div className={styles.section}>
+          <h2>Добавить игрока</h2>
+          <div className={styles.searchBox}>
+            <input
+              type="text"
+              placeholder="Введите никнейм пользователя"
+              value={searchNickname}
+              onChange={(e) => setSearchNickname(e.target.value)}
+              className={inputStyles.input}
+            />
+            <button onClick={handleSearch} className={buttonStyles.button}>
+              Поиск
+            </button>
           </div>
-        )}
-      </div>
 
+          {searchResults.length > 0 && (
+            <div className={styles.searchResults}>
+              <h3>Результаты поиска:</h3>
+              {searchResults.map(user => (
+                <div key={user.id} className={stylesUi.userCard}>
+                  <img src={user.imageLink || '/default-avatar.png'} alt={user.nickname} className={stylesUi.avatar} />
+                  <div className={stylesUi.userInfo}>
+                    <h4>{user.visibleName}</h4>
+                    <p>@{user.nickname}</p>
+                  </div>
+                  <div className={stylesUi.actions}>
+                    <button onClick={() => handleAddUser(user, false)} className={buttonStyles.button}>
+                      Добавить (чтение)
+                    </button>
+                    <button onClick={() => handleAddUser(user, true)} className={buttonStyles.button}>
+                      Добавить (редактирование)
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       <div className={styles.section}>
         <h2>Игроки персонажа</h2>
         {characterUsers.length === 0 ? (
@@ -133,14 +135,16 @@ const CharacterUsers: React.FC = () => {
                   <h4>{characterUser.user.visibleName}</h4>
                   <p>@{characterUser.user.nickname} {characterUser.canWrite ? '(Редактор)' : '(Читатель)'}</p>
                 </div>
-                <div className={stylesUi.actions}>
-                  <button 
-                    onClick={() => handleRemoveUser(characterUser.user.id)} 
-                    className={buttonStyles.button}
-                  >
-                    Удалить
-                  </button>
-                </div>
+                {canManageCharacterUsers && (
+                  <div className={stylesUi.actions}>
+                    <button 
+                      onClick={() => handleRemoveUser(characterUser.user.id)} 
+                      className={buttonStyles.button}
+                    >
+                      Удалить
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>

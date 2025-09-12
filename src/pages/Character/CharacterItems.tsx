@@ -10,6 +10,7 @@ import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';
 import ItemCard from '../../components/Cards/ItemCard';
 import List from '../../components/List/List';
+import { useActionPermissions } from '../../hooks/useActionPermissions';
 
 const CharacterItems: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -19,6 +20,7 @@ const CharacterItems: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<CharacterItem | null>(null);
+  const { canEditThisCharacter } = useActionPermissions();
 
   useEffect(() => {
     if (groupId && characterId) {
@@ -87,16 +89,16 @@ const CharacterItems: React.FC = () => {
       <h1>Предметы персонажа</h1>
 
       {error && <div className={commonStyles.error}>{error}</div>}
-
-      <div className={commonStyles.actions}>
-        <button 
-          className={buttonStyles.button}
-          onClick={() => setIsModalOpen(true)}
-        >
-          Добавить предмет
-        </button>
-      </div>
-
+      {canEditThisCharacter && (
+        <div className={commonStyles.actions}>
+          <button 
+            className={buttonStyles.button}
+            onClick={() => setIsModalOpen(true)}
+          >
+            Добавить предмет
+          </button>
+        </div>
+      )}
       <div className={commonStyles.list}>
         <h2>Список предметов</h2>
         {items.length === 0 ? (
@@ -110,6 +112,7 @@ const CharacterItems: React.FC = () => {
               onEdit={() => handleEditItem(item)}
               onDelete={() => handleDeleteItem(item.id)}
               showAmount={true}
+              showActions={canEditThisCharacter}
             />
             ))}
           </List>

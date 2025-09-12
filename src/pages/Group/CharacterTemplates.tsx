@@ -8,6 +8,7 @@ import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';
 import List from '../../components/List/List';
 import TemplateCard from '../../components/Cards/TemplateCard';
+import { useActionPermissions } from '../../hooks/useActionPermissions';
 
 const CharacterTemplates: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -16,6 +17,7 @@ const CharacterTemplates: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<CharacterTemplate | null>(null);
+  const { canEditTemplates } = useActionPermissions();
 
   useEffect(() => {
     if (groupId) {
@@ -74,23 +76,24 @@ const CharacterTemplates: React.FC = () => {
       <h1>Шаблоны персонажей</h1>
 
       {error && <div className={commonStyles.error}>{error}</div>}
-
-      <div className={commonStyles.actions}>
-        <button 
-          className={buttonStyles.button}
-          onClick={() => setIsModalOpen(true)}
-        >
-          Создать шаблон
-        </button>
-      </div>
-
+      {canEditTemplates && (
+        <div className={commonStyles.actions}>
+          <button 
+            className={buttonStyles.button}
+            onClick={() => setIsModalOpen(true)}
+          >
+            Создать шаблон
+          </button>
+        </div>
+      )}  
       <List layout="grid" gap="large">
         {templates.map(template => (
           <TemplateCard
             key={template.id}
             template={template}
-            onEdit={() => handleEditTemplate(template)}
-            onDelete={() => handleDeleteTemplate(template.id)}
+            onEdit={canEditTemplates ? () => handleEditTemplate(template) : () => undefined}
+            onDelete={canEditTemplates ? () => handleDeleteTemplate(template.id) : () => undefined}
+            showActions={canEditTemplates}
           />
         ))}
       </List>

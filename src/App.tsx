@@ -20,6 +20,7 @@ import CharacterItems from './pages/Character/CharacterItems';
 import GroupItems from './pages/Group/GroupItems';
 import Profile from './pages/Profile';
 import './styles/globals.css';
+import { PermissionsProvider } from './contexts/PermissionsContext';
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
@@ -82,7 +83,9 @@ const App: React.FC = () => {
       <AuthProvider>
         <GroupProvider>
           <Router>
-            <AppContent />
+            <PermissionsProvider>
+              <AppContent />
+            </PermissionsProvider>
           </Router>
         </GroupProvider>
       </AuthProvider>

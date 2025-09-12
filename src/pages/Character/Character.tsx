@@ -6,6 +6,7 @@ import CharacterFieldModal from '../../components/Modals/CharacterFieldModal/Cha
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';
+import { useActionPermissions } from '../../hooks/useActionPermissions';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -16,6 +17,7 @@ const Character: React.FC = () => {
   const [isFieldModalOpen, setIsFieldModalOpen] = useState(false);
   const [editingField, setEditingField] = useState<{ key: string; field: CharacterField } | null>(null);
   const [isAddingField, setIsAddingField] = useState(false);
+  const { canDeleteThisCharacter, canEditThisCharacter } = useActionPermissions();
 
   useEffect(() => {
     if (groupId && characterId) {
@@ -135,22 +137,24 @@ const Character: React.FC = () => {
       <p>{character.description}</p>
 
       {error && <div className={commonStyles.error}>{error}</div>}
-
-      <div className={commonStyles.actions}>
-        <button 
-          className={buttonStyles.button}
-          onClick={handleAddField}
-        >
-          Добавить поле
-        </button>
-        <button 
-          className={buttonStyles.button}
-          onClick={handleDeleteCharacter}
-        >
-          Удалить персонажа
-        </button>
-      </div>
-
+      {canEditThisCharacter && (
+        <div className={commonStyles.actions}>
+          <button 
+            className={buttonStyles.button}
+            onClick={handleAddField}
+          >
+            Добавить поле
+          </button>
+          { canDeleteThisCharacter && (
+            <button 
+              className={buttonStyles.button}
+              onClick={handleDeleteCharacter}
+            >
+              Удалить персонажа
+            </button>
+          )}
+        </div>
+      )}
       <div className={uiStyles.fields}>
         <h2>Поля персонажа</h2>
         {Object.entries(character.fields).map(([key, field]) => (
@@ -163,21 +167,22 @@ const Character: React.FC = () => {
             <div className={uiStyles.fieldValue}>
               <strong>Значение:</strong> {field.value}
             </div>
-            
-            <div className={uiStyles.fieldActions}>
-              <button 
-                onClick={() => handleEditField(key, field)}
-                className={buttonStyles.button}
-              >
-                Редактировать
-              </button>
-              <button 
-                onClick={() => handleDeleteField(key)}
-                className={buttonStyles.button}
-              >
-                Удалить
-              </button>
-            </div>
+            {canEditThisCharacter && (
+              <div className={uiStyles.fieldActions}>
+                <button 
+                  onClick={() => handleEditField(key, field)}
+                  className={buttonStyles.button}
+                >
+                  Редактировать
+                </button>
+                <button 
+                  onClick={() => handleDeleteField(key)}
+                  className={buttonStyles.button}
+                >
+                  Удалить
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

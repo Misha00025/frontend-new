@@ -11,6 +11,7 @@ import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';
 import List from '../../components/List/List';
 import CharacterCard from '../../components/Cards/CharacterCard';
+import { useActionPermissions } from '../../hooks/useActionPermissions';
 
 const Characters: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -20,6 +21,7 @@ const Characters: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { canEditGroup } = useActionPermissions();
 
   useEffect(() => {
     if (groupId) {
@@ -70,22 +72,22 @@ const Characters: React.FC = () => {
       <h1>Персонажи группы</h1>
 
       {error && <div className={commonStyles.error}>{error}</div>}
-
-      <div className={commonStyles.actions}>
-        <button 
-          className={buttonStyles.button}
-          onClick={() => setIsModalOpen(true)}
-          disabled={templates.length === 0}
-        >
-          Создать персонажа
-        </button>
-        {templates.length === 0 && (
-          <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-            Для создания персонажа сначала создайте хотя бы один шаблон
-          </p>
-        )}
-      </div>
-
+      {canEditGroup && (
+        <div className={commonStyles.actions}>
+          <button 
+            className={buttonStyles.button}
+            onClick={() => setIsModalOpen(true)}
+            disabled={templates.length === 0}
+          >
+            Создать персонажа
+          </button>
+          {templates.length === 0 && (
+            <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+              Для создания персонажа сначала создайте хотя бы один шаблон
+            </p>
+          )}
+        </div>
+      )}
       <List layout="grid" gap="large">
         {characters.map(character => (
           <CharacterCard

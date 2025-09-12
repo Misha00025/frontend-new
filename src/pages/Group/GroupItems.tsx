@@ -7,6 +7,7 @@ import ItemCard from '../../components/Cards/ItemCard';
 import List from '../../components/List/List';
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
+import { useActionPermissions } from '../../hooks/useActionPermissions';
 
 const GroupItems: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -15,6 +16,7 @@ const GroupItems: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<GroupItem | null>(null);
+  const { canEditItems } = useActionPermissions();
 
   useEffect(() => {
     if (groupId) {
@@ -74,33 +76,38 @@ const GroupItems: React.FC = () => {
 
       {error && <div className={commonStyles.error}>{error}</div>}
 
-      <div className={commonStyles.actions}>
-        <button 
-          className={buttonStyles.button}
-          onClick={() => setIsModalOpen(true)}
-        >
-          Создать предмет
-        </button>
-      </div>
+      {canEditItems && (
+        <div className={commonStyles.actions}>
+          <button 
+            className={buttonStyles.button}
+            onClick={() => setIsModalOpen(true)}
+          >
+            Создать предмет
+          </button>
+        </div>
+      )}
 
-      <List layout="grid" gap="small">
+      <List layout="grid" gap="medium">
         {items.map(item => (
           <ItemCard
             key={item.id}
             item={item}
-            onEdit={() => handleEditItem(item)}
-            onDelete={() => handleDeleteItem(item.id)}
+            onEdit={canEditItems ? () => handleEditItem(item) : undefined}
+            onDelete={canEditItems ? () => handleDeleteItem(item.id) : undefined}
+            showActions={canEditItems}
           />
         ))}
       </List>
 
-      <GroupItemModal 
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={editingItem ? handleUpdateItem : handleCreateItem}
-        editingItem={editingItem}
-        title={editingItem ? 'Редактирование предмета' : 'Создание предмета'}
-      />
+      {canEditItems && (
+        <GroupItemModal 
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSave={editingItem ? handleUpdateItem : handleCreateItem}
+          editingItem={editingItem}
+          title={editingItem ? 'Редактирование предмета' : 'Создание предмета'}
+        />
+      )}
     </div>
   );
 };
