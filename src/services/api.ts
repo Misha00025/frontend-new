@@ -27,6 +27,7 @@ import {
   CreateCharacterItemRequest,
   UpdateCharacterItemRequest
 } from '../types/characterItems';
+import { useAuth } from '../contexts/AuthContext';
 
 
 const API_BASE = 'https://thedun.ru';
@@ -66,8 +67,25 @@ export const authAPI = {
   },
 };
 
-export const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
+// Флаг для отслеживания процесса обновления токена
+let isRefreshing = false;
+// Очередь запросов, которые нужно повторить после обновления токена
+let failedQueue: Array<{ resolve: (value?: any) => void; reject: (reason?: any) => void }> = [];
+
+const processQueue = (error: any = null) => {
+  failedQueue.forEach(promise => {
+    if (error) {
+      promise.reject(error);
+    } else {
+      promise.resolve();
+    }
+  });
+  failedQueue = [];
+};
+
+export const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
   const accessToken = storage.getAccessToken();
+  const refreshToken = storage.getRefreshToken();
   
   // Добавляем токен в заголовки, если он есть
   const headers = {
@@ -76,12 +94,56 @@ export const makeAuthenticatedRequest = async (endpoint: string, options: Reques
     ...(accessToken ? { 'Authorization': accessToken } : {}),
   };
   
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
-  });
-  
-  return response;
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers,
+    });
+    
+    // Если получили 401 и есть refreshToken, пытаемся обновить токен
+    if (response.status === 401 && refreshToken && !isRefreshing) {
+      isRefreshing = true;
+      
+      try {
+        // Пытаемся обновить токен
+        const refreshData = await authAPI.refresh(refreshToken);
+        const newAccessToken = refreshData.accessToken;
+        
+        // Сохраняем новый accessToken
+        storage.setAccessToken(newAccessToken);
+        
+        // Обновляем заголовки с новым токеном
+        const newHeaders = {
+          ...headers,
+          'Authorization': newAccessToken,
+        };
+        
+        // Повторяем исходный запрос с новым токеном
+        const retryResponse = await fetch(`${API_BASE}${endpoint}`, {
+          ...options,
+          headers: newHeaders,
+        });
+        
+        isRefreshing = false;
+        processQueue(); // Успешно обрабатываем очередь
+        
+        return retryResponse;
+      } catch (refreshError) {
+        isRefreshing = false;
+        processQueue(refreshError); // Обрабатываем очередь с ошибкой
+        
+        // Если не удалось обновить токен, делаем logout
+        storage.clearTokens();
+        window.location.reload();
+        
+        throw new Error('Session expired. Please login again.');
+      }
+    }
+    
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Отдельная функция для обработки обновления токена
