@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterTemplate, CreateTemplateRequest, UpdateTemplateRequest, TemplateField } from '../../../types/characterTemplates';
+import { CharacterTemplate, CreateTemplateRequest, UpdateTemplateRequest, TemplateField, TemplateCategory, TemplateSchema } from '../../../types/characterTemplates';
 import TemplateFieldModal from '../CharacterFieldModal/TemplateFieldModal';
+import CategoryModal from './CategoryModal';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CharacterTemplateModal.module.css';
@@ -24,29 +25,26 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [fields, setFields] = useState<Record<string, TemplateField>>({});
-  const [fieldKeys, setFieldKeys] = useState<Record<string, string>>({});
+  const [schema, setSchema] = useState<TemplateSchema>({ categories: [] });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isFieldModalOpen, setIsFieldModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingField, setEditingField] = useState<{ key: string; field: TemplateField } | null>(null);
+  const [editingCategory, setEditingCategory] = useState<TemplateCategory | null>(null);
+  const [selectedCategoryForField, setSelectedCategoryForField] = useState<Record<string, string>>({});
 
-  // Заполняем форму данными при редактировании
   useEffect(() => {
     if (editingTemplate) {
       setName(editingTemplate.name);
       setDescription(editingTemplate.description);
       setFields(editingTemplate.fields);
-      
-      const initialFieldKeys: Record<string, string> = {};
-      Object.keys(editingTemplate.fields).forEach(key => {
-        initialFieldKeys[key] = key;
-      });
-      setFieldKeys(initialFieldKeys);
+      setSchema(editingTemplate.schema || { categories: [] });
     } else {
       setName('');
       setDescription('');
       setFields({});
-      setFieldKeys({});
+      setSchema({ categories: [] });
     }
   }, [editingTemplate, isOpen]);
 
@@ -56,18 +54,11 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     setError(null);
 
     try {
-      // Преобразуем поля с использованием правильных ключей
-      const fieldsWithCorrectKeys: Record<string, TemplateField> = {};
-      
-      Object.entries(fields).forEach(([tempKey, field]) => {
-        const finalKey = fieldKeys[tempKey] || tempKey;
-        fieldsWithCorrectKeys[finalKey] = field;
-      });
-
       const templateData = {
         name,
         description,
-        fields: fieldsWithCorrectKeys,
+        fields,
+        schema
       };
 
       await onSave(templateData);
@@ -79,38 +70,43 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     }
   };
 
-  const addField = () => {
+  const addField = (categoryKey?: string) => {
     const fieldKey = `field_${Date.now()}`;
     const fieldName = `Новое поле ${Object.keys(fields).length + 1}`;
     
-    setFields(prev => ({
-      ...prev,
-      [fieldKey]: {
-        name: fieldName,
-        value: 0,
-        description: '',
-      },
-    }));
-    
-    setFieldKeys(prev => ({
-      ...prev,
-      [fieldKey]: fieldKey,
-    }));
+    const newField = {
+      name: fieldName,
+      value: 0,
+      description: '',
+    };
 
-    // Открываем модальное окно для редактирования нового поля
-    setEditingField({ key: fieldKey, field: { name: fieldName, value: 0, description: '' } });
+    setFields(prev => ({ ...prev, [fieldKey]: newField }));
+
+    if (categoryKey && categoryKey !== 'other') {
+      setSchema(prev => ({
+        categories: prev.categories.map(category => 
+          category.key === categoryKey
+            ? { ...category, fields: [...category.fields, fieldKey] }
+            : category
+        )
+      }));
+    }
+
+    setEditingField({ key: fieldKey, field: newField });
     setIsFieldModalOpen(true);
   };
 
   const removeField = (fieldKey: string) => {
     const newFields = { ...fields };
-    const newFieldKeys = { ...fieldKeys };
-    
     delete newFields[fieldKey];
-    delete newFieldKeys[fieldKey];
-    
     setFields(newFields);
-    setFieldKeys(newFieldKeys);
+
+    setSchema(prev => ({
+      categories: prev.categories.map(category => ({
+        ...category,
+        fields: category.fields.filter(f => f !== fieldKey)
+      }))
+    }));
   };
 
   const editField = (fieldKey: string) => {
@@ -119,31 +115,79 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
   };
 
   const handleSaveField = (field: TemplateField, fieldKey: string) => {
-    setFields(prev => ({
-      ...prev,
-      [editingField!.key]: field,
-    }));
-
+    const newFields = { ...fields };
+    
     if (fieldKey !== editingField!.key) {
-      const newFieldKeys = { ...fieldKeys };
-      newFieldKeys[fieldKey] = fieldKey;
-      
-      if (fieldKey !== editingField!.key) {
-        delete newFieldKeys[editingField!.key];
-        
-        const newFields = { ...fields };
-        newFields[fieldKey] = field;
-        delete newFields[editingField!.key];
-        setFields(newFields);
-      }
-      
-      setFieldKeys(newFieldKeys);
+      delete newFields[editingField!.key];
+      newFields[fieldKey] = field;
+
+      setSchema(prev => ({
+        categories: prev.categories.map(category => ({
+          ...category,
+          fields: category.fields.map(f => f === editingField!.key ? fieldKey : f)
+        }))
+      }));
+    } else {
+      newFields[fieldKey] = field;
+    }
+
+    setFields(newFields);
+  };
+
+  const addCategory = () => {
+    setEditingCategory(null);
+    setIsCategoryModalOpen(true);
+  };
+
+  const editCategory = (category: TemplateCategory) => {
+    setEditingCategory(category);
+    setIsCategoryModalOpen(true);
+  };
+
+  const removeCategory = (categoryKey: string) => {
+    setSchema(prev => ({
+      categories: prev.categories.filter(category => category.key !== categoryKey)
+    }));
+  };
+
+  const handleSaveCategory = (category: TemplateCategory) => {
+    if (editingCategory) {
+      setSchema(prev => ({
+        categories: prev.categories.map(c => 
+          c.key === editingCategory.key ? category : c
+        )
+      }));
+    } else {
+      setSchema(prev => ({
+        categories: [...prev.categories, category]
+      }));
+    }
+    setIsCategoryModalOpen(false);
+  };
+
+  const moveFieldToCategory = (fieldKey: string, categoryKey: string) => {
+    if (categoryKey === 'other') {
+      setSchema(prev => ({
+        categories: prev.categories.map(category => ({
+          ...category,
+          fields: category.fields.filter(f => f !== fieldKey)
+        }))
+      }));
+    } else {
+      setSchema(prev => ({
+        categories: prev.categories.map(category => 
+          category.key === categoryKey
+            ? { ...category, fields: [...category.fields, fieldKey] }
+            : { ...category, fields: category.fields.filter(f => f !== fieldKey) }
+        )
+      }));
     }
   };
 
-  const handleCloseFieldModal = () => {
-    setIsFieldModalOpen(false);
-    setEditingField(null);
+  const getUncategorizedFields = () => {
+    const allFieldKeys = new Set(Object.keys(fields));
+    const categorizedFields = new Set(schema.categories.flatMap(c => c.fields));
+    return Array.from(allFieldKeys).filter(key => !categorizedFields.has(key));
   };
 
   if (!isOpen) return null;
@@ -180,38 +224,136 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
             </div>
 
             <div className={styles.fieldsSection}>
-              <h3>Поля шаблона:</h3>
-              <button type="button" onClick={addField} className={buttonStyles.button}>
-                Добавить поле
+              <h3>Категории полей:</h3>
+              <button type="button" onClick={addCategory} className={buttonStyles.button}>
+                Добавить категорию
               </button>
 
-              {Object.entries(fields).map(([key, field]) => (
-                <div key={key} className={styles.fieldCard}>
-                  <div className={styles.fieldHeader}>
-                    <h4>{field.name}</h4>
-                    <span className={styles.fieldKey}>({fieldKeys[key]})</span>
+              {schema.categories.map(category => (
+                <div key={category.key} className={styles.categoryCard}>
+                  <div className={styles.categoryHeader}>
+                    <h4>{category.name}</h4>
+                    <div className={styles.categoryActions}>
+                      <IconButton 
+                        icon="edit" 
+                        onClick={() => editCategory(category)}
+                        title="Редактировать категорию"
+                        size="small"
+                        variant="primary"
+                      />
+                      <IconButton 
+                        icon="delete" 
+                        onClick={() => removeCategory(category.key)}
+                        title="Удалить категорию"
+                        size="small"
+                        variant="primary"
+                      />
+                    </div>
                   </div>
-                  <p className={styles.fieldDescription}>{field.description}</p>
-                  <p className={styles.fieldValue}>Значение по умолчанию: {field.value}</p>
                   
-                  <div className={styles.fieldActions}>
-                    <IconButton 
-                      icon="edit" 
-                      onClick={()=> editField(key)}
-                      title="Редактировать"
-                      size="small"
-                      variant="primary"
-                    />
-                    <IconButton 
-                      icon="delete" 
-                      onClick={()=> removeField(key)}
-                      title="Удалить"
-                      size="small"
-                      variant="primary"
-                    />
-                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => addField(category.key)}
+                    className={buttonStyles.button}
+                  >
+                    Добавить поле в категорию
+                  </button>
+
+                  {category.fields.map(fieldKey => (
+                    <div key={fieldKey} className={styles.fieldCard}>
+                      <div className={styles.fieldHeader}>
+                        <h4>{fields[fieldKey]?.name || 'Unknown Field'}</h4>
+                        <span className={styles.fieldKey}>({fieldKey})</span>
+                      </div>
+                      <p className={styles.fieldDescription}>{fields[fieldKey]?.description}</p>
+                      <p className={styles.fieldValue}>Значение по умолчанию: {fields[fieldKey]?.value}</p>
+                      
+                      <div className={styles.fieldActions}>
+                        <IconButton 
+                          icon="edit" 
+                          onClick={() => editField(fieldKey)}
+                          title="Редактировать"
+                          size="small"
+                          variant="primary"
+                        />
+                        <IconButton 
+                          icon="delete" 
+                          onClick={() => removeField(fieldKey)}
+                          title="Удалить"
+                          size="small"
+                          variant="primary"
+                        />
+                        <select
+                          value={selectedCategoryForField[fieldKey] || ''}
+                          onChange={(e) => {
+                            setSelectedCategoryForField(prev => ({ ...prev, [fieldKey]: e.target.value }));
+                            moveFieldToCategory(fieldKey, e.target.value);
+                          }}
+                          className={inputStyles.input}
+                        >
+                          <option value="">Переместить в...</option>
+                          <option value="other">Другое</option>
+                          {schema.categories.filter(c => c.key !== category.key).map(c => (
+                            <option key={c.key} value={c.key}>{c.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ))}
+
+              <div className={styles.categoryCard}>
+                <h4>Другое</h4>
+                <button 
+                  type="button" 
+                  onClick={() => addField()}
+                  className={buttonStyles.button}
+                >
+                  Добавить поле
+                </button>
+
+                {getUncategorizedFields().map(fieldKey => (
+                  <div key={fieldKey} className={styles.fieldCard}>
+                    <div className={styles.fieldHeader}>
+                      <h4>{fields[fieldKey]?.name || 'Unknown Field'}</h4>
+                      <span className={styles.fieldKey}>({fieldKey})</span>
+                    </div>
+                    <p className={styles.fieldDescription}>{fields[fieldKey]?.description}</p>
+                    <p className={styles.fieldValue}>Значение по умолчанию: {fields[fieldKey]?.value}</p>
+                    
+                    <div className={styles.fieldActions}>
+                      <IconButton 
+                        icon="edit" 
+                        onClick={() => editField(fieldKey)}
+                        title="Редактировать"
+                        size="small"
+                        variant="primary"
+                      />
+                      <IconButton 
+                        icon="delete" 
+                        onClick={() => removeField(fieldKey)}
+                        title="Удалить"
+                        size="small"
+                        variant="primary"
+                      />
+                      <select
+                        value={selectedCategoryForField[fieldKey] || ''}
+                        onChange={(e) => {
+                          setSelectedCategoryForField(prev => ({ ...prev, [fieldKey]: e.target.value }));
+                          moveFieldToCategory(fieldKey, e.target.value);
+                        }}
+                        className={inputStyles.input}
+                      >
+                        <option value="">Переместить в категорию...</option>
+                        {schema.categories.map(c => (
+                          <option key={c.key} value={c.key}>{c.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className={styles.buttons}>
@@ -228,11 +370,19 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
 
       <TemplateFieldModal 
         isOpen={isFieldModalOpen}
-        onClose={handleCloseFieldModal}
+        onClose={() => setIsFieldModalOpen(false)}
         onSave={handleSaveField}
         field={editingField?.field || null}
         fieldKey={editingField?.key || ''}
         title={editingField ? 'Редактирование поля' : 'Создание поля'}
+      />
+
+      <CategoryModal 
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        onSave={handleSaveCategory}
+        category={editingCategory}
+        title={editingCategory ? 'Редактирование категории' : 'Создание категории'}
       />
     </>
   );

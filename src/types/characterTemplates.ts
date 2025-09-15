@@ -2,6 +2,7 @@ export interface TemplateField {
     name: string;
     value: number;
     description: string;
+    category?: string;
   }
   
   export interface TemplateGroup {
@@ -10,12 +11,23 @@ export interface TemplateField {
     icon: string | null;
   }
   
+  export interface TemplateCategory {
+    key: string;
+    name: string;
+    fields: string[];
+  }
+
+  export interface TemplateSchema {
+    categories: TemplateCategory[];
+  }
+
   export interface CharacterTemplate {
     id: number;
     name: string;
     description: string;
     fields: Record<string, TemplateField>;
     group: TemplateGroup;
+    schema: TemplateSchema;
   }
   
   export interface CharacterTemplatesResponse {
