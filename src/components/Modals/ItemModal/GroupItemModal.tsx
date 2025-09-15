@@ -21,7 +21,7 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState<number | ''>(0);
   const [imageLink, setImageLink] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,10 +37,34 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
       // Сброс формы при создании нового предмета
       setName('');
       setDescription('');
-      setPrice(0);
+      setPrice('');
       setImageLink('');
     }
   }, [editingItem, isOpen]);
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+      setPrice('');
+    } else {
+      const numValue = Number(value);
+      if (!isNaN(numValue)) {
+        setPrice(numValue);
+      }
+    }
+  };
+
+  const handlePriceBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+      setPrice(0);
+    } else {
+      const numValue = Number(value);
+      if (!isNaN(numValue)) {
+        setPrice(numValue);
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +75,7 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
       const itemData = {
         name,
         description,
-        price,
+        price: price === '' ? 0 : price,
         image_link: imageLink || undefined,
       };
 
@@ -101,14 +125,15 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
             <input
               type="number"
               value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
+              onChange={handlePriceChange}
+              onBlur={handlePriceBlur}
               className={inputStyles.input}
               required
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label>Ссылка на изображение (опционально):</label>
+            <label>Ссылка на изображение (в разработке):</label>
             <input
               type="text"
               value={imageLink}

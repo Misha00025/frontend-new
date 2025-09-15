@@ -24,8 +24,8 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState(1);
-  const [price, setPrice] = useState(0);
+  const [amount, setAmount] = useState<number | ''>(1);
+  const [price, setPrice] = useState<number | ''>(0);
   const [imageLink, setImageLink] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +52,57 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
     }
   }, [editingItem, isOpen]);
 
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      if (value === '') {
+        setPrice('');
+      } else {
+        const numValue = Number(value);
+        if (!isNaN(numValue)) {
+          setPrice(numValue);
+        }
+      }
+    };
+  
+  const handlePriceBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+      setPrice(0);
+    } else {
+      const numValue = Number(value);
+      if (!isNaN(numValue)) {
+        setPrice(numValue);
+      }
+    }
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '') {
+      setAmount('');
+    } else {
+      const numValue = Number(value);
+      if (!isNaN(numValue)) {
+        setAmount(numValue);
+      }
+    }
+  };
+
+const handleAmountBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  if (value === '') {
+    setAmount(1);
+  } else if (amount !== '' && amount < 0) {
+    setAmount(0)
+  } else {
+    
+    const numValue = Number(value);
+    if (!isNaN(numValue)) {
+      setAmount(numValue);
+    }
+  }
+};
+
   // Обработчик выбора предмета из группы
   const handleGroupItemSelect = (item: GroupItem) => {
     setSelectedGroupItem(item);
@@ -70,8 +121,8 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
       const itemData = {
         name,
         description,
-        amount,
-        price,
+        amount: amount === '' ? 1 : amount < 0 ? 0 : amount,
+        price: price === '' ? 0 : price,
         image_link: imageLink || undefined,
       };
 
@@ -170,7 +221,8 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
             <input
               type="number"
               value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
+              onChange={handleAmountChange}
+              onBlur={handleAmountBlur}
               className={inputStyles.input}
               required
               min="1"
@@ -182,7 +234,8 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
             <input
               type="number"
               value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
+              onChange={handlePriceChange}
+              onBlur={handlePriceBlur}
               className={inputStyles.input}
               required
               disabled={creationMode === 'existing' && !editingItem}
@@ -190,7 +243,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
           </div>
 
           <div className={styles.formGroup}>
-            <label>Ссылка на изображение (опционально):</label>
+            <label>Ссылка на изображение (в разработке):</label>
             <input
               type="text"
               value={imageLink}

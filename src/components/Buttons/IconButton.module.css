@@ -27,20 +27,20 @@
 }
 
 .iconButton.primary {
-  background-color: var(--primary-color);
-  color: white;
-  border: 1px solid var(--primary-color);
+  background-color: var(--accent-color);
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
 }
 
 .iconButton.secondary {
   background-color: transparent;
-  color: var(--text-color);
+  color: var(--accent-color);
   border: 1px solid var(--border-color);
 }
 
 .iconButton.danger {
   background-color: var(--danger-color);
-  color: white;
+  color: var(--accent-color);
   border: 1px solid var(--danger-color);
 }
 

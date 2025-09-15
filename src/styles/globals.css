@@ -14,6 +14,7 @@
     --text-secondary: #666666;
     --accent-color: #00158f;
     --border-color: #dddddd;
+    --danger-color: #f80b0b;
   }
   
   /* Тёмная тема */
@@ -24,6 +25,7 @@
     --text-secondary: #cccccc;
     --accent-color: #4aa334;
     --border-color: #444444;
+    --danger-color: #c00000;
   }
   
   /* Базовые стили */
