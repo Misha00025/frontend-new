@@ -92,8 +92,8 @@ const handleAmountBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
   const value = e.target.value;
   if (value === '') {
     setAmount(1);
-  } else if (amount !== '' && amount < 0) {
-    setAmount(0)
+  } else if (amount !== '' && amount <= 0) {
+    setAmount(1)
   } else {
     
     const numValue = Number(value);
