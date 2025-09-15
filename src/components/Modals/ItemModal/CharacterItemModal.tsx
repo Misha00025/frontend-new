@@ -92,8 +92,8 @@ const handleAmountBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
   const value = e.target.value;
   if (value === '') {
     setAmount(1);
-  } else if (amount !== '' && amount <= 0) {
-    setAmount(1)
+  } else if (amount !== '' && amount < 0) {
+    setAmount(0)
   } else {
     
     const numValue = Number(value);
@@ -225,7 +225,7 @@ const handleAmountBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
               onBlur={handleAmountBlur}
               className={inputStyles.input}
               required
-              min="1"
+              min="0"
             />
           </div>
 
