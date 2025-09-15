@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CharacterField } from '../../../types/characters';
+import { TemplateCategory } from '../../../types/characterTemplates';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CharacterFieldModal.module.css';
@@ -12,6 +13,7 @@ interface CharacterFieldModalProps {
   fieldKey: string;
   title: string;
   isKeyEditable?: boolean;
+  categories?: TemplateCategory[]; // Добавляем опциональный пропс для категорий
 }
 
 const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
@@ -21,12 +23,14 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
   field,
   fieldKey,
   title,
-  isKeyEditable = true
+  isKeyEditable = true,
+  categories = [] // Значение по умолчанию - пустой массив
 }) => {
   const [name, setName] = useState('');
   const [value, setValue] = useState(0);
   const [description, setDescription] = useState('');
   const [key, setKey] = useState('');
+  const [category, setCategory] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   // Заполняем форму данными при открытии
@@ -36,12 +40,14 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
       setValue(field.value);
       setDescription(field.description || '');
       setKey(fieldKey);
+      setCategory(field.category || '');
     } else {
       // Сброс формы при создании нового поля
       setName('');
       setValue(0);
       setDescription('');
       setKey('');
+      setCategory('');
     }
   }, [field, fieldKey, isOpen]);
 
@@ -63,6 +69,11 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
       value,
       description,
     };
+
+    // Добавляем категорию, если она выбрана
+    if (category) {
+      fieldData.category = category;
+    }
 
     onSave(fieldData, key);
     onClose();
@@ -126,6 +137,23 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
               rows={3}
             />
           </div>
+
+          {/* Поле выбора категории, только если есть категории */}
+          {categories.length > 0 && (
+            <div className={styles.formGroup}>
+              <label>Категория:</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className={inputStyles.input}
+              >
+                <option value="">Без категории</option>
+                {categories.map(cat => (
+                  <option key={cat.key} value={cat.key}>{cat.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className={styles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>

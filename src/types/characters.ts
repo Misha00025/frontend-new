@@ -14,12 +14,14 @@ export interface CharacterShort {
       name: string;
       icon: string | null;
     };
+    templateId: number;
   }
   
   export interface CharacterField {
     name: string;
     value: number;
     description: string;
+    category?: string;
   }
   
   export interface CreateCharacterRequest {

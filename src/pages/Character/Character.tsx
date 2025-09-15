@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Character as CharacterData, UpdateCharacterRequest, CharacterField } from '../../types/characters';
-import { charactersAPI } from '../../services/api';
+import { charactersAPI, characterTemplatesAPI } from '../../services/api';
 import CharacterFieldModal from '../../components/Modals/CharacterFieldModal/CharacterFieldModal';
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
+import { CharacterTemplate, TemplateCategory } from '../../types/characterTemplates';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
   const navigate = useNavigate();
   const [character, setCharacter] = useState<CharacterData | null>(null);
+  const [template, setTemplate] = useState<CharacterTemplate | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isFieldModalOpen, setIsFieldModalOpen] = useState(false);
@@ -30,11 +32,56 @@ const Character: React.FC = () => {
       setLoading(true);
       const characterData = await charactersAPI.getCharacter(parseInt(groupId!), parseInt(characterId!));
       setCharacter(characterData);
+      if (characterData.templateId) {
+        try {
+          const templateData = await characterTemplatesAPI.getTemplate(
+            parseInt(groupId!), 
+            characterData.templateId
+          );
+          setTemplate(templateData);
+        } catch (err) {
+          console.error('Failed to load template:', err);
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load character');
     } finally {
       setLoading(false);
     }
+  };
+
+  const getFieldsByCategory = () => {
+    if (!template && character) return { uncategorized: Object.entries(character.fields) };
+    if (!template || !character) return {};
+    const categorizedFields: Record<string, [string, CharacterField][]> = {};
+    template.schema.categories.forEach(category => {
+      categorizedFields[category.key] = [];
+    });
+    categorizedFields.other = [];
+    Object.entries(character.fields).forEach(([key, field]) => {
+      let foundCategory = false;
+      for (const category of template.schema.categories) {
+        if (category.fields.includes(key)) {
+          categorizedFields[category.key].push([key, field]);
+          foundCategory = true;
+          break;
+        }
+      }
+      if (!foundCategory && field.category) {
+        for (const category of template.schema.categories) {
+          if (category.key === field.category) {
+            categorizedFields[category.key].push([key, field]);
+            foundCategory = true;
+            break;
+          }
+        }
+      }
+      if (!foundCategory) {
+        categorizedFields.other.push([key, field]);
+      }
+    });
+    
+    return categorizedFields;
   };
 
   const handleSaveField = async (field: CharacterField, fieldKey: string) => {
@@ -97,6 +144,34 @@ const Character: React.FC = () => {
     }
   };
 
+  const handleChangeFieldCategory = async (fieldKey: string, newCategory: string) => {
+    if (!character) return;
+
+    try {
+      const field = character.fields[fieldKey];
+      const updatedField = {
+        ...field,
+        category: newCategory === 'other' ? undefined : newCategory
+      };
+
+      const updateData: UpdateCharacterRequest = {
+        fields: {
+          [fieldKey]: updatedField
+        }
+      };
+
+      const updatedCharacter = await charactersAPI.updateCharacter(
+        parseInt(groupId!), 
+        parseInt(characterId!), 
+        updateData
+      );
+      
+      setCharacter(updatedCharacter);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update field category');
+    }
+  };
+
   const handleEditField = (fieldKey: string, field: CharacterField) => {
     setEditingField({ key: fieldKey, field });
     setIsAddingField(false);
@@ -131,6 +206,8 @@ const Character: React.FC = () => {
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
   if (!character) return <div className={commonStyles.container}>Персонаж не найден</div>;
 
+  const categorizedFields = getFieldsByCategory();
+
   return (
     <div className={commonStyles.container}>
       <h1>{character.name}</h1>
@@ -155,36 +232,99 @@ const Character: React.FC = () => {
           )}
         </div>
       )}
+      
       <div className={uiStyles.fields}>
         <h2>Поля персонажа</h2>
-        {Object.entries(character.fields).map(([key, field]) => (
-          <div key={key} className={uiStyles.fieldCard}>
-            <div className={uiStyles.fieldHeader}>
-              <h3>{field.name}</h3>
-              <span className={uiStyles.fieldKey}>({key})</span>
-            </div>
-            {field.description && <p className={uiStyles.fieldDescription}>{field.description}</p>}
-            <div className={uiStyles.fieldValue}>
-              <strong>Значение:</strong> {field.value}
-            </div>
-            {canEditThisCharacter && (
-              <div className={uiStyles.fieldActions}>
-                <button 
-                  onClick={() => handleEditField(key, field)}
-                  className={buttonStyles.button}
-                >
-                  Редактировать
-                </button>
-                <button 
-                  onClick={() => handleDeleteField(key)}
-                  className={buttonStyles.button}
-                >
-                  Удалить
-                </button>
+        
+        {/* Отображаем поля по категориям из шаблона */}
+        {template && template.schema.categories.map(category => (
+          <div key={category.key} className={uiStyles.categorySection}>
+            <h3>{category.name}</h3>
+            {categorizedFields[category.key]?.map(([key, field]) => (
+              <div key={key} className={uiStyles.fieldCard}>
+                <div className={uiStyles.fieldHeader}>
+                  <h4>{field.name}</h4>
+                  <span className={uiStyles.fieldKey}>({key})</span>
+                </div>
+                {field.description && <p className={uiStyles.fieldDescription}>{field.description}</p>}
+                <div className={uiStyles.fieldValue}>
+                  <strong>Значение:</strong> {field.value}
+                </div>
+                {canEditThisCharacter && (
+                  <div className={uiStyles.fieldActions}>
+                    <button 
+                      onClick={() => handleEditField(key, field)}
+                      className={buttonStyles.button}
+                    >
+                      Редактировать
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteField(key)}
+                      className={buttonStyles.button}
+                    >
+                      Удалить
+                    </button>
+                    <select
+                      value={field.category || 'other'}
+                      onChange={(e) => handleChangeFieldCategory(key, e.target.value)}
+                      className={buttonStyles.button}
+                    >
+                      <option value="other">Другое</option>
+                      {template.schema.categories.map(cat => (
+                        <option key={cat.key} value={cat.key}>{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
         ))}
+        
+        {/* Отображаем поля без категории (Другое) */}
+        <div className={uiStyles.categorySection}>
+          <h3>Другое</h3>
+          {categorizedFields.other?.map(([key, field]) => (
+            <div key={key} className={uiStyles.fieldCard}>
+              <div className={uiStyles.fieldHeader}>
+                <h4>{field.name}</h4>
+                <span className={uiStyles.fieldKey}>({key})</span>
+              </div>
+              {field.description && <p className={uiStyles.fieldDescription}>{field.description}</p>}
+              <div className={uiStyles.fieldValue}>
+                <strong>Значение:</strong> {field.value}
+              </div>
+              {canEditThisCharacter && (
+                <div className={uiStyles.fieldActions}>
+                  <button 
+                    onClick={() => handleEditField(key, field)}
+                    className={buttonStyles.button}
+                  >
+                    Редактировать
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteField(key)}
+                    className={buttonStyles.button}
+                  >
+                    Удалить
+                  </button>
+                  {template && (
+                    <select
+                      value={field.category || 'other'}
+                      onChange={(e) => handleChangeFieldCategory(key, e.target.value)}
+                      className={buttonStyles.button}
+                    >
+                      <option value="other">Другое</option>
+                      {template.schema.categories.map(category => (
+                        <option key={category.key} value={category.key}>{category.name}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       <CharacterFieldModal 
@@ -194,7 +334,8 @@ const Character: React.FC = () => {
         field={editingField?.field || null}
         fieldKey={editingField?.key || ''}
         title={editingField ? 'Редактирование поля' : 'Добавление поля'}
-        isKeyEditable={!editingField} // Разрешаем редактирование ключа только при создании нового поля
+        isKeyEditable={!editingField}
+        categories={template?.schema.categories || []} // Передаем категории в модальное окно
       />
     </div>
   );

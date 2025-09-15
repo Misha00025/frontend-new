@@ -253,6 +253,14 @@ export const characterTemplatesAPI = {
     return data.templates;
   },
 
+  getTemplate: async (groupId: number, templateId: number): Promise<CharacterTemplate> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates/${templateId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch template');
+    }
+    return response.json();
+  },
+
   createTemplate: async (groupId: number, templateData: CreateTemplateRequest): Promise<CharacterTemplate> => {
     const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates`, {
       method: 'POST',
