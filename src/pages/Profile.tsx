@@ -1,9 +1,13 @@
 import React, { useEffect } from 'react';
 import { useProfile } from '../hooks/useProfile';
+import buttonStyles from '../styles/components/Button.module.css';
 import styles from '../styles/common.module.css';
+import { useAuth } from '../contexts/AuthContext';
 
 const Profile: React.FC = () => {
   const { profile, loading, error, fetchProfile } = useProfile();
+  const { logout } = useAuth();
+  
 
   useEffect(() => {
     fetchProfile();
@@ -28,6 +32,11 @@ const Profile: React.FC = () => {
             <p><strong>ID:</strong> {profile.id}</p>
             <p><strong>Никнейм:</strong> {profile.nickname}</p>
             <p><strong>Видимое имя:</strong> {profile.visibleName}</p>
+          </div>
+          <div className={styles.footer}>
+            <button className={buttonStyles.button} onClick={logout}>
+              Выйти
+            </button>
           </div>
         </div>
       )}
