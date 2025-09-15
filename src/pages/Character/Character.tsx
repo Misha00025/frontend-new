@@ -214,17 +214,19 @@ const Character: React.FC = () => {
       {error && <div className={commonStyles.error}>{error}</div>}
       {canEditThisCharacter && (
         <div className={commonStyles.actions}>
-          <IconButton
-            icon='edit'
-            title='Редактировать'
+          <button 
+            className={buttonStyles.button}
             onClick={handleAddField}
-          />
+          >
+            Добавить поле
+          </button>
           { canDeleteThisCharacter && (
-            <IconButton 
-              icon='delete'
-              title='Удалить'
+            <button 
+              className={buttonStyles.button}
               onClick={handleDeleteCharacter}
-            />
+            >
+              Удалить персонажа
+            </button>
           )}
         </div>
       )}
