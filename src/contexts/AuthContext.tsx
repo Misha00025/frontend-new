@@ -1,7 +1,7 @@
 // src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { AuthResponse, RefreshResponse } from '../types/auth';
-import { authAPI } from '../services/api';
+import { authAPI, makeAuthenticatedRequest } from '../services/api';
 import { storage } from '../utils/storage';
 
 interface AuthContextType {
@@ -16,6 +16,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+
 
   useEffect(() => {
     const savedAccessToken = storage.getAccessToken();
@@ -55,6 +57,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const refreshData: RefreshResponse = await authAPI.refresh(loginData.token);
       setAccessToken(refreshData.accessToken);
       storage.setAccessToken(refreshData.accessToken);
+      const whoamiResponse = await makeAuthenticatedRequest('/api/whoami');
+      if (whoamiResponse.ok) {
+        const whoamiData = await whoamiResponse.json();
+        setUserId(whoamiData.id);
+        localStorage.setItem('userId', whoamiData.id.toString());
+      }
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -73,7 +81,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = () => {
     setAccessToken(null);
+    setUserId(null);
     storage.clearTokens();
+    localStorage.removeItem('userId');
   };
 
   return (
