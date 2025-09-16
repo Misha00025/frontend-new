@@ -58,6 +58,7 @@ const FieldCard: React.FC<FieldCardProps> = ({
               title='Удалить'
               icon='delete'
               onClick={() => onDelete(fieldKey)}
+              variant='danger'
             />
           </div>
         </div>

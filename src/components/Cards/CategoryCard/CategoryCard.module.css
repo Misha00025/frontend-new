@@ -1,10 +1,23 @@
 .categorySection {
-    margin-bottom: 2rem;
-  }
-  
-  .categorySection h3 {
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.5rem;
-  }
+  margin-bottom: 2rem;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.categoryHeader h3 {
+  margin: 0;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  flex-grow: 1;
+}
+
+.sortButton {
+  margin-left: 1rem;
+  flex-shrink: 0;
+}

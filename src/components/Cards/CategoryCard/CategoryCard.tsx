@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { CharacterField } from '../../../types/characters';
 import { CharacterTemplate } from '../../../types/characterTemplates';
 import List from '../../List/List';
 import FieldCard from '../FieldCard/FieldCard';
+import IconButton from '../../Buttons/IconButton';
 import styles from './CategoryCard.module.css';
 
 interface CategoryCardProps {
@@ -15,6 +16,8 @@ interface CategoryCardProps {
   onChangeCategory: (fieldKey: string, newCategory: string) => void;
 }
 
+type SortOrder = 'none' | 'asc' | 'desc';
+
 const CategoryCard: React.FC<CategoryCardProps> = ({
   title,
   fields,
@@ -24,13 +27,57 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
   onDelete,
   onChangeCategory
 }) => {
+  const [sortOrder, setSortOrder] = useState<SortOrder>('none');
+  
+  const sortedFields = useMemo(() => {
+    if (sortOrder === 'none') return fields;
+    
+    return [...fields].sort((a, b) => {
+      const valueA = a[1].value?.toString().toLowerCase() || '';
+      const valueB = b[1].value?.toString().toLowerCase() || '';
+      
+      if (sortOrder === 'asc') {
+        return valueA.localeCompare(valueB);
+      } else {
+        return valueB.localeCompare(valueA);
+      }
+    });
+  }, [fields, sortOrder]);
+
+  const handleSortToggle = () => {
+    setSortOrder(prev => {
+      if (prev === 'none') return 'desc';
+      if (prev === 'desc') return 'asc';
+      return 'none';
+    });
+  };
+
+  const getSortIcon = () => {
+    if (sortOrder === 'none') return 'sort';
+    if (sortOrder === 'asc') return 'sort-up';
+    return 'sort-down';
+  };
+
+  const getSortTitle = () => {
+    if (sortOrder === 'none') return 'Сортировать по значению';
+    if (sortOrder === 'asc') return 'Сортировка по возрастанию';
+    return 'Сортировка по убыванию';
+  };
+
   if (fields.length === 0) return null;
 
   return (
     <div className={styles.categorySection}>
-      <h3>{title}</h3>
+      <div className={styles.categoryHeader}>
+        <h3>{title}</h3>
+        <IconButton
+          icon={getSortIcon()}
+          title={getSortTitle()}
+          onClick={handleSortToggle}
+        />
+      </div>
       <List layout="grid" gap="medium">
-        {fields.map(([key, field]) => (
+        {sortedFields.map(([key, field]) => (
           <FieldCard
             key={key}
             fieldKey={key}
