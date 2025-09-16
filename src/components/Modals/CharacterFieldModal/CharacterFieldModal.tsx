@@ -5,6 +5,13 @@ import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CharacterFieldModal.module.css';
 
+const generateFieldKey = (fieldName: string): string => {
+  return fieldName
+    .toLowerCase()
+    .replace(/\s+/g, '_')
+    .replace(/[^a-zа-я0-9_]/g, '');
+};
+
 interface CharacterFieldModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -27,7 +34,7 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
   categories = [] // Значение по умолчанию - пустой массив
 }) => {
   const [name, setName] = useState('');
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState<number | ''>('');
   const [description, setDescription] = useState('');
   const [key, setKey] = useState('');
   const [category, setCategory] = useState('');
@@ -43,10 +50,11 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
       setCategory(field.category || '');
     } else {
       // Сброс формы при создании нового поля
-      setName('');
+      const newName = 'Новое поле'
+      setName(newName);
       setValue(0);
       setDescription('');
-      setKey('');
+      setKey(generateFieldKey(newName));
       setCategory('');
     }
   }, [field, fieldKey, isOpen]);
@@ -66,7 +74,7 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
 
     const fieldData: CharacterField = {
       name,
-      value,
+      value: value === ''? 0 : value,
       description,
     };
 
@@ -95,10 +103,10 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
               <input
                 type="text"
                 value={key}
-                onChange={(e) => setKey(e.target.value)}
+                onChange={(e) => {setKey(e.target.value)}}
                 className={inputStyles.input}
                 required
-                disabled={!isKeyEditable}
+                disabled={true}
               />
               <small className={styles.helpText}>
                 Ключ используется в системе (только латинские буквы, цифры и _)
@@ -111,7 +119,7 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {setName(e.target.value); if (isKeyEditable) setKey(generateFieldKey(e.target.value))}}
               className={inputStyles.input}
               required
             />
@@ -122,7 +130,8 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
             <input
               type="number"
               value={value}
-              onChange={(e) => setValue(Number(e.target.value))}
+              onChange={(e) => setValue(e.target.value === ''? '' : Number(e.target.value))}
+              onBlur={(e) => setValue(e.target.value === ''? 0 : Number(e.target.value))}
               className={inputStyles.input}
               required
             />

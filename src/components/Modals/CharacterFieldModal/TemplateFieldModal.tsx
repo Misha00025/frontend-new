@@ -22,7 +22,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
   title
 }) => {
   const [name, setName] = useState('');
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState<number | ''>(0);
   const [description, setDescription] = useState('');
   const [key, setKey] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +66,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
 
     const fieldData: TemplateField = {
       name,
-      value,
+      value: value === ''? 0 : value,
       description,
     };
 
@@ -94,7 +94,8 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
             <input
               type="text"
               value={name}
-              onChange={(e) => { setName(e.target.value) }}
+              onChange={(e) => { setName(e.target.value); setKey(generateFieldKey(e.target.value)) }}
+              onBlur={handleGenerateKey}
               className={inputStyles.input}
               required
             />
@@ -128,7 +129,8 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
             <input
               type="number"
               value={value}
-              onChange={(e) => setValue(Number(e.target.value))}
+              onChange={(e) => setValue(e.target.value === ''? '' : Number(e.target.value))}
+              onBlur={(e) => setValue(e.target.value === ''? 0 : Number(e.target.value))}
               className={inputStyles.input}
               required
             />
