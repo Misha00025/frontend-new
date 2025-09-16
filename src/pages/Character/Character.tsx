@@ -54,24 +54,18 @@ const Character: React.FC = () => {
   };
 
   const getFieldsByCategory = () => {
-    if (!template && character) return { uncategorized: Object.entries(character.fields) };
+    
     if (!template || !character) return {};
     
-    const categorizedFields: Record<string, [string, CharacterField][]> = {};
-    
-    // Инициализируем категории из шаблона
+    const categorizedFields: Record<string, [string, CharacterField, boolean][]> = {};
     template.schema.categories.forEach(category => {
       categorizedFields[category.key] = [];
     });
-    
-    // Добавляем категорию для полей без категории
     categorizedFields.other = [];
-    
-    // Сначала добавляем поля, которые явно указаны в шаблоне
     template.schema.categories.forEach(category => {
       category.fields.forEach(fieldKey => {
         if (character.fields[fieldKey]) {
-          categorizedFields[category.key].push([fieldKey, character.fields[fieldKey]]);
+          categorizedFields[category.key].push([fieldKey, character.fields[fieldKey], true]);
         }
       });
     });
@@ -87,9 +81,9 @@ const Character: React.FC = () => {
       
       if (alreadyAdded) return;
       if (field.category && categorizedFields[field.category]) {
-        categorizedFields[field.category].push([key, field]);
+        categorizedFields[field.category].push([key, field, false]);
       } else {
-        categorizedFields.other.push([key, field]);
+        categorizedFields.other.push([key, field, false]);
       }
     });
     

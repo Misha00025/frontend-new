@@ -8,7 +8,7 @@ import styles from './CategoryCard.module.css';
 
 interface CategoryCardProps {
   title: string;
-  fields: [string, CharacterField][];
+  fields: [string, CharacterField, boolean][];
   canEdit: boolean;
   template?: CharacterTemplate | null;
   onEdit: (fieldKey: string, field: CharacterField) => void;
@@ -77,12 +77,13 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         />
       </div>
       <List layout="grid" gap="medium">
-        {sortedFields.map(([key, field]) => (
+        {sortedFields.map(([key, field, isStatic]) => (
           <FieldCard
             key={key}
             fieldKey={key}
             field={field}
             canEdit={canEdit}
+            canEditCategory = {!isStatic && canEdit}
             template={template}
             onEdit={onEdit}
             onDelete={onDelete}

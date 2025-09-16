@@ -8,6 +8,7 @@ interface FieldCardProps {
   fieldKey: string;
   field: CharacterField;
   canEdit: boolean;
+  canEditCategory?: boolean;
   template?: CharacterTemplate | null;
   onEdit: (fieldKey: string, field: CharacterField) => void;
   onDelete: (fieldKey: string) => void;
@@ -18,6 +19,7 @@ const FieldCard: React.FC<FieldCardProps> = ({
   fieldKey,
   field,
   canEdit,
+  canEditCategory = canEdit,
   template,
   onEdit,
   onDelete,
@@ -36,7 +38,7 @@ const FieldCard: React.FC<FieldCardProps> = ({
       {canEdit && (
         
         <div>
-          {template && (
+          {template && canEditCategory && (
             <select
               value={field.category || 'other'}
               onChange={(e) => onChangeCategory(fieldKey, e.target.value)}
