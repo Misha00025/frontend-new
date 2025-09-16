@@ -8,9 +8,9 @@ import commonStyles from '../../styles/common.module.css';
 import uiStyles from './Character.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import { CharacterTemplate, TemplateCategory } from '../../types/characterTemplates';
-import IconButton from '../../components/Buttons/IconButton';
 import List from '../../components/List/List';
 import CategoryCard from '../../components/Cards/CategoryCard/CategoryCard';
+import CharacterTableView from '../../components/Views/CharacterTableView/CharacterTableView';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -23,6 +23,7 @@ const Character: React.FC = () => {
   const [editingField, setEditingField] = useState<{ key: string; field: CharacterField } | null>(null);
   const [isAddingField, setIsAddingField] = useState(false);
   const { canDeleteThisCharacter, canEditThisCharacter } = useActionPermissions();
+  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
 
   useEffect(() => {
     if (groupId && characterId) {
@@ -192,6 +193,34 @@ const Character: React.FC = () => {
     setIsAddingField(false);
   };
 
+  const handleUpdateFieldValue = async (fieldKey: string, newValue: string) => {
+    if (!character) return;
+  
+    try {
+      const field = character.fields[fieldKey];
+      const updatedField = {
+        ...field,
+        value: Number(newValue)
+      };
+  
+      const updateData: UpdateCharacterRequest = {
+        fields: {
+          [fieldKey]: updatedField
+        }
+      };
+  
+      const updatedCharacter = await charactersAPI.updateCharacter(
+        parseInt(groupId!), 
+        parseInt(characterId!), 
+        updateData
+      );
+      console.log(updatedCharacter)
+      setCharacter(updatedCharacter);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update field value');
+    }
+  };
+
   const handleDeleteCharacter = async () => {
     if (!groupId || !characterId) return;
 
@@ -209,6 +238,14 @@ const Character: React.FC = () => {
   if (!character) return <div className={commonStyles.container}>Персонаж не найден</div>;
 
   const categorizedFields = getFieldsByCategory();
+
+  const categoryNames: Record<string, string> = {};
+  if (template) {
+    template.schema.categories.forEach(category => {
+      categoryNames[category.key] = category.name;
+    });
+  }
+  categoryNames.other = "Другое";
 
   return (
     <div className={commonStyles.container}>
@@ -236,32 +273,59 @@ const Character: React.FC = () => {
       )}
       
       <div className={uiStyles.fields}>
-        <h2>Поля персонажа</h2>
-        <List layout='vertical' gap='small'>
-          {/* Отображаем поля по категориям из шаблона */}
-          {template && template.schema.categories.map(category => (
+        <List layout='horizontal'>
+          <h2>Поля персонажа</h2>
+          <div className={uiStyles.viewSwitcher}>
+            <button 
+              className={`${uiStyles.viewButton} ${viewMode === 'card' ? uiStyles.active : ''}`}
+              onClick={() => setViewMode('card')}
+              title="Карточный вид"
+            >
+              📋
+            </button>
+            <button 
+              className={`${uiStyles.viewButton} ${viewMode === 'table' ? uiStyles.active : ''}`}
+              onClick={() => setViewMode('table')}
+              title="Табличный вид"
+            >
+              📊
+            </button>
+          </div>
+        </List>
+        {viewMode === 'card' ? (
+          <List layout='vertical' gap='small'>
+            {/* Отображаем поля по категориям из шаблона */}
+            {template && template.schema.categories.map(category => (
+              <CategoryCard
+                key={category.key}
+                title={category.name}
+                fields={categorizedFields[category.key] || []}
+                canEdit={canEditThisCharacter}
+                template={template}
+                onEdit={handleEditField}
+                onDelete={handleDeleteField}
+                onChangeCategory={handleChangeFieldCategory}
+              />
+            ))}
+            
             <CategoryCard
-              key={category.key}
-              title={category.name}
-              fields={categorizedFields[category.key] || []}
+              title="Другое"
+              fields={categorizedFields.other || []}
               canEdit={canEditThisCharacter}
               template={template}
               onEdit={handleEditField}
               onDelete={handleDeleteField}
               onChangeCategory={handleChangeFieldCategory}
             />
-          ))}
-          
-          <CategoryCard
-            title="Другое"
-            fields={categorizedFields.other || []}
+          </List>
+        ) : (
+          <CharacterTableView
+            categorizedFields={categorizedFields}
+            categoryNames={categoryNames}
             canEdit={canEditThisCharacter}
-            template={template}
-            onEdit={handleEditField}
-            onDelete={handleDeleteField}
-            onChangeCategory={handleChangeFieldCategory}
+            onUpdateFieldValue={handleUpdateFieldValue}
           />
-        </List>
+        )}
       </div>
 
       <CharacterFieldModal 

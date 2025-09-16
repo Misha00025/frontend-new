@@ -1,0 +1,64 @@
+/* components/CharacterTableView/CharacterTableView.module.css */
+.tableView {
+    margin-top: 1rem;
+  }
+  
+  .categorySection {
+    margin-bottom: 0.0rem;
+  }
+  
+  .categoryTitle {
+    margin-bottom: 0.2rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.2rem;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .row {
+    border-bottom: 1px solid var(--border-color-light);
+  }
+  
+  .row:last-child {
+    border-bottom: none;
+  }
+  
+  .nameCell {
+    padding: 0.5rem;
+    font-weight: 500;
+    width: 40%;
+    vertical-align: top;
+  }
+  
+  .valueCell {
+    padding: 0.5rem;
+    width: 60%;
+  }
+  
+  .value {
+    min-height: 0.8rem;
+  }
+  
+  .editableValue {
+    min-height: 0.8rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: var(--border-radius-sm);
+  }
+  
+  .editableValue:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  }
+  
+  .input {
+    width: 100%;
+    padding: 0.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
