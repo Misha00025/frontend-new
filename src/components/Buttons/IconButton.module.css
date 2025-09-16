@@ -90,6 +90,14 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h12'%3E%3C/path%3E%3Cpath d='M7 10l4 4 4-4'%3E%3C/path%3E%3Cpath d='M7 3v18'%3E%3C/path%3E%3C/svg%3E");
 }
 
+.icon.arrow-up {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M5 12l7-7 7 7'%3E%3C/path%3E%3C/svg%3E");
+}
+
+.icon.arrow-down {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v14M19 12l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+}
+
 .iconButton.primary .icon {
   filter: invert(1) brightness(2);
 }

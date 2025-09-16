@@ -150,6 +150,20 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     }));
   };
 
+  const moveCategoryUp = (index: number) => {
+    if (index <= 0) return;
+    const newCategories = [...schema.categories];
+    [newCategories[index - 1], newCategories[index]] = [newCategories[index], newCategories[index - 1]];
+    setSchema({ ...schema, categories: newCategories });
+  };
+
+  const moveCategoryDown = (index: number) => {
+    if (index >= schema.categories.length - 1) return;
+    const newCategories = [...schema.categories];
+    [newCategories[index], newCategories[index + 1]] = [newCategories[index + 1], newCategories[index]];
+    setSchema({ ...schema, categories: newCategories });
+  };
+
   const handleSaveCategory = (category: TemplateCategory) => {
     if (editingCategory) {
       setSchema(prev => ({
@@ -229,11 +243,25 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
                 Добавить категорию
               </button>
 
-              {schema.categories.map(category => (
+              {schema.categories.map((category, index) => (
                 <div key={category.key} className={styles.categoryCard}>
                   <div className={styles.categoryHeader}>
                     <h4>{category.name}</h4>
                     <div className={styles.categoryActions}>
+                      {!(index === 0) && <IconButton 
+                        icon="arrow-up" 
+                        onClick={() => moveCategoryUp(index)}
+                        title="Переместить вверх"
+                        size="small"
+                        variant="primary"
+                      />}
+                      {!(index === schema.categories.length - 1) && <IconButton 
+                        icon="arrow-down" 
+                        onClick={() => moveCategoryDown(index)}
+                        title="Переместить вниз"
+                        size="small"
+                        variant="primary"
+                      />}
                       <IconButton 
                         icon="edit" 
                         onClick={() => editCategory(category)}
@@ -246,7 +274,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
                         onClick={() => removeCategory(category.key)}
                         title="Удалить категорию"
                         size="small"
-                        variant="primary"
+                        variant="danger"
                       />
                     </div>
                   </div>
@@ -281,7 +309,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
                           onClick={() => removeField(fieldKey)}
                           title="Удалить"
                           size="small"
-                          variant="primary"
+                          variant="danger"
                         />
                         <select
                           value={selectedCategoryForField[fieldKey] || ''}
