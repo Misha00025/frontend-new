@@ -1,0 +1,10 @@
+.categorySection {
+    margin-bottom: 2rem;
+  }
+  
+  .categorySection h3 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+  }

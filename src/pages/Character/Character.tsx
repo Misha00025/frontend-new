@@ -10,6 +10,7 @@ import { useActionPermissions } from '../../hooks/useActionPermissions';
 import { CharacterTemplate, TemplateCategory } from '../../types/characterTemplates';
 import IconButton from '../../components/Buttons/IconButton';
 import List from '../../components/List/List';
+import CategoryCard from '../../components/Cards/CategoryCard/CategoryCard';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -55,30 +56,39 @@ const Character: React.FC = () => {
   const getFieldsByCategory = () => {
     if (!template && character) return { uncategorized: Object.entries(character.fields) };
     if (!template || !character) return {};
+    
     const categorizedFields: Record<string, [string, CharacterField][]> = {};
+    
+    // Инициализируем категории из шаблона
     template.schema.categories.forEach(category => {
       categorizedFields[category.key] = [];
     });
+    
+    // Добавляем категорию для полей без категории
     categorizedFields.other = [];
+    
+    // Сначала добавляем поля, которые явно указаны в шаблоне
+    template.schema.categories.forEach(category => {
+      category.fields.forEach(fieldKey => {
+        if (character.fields[fieldKey]) {
+          categorizedFields[category.key].push([fieldKey, character.fields[fieldKey]]);
+        }
+      });
+    });
+    
     Object.entries(character.fields).forEach(([key, field]) => {
-      let foundCategory = false;
+      let alreadyAdded = false;
       for (const category of template.schema.categories) {
         if (category.fields.includes(key)) {
-          categorizedFields[category.key].push([key, field]);
-          foundCategory = true;
+          alreadyAdded = true;
           break;
         }
       }
-      if (!foundCategory && field.category) {
-        for (const category of template.schema.categories) {
-          if (category.key === field.category) {
-            categorizedFields[category.key].push([key, field]);
-            foundCategory = true;
-            break;
-          }
-        }
-      }
-      if (!foundCategory) {
+      
+      if (alreadyAdded) return;
+      if (field.category && categorizedFields[field.category]) {
+        categorizedFields[field.category].push([key, field]);
+      } else {
         categorizedFields.other.push([key, field]);
       }
     });
@@ -233,99 +243,31 @@ const Character: React.FC = () => {
       
       <div className={uiStyles.fields}>
         <h2>Поля персонажа</h2>
-        
-        {/* Отображаем поля по категориям из шаблона */}
-        {template && template.schema.categories.map(category => (
-          <div key={category.key} className={uiStyles.categorySection}>
-            <h3>{category.name}</h3>
-            <List layout="grid" gap="medium">
-              {categorizedFields[category.key]?.map(([key, field]) => (
-                <div key={key} className={uiStyles.fieldCard}>
-                  <div className={uiStyles.fieldHeader}>
-                    <h4>{field.name}</h4>
-                    <span className={uiStyles.fieldKey}>({key})</span>
-                  </div>
-                  {field.description && <p className={uiStyles.fieldDescription}>{field.description}</p>}
-                  <div className={uiStyles.fieldValue}>
-                    <strong>Значение:</strong> {field.value}
-                  </div>
-                  {canEditThisCharacter && (
-                    <div>
-                      <select
-                        value={field.category || 'other'}
-                        onChange={(e) => handleChangeFieldCategory(key, e.target.value)}
-                        className={buttonStyles.button}
-                      >
-                        <option value="other">Другое</option>
-                        {template.schema.categories.map(cat => (
-                          <option key={cat.key} value={cat.key}>{cat.name}</option>
-                        ))}
-                      </select>
-                      <div className={uiStyles.fieldActions}>
-                        <IconButton
-                          title='Редактировать'
-                          icon='edit' 
-                          onClick={() => handleEditField(key, field)}
-                        />
-                        <IconButton
-                          title='Удалить'
-                          icon='delete'
-                          onClick={() => handleDeleteField(key)}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </List>
-          </div>
-        ))}
-        
-        <div className={uiStyles.categorySection}>
-          <h3>Другое</h3>
-          <List layout="grid" gap="small">
-            {categorizedFields.other?.map(([key, field]) => (
-              <div key={key} className={uiStyles.fieldCard}>
-                <div className={uiStyles.fieldHeader}>
-                  <h4>{field.name}</h4>
-                  <span className={uiStyles.fieldKey}>({key})</span>
-                </div>
-                {field.description && <p className={uiStyles.fieldDescription}>{field.description}</p>}
-                <div className={uiStyles.fieldValue}>
-                  <strong>Значение:</strong> {field.value}
-                </div>
-                {canEditThisCharacter && (
-                  <div>
-                    {template && (
-                      <select
-                        value={field.category || 'other'}
-                        onChange={(e) => handleChangeFieldCategory(key, e.target.value)}
-                        className={buttonStyles.button}
-                      >
-                        <option value="other">Другое</option>
-                        {template.schema.categories.map(category => (
-                          <option key={category.key} value={category.key}>{category.name}</option>
-                        ))}
-                      </select>
-                    )}
-                    <div className={uiStyles.fieldActions}>
-                      <IconButton
-                        title='Редактировать'
-                        icon='edit' 
-                        onClick={() => handleEditField(key, field)}
-                      />
-                      <IconButton
-                        title='Удалить'
-                        icon='delete'
-                        onClick={() => handleDeleteField(key)}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </List>
-        </div>
+        <List layout='vertical' gap='small'>
+          {/* Отображаем поля по категориям из шаблона */}
+          {template && template.schema.categories.map(category => (
+            <CategoryCard
+              key={category.key}
+              title={category.name}
+              fields={categorizedFields[category.key] || []}
+              canEdit={canEditThisCharacter}
+              template={template}
+              onEdit={handleEditField}
+              onDelete={handleDeleteField}
+              onChangeCategory={handleChangeFieldCategory}
+            />
+          ))}
+          
+          <CategoryCard
+            title="Другое"
+            fields={categorizedFields.other || []}
+            canEdit={canEditThisCharacter}
+            template={template}
+            onEdit={handleEditField}
+            onDelete={handleDeleteField}
+            onChangeCategory={handleChangeFieldCategory}
+          />
+        </List>
       </div>
 
       <CharacterFieldModal 
@@ -336,7 +278,7 @@ const Character: React.FC = () => {
         fieldKey={editingField?.key || ''}
         title={editingField ? 'Редактирование поля' : 'Добавление поля'}
         isKeyEditable={!editingField}
-        categories={template?.schema.categories || []} // Передаем категории в модальное окно
+        categories={template?.schema.categories || []}
       />
     </div>
   );
