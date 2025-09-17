@@ -20,6 +20,7 @@ export interface CharacterShort {
   export interface CharacterField {
     name: string;
     value: number;
+    maxValue?: number;
     description: string;
     category?: string;
   }

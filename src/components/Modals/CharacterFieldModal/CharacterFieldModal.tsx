@@ -35,6 +35,7 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [value, setValue] = useState<number | ''>('');
+  const [maxValue, setMaxValue] = useState<number | '' | null>(null);
   const [description, setDescription] = useState('');
   const [key, setKey] = useState('');
   const [category, setCategory] = useState('');
@@ -45,6 +46,7 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
     if (field) {
       setName(field.name);
       setValue(field.value);
+      setMaxValue(field.maxValue ? field.maxValue : null)
       setDescription(field.description || '');
       setKey(fieldKey);
       setCategory(field.category || '');
@@ -77,8 +79,9 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
       value: value === ''? 0 : value,
       description,
     };
-
-    // Добавляем категорию, если она выбрана
+    if (maxValue !== null){
+      fieldData.maxValue = maxValue === ''? 0 : maxValue;
+    }
     if (category) {
       fieldData.category = category;
     }
@@ -137,6 +140,19 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
             />
           </div>
 
+          {maxValue !== null && (
+            <div className={styles.formGroup}>
+              <label>Максимальное значение:</label>
+              <input
+                type="number"
+                value={maxValue}
+                onChange={(e) => setMaxValue(e.target.value === ''? '' : Number(e.target.value))}
+                onBlur={(e) => setMaxValue(e.target.value === ''? 0 : Number(e.target.value))}
+                className={inputStyles.input}
+                required
+              />
+            </div>
+          )}
           <div className={styles.formGroup}>
             <label>Описание поля:</label>
             <textarea

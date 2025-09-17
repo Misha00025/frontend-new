@@ -27,18 +27,34 @@ const FieldCard: React.FC<FieldCardProps> = ({
 }) => {
   return (
     <div className={styles.fieldCard}>
-      <div className={styles.fieldHeader}>
-        <h4>{field.name}</h4>
-        <span className={styles.fieldKey}>({fieldKey})</span>
-      </div>
-      {field.description && <p className={styles.fieldDescription}>{field.description}</p>}
-      <div className={styles.fieldValue}>
-        <strong>Значение:</strong> {field.value}
-      </div>
-      {canEdit && (
-        
-        <div>
-          {template && canEditCategory && (
+      <div className={styles.fieldContent}>
+        <div className={styles.fieldHeader}>
+          <h4>{field.name}</h4>
+          <span className={styles.fieldKey}>({fieldKey})</span>
+        </div>
+        {field.description && <p className={styles.fieldDescription}>{field.description}</p>}
+        <div className={styles.fieldValue}>
+          {field.maxValue !== undefined ? (
+            <div className={styles.progressContainer}>
+              <div 
+                className={styles.progressBar}
+                style={{ 
+                  width: `${(field.value / field.maxValue) * 100}%`,
+                  backgroundColor: `hsl(${(field.value / field.maxValue) * 120}, 70%, 45%)`
+                }}
+              >
+                <span className={styles.progressText}>
+                  {field.value}/{field.maxValue}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <>
+              <strong>Значение:</strong> {field.value}
+            </>
+          )}
+        </div>
+        {template && canEditCategory && (
             <select
               value={field.category || 'other'}
               onChange={(e) => onChangeCategory(fieldKey, e.target.value)}
@@ -50,6 +66,10 @@ const FieldCard: React.FC<FieldCardProps> = ({
               ))}
             </select>
           )}
+      </div>
+      {canEdit && (
+        <div className={styles.actionsContainer}>
+          
           <div className={styles.fieldActions}>
             <IconButton
               title='Редактировать'
