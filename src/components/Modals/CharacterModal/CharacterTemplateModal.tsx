@@ -6,6 +6,7 @@ import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CharacterTemplateModal.module.css';
 import IconButton from '../../Buttons/IconButton';
+import EditedTemplateFieldCard from '../../Cards/FieldCard/EditedTemplateFieldCard';
 
 interface CharacterTemplateModalProps {
   isOpen: boolean;
@@ -288,45 +289,20 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
                   </button>
 
                   {category.fields.map(fieldKey => (
-                    <div key={fieldKey} className={styles.fieldCard}>
-                      <div className={styles.fieldHeader}>
-                        <h4>{fields[fieldKey]?.name || 'Unknown Field'}</h4>
-                        <span className={styles.fieldKey}>({fieldKey})</span>
-                      </div>
-                      <p className={styles.fieldDescription}>{fields[fieldKey]?.description}</p>
-                      <p className={styles.fieldValue}>Значение по умолчанию: {fields[fieldKey]?.value}</p>
-                      
-                      <div className={styles.fieldActions}>
-                        <IconButton 
-                          icon="edit" 
-                          onClick={() => editField(fieldKey)}
-                          title="Редактировать"
-                          size="small"
-                          variant="primary"
-                        />
-                        <IconButton 
-                          icon="delete" 
-                          onClick={() => removeField(fieldKey)}
-                          title="Удалить"
-                          size="small"
-                          variant="danger"
-                        />
-                        <select
-                          value={selectedCategoryForField[fieldKey] || ''}
-                          onChange={(e) => {
-                            setSelectedCategoryForField(prev => ({ ...prev, [fieldKey]: e.target.value }));
-                            moveFieldToCategory(fieldKey, e.target.value);
-                          }}
-                          className={inputStyles.input}
-                        >
-                          <option value="">Переместить в...</option>
-                          <option value="other">Другое</option>
-                          {schema.categories.filter(c => c.key !== category.key).map(c => (
-                            <option key={c.key} value={c.key}>{c.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
+                    <EditedTemplateFieldCard
+                      key={fieldKey}
+                      fieldKey={fieldKey}
+                      field={fields[fieldKey]}
+                      onEdit={editField}
+                      onRemove={removeField}
+                      onMoveToCategory={moveFieldToCategory}
+                      categories={schema.categories}
+                      selectedCategoryForField={selectedCategoryForField[fieldKey] || ''}
+                      onCategoryChange={(fieldKey, categoryKey) => 
+                        setSelectedCategoryForField(prev => ({ ...prev, [fieldKey]: categoryKey }))
+                      }
+                      currentCategoryKey={category.key}
+                    />
                   ))}
                 </div>
               ))}
@@ -342,44 +318,19 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
                 </button>
 
                 {getUncategorizedFields().map(fieldKey => (
-                  <div key={fieldKey} className={styles.fieldCard}>
-                    <div className={styles.fieldHeader}>
-                      <h4>{fields[fieldKey]?.name || 'Unknown Field'}</h4>
-                      <span className={styles.fieldKey}>({fieldKey})</span>
-                    </div>
-                    <p className={styles.fieldDescription}>{fields[fieldKey]?.description}</p>
-                    <p className={styles.fieldValue}>Значение по умолчанию: {fields[fieldKey]?.value}</p>
-                    
-                    <div className={styles.fieldActions}>
-                      <IconButton 
-                        icon="edit" 
-                        onClick={() => editField(fieldKey)}
-                        title="Редактировать"
-                        size="small"
-                        variant="primary"
-                      />
-                      <IconButton 
-                        icon="delete" 
-                        onClick={() => removeField(fieldKey)}
-                        title="Удалить"
-                        size="small"
-                        variant="primary"
-                      />
-                      <select
-                        value={selectedCategoryForField[fieldKey] || ''}
-                        onChange={(e) => {
-                          setSelectedCategoryForField(prev => ({ ...prev, [fieldKey]: e.target.value }));
-                          moveFieldToCategory(fieldKey, e.target.value);
-                        }}
-                        className={inputStyles.input}
-                      >
-                        <option value="">Переместить в категорию...</option>
-                        {schema.categories.map(c => (
-                          <option key={c.key} value={c.key}>{c.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
+                  <EditedTemplateFieldCard
+                    key={fieldKey}
+                    fieldKey={fieldKey}
+                    field={fields[fieldKey]}
+                    onEdit={editField}
+                    onRemove={removeField}
+                    onMoveToCategory={moveFieldToCategory}
+                    categories={schema.categories}
+                    selectedCategoryForField={selectedCategoryForField[fieldKey] || ''}
+                    onCategoryChange={(fieldKey, categoryKey) => 
+                      setSelectedCategoryForField(prev => ({ ...prev, [fieldKey]: categoryKey }))
+                    }
+                  />
                 ))}
               </div>
             </div>

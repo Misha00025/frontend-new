@@ -1,6 +1,7 @@
 export interface TemplateField {
     name: string;
     value: number;
+    maxValue?: number;
     description: string;
     category?: string;
   }

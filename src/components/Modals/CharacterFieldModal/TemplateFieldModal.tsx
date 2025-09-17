@@ -23,6 +23,8 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [value, setValue] = useState<number | ''>(0);
+  const [maxValue, setMaxValue] = useState<number | ''>(0);
+  const [isProperty, setIsProperty] = useState<boolean>(false);
   const [description, setDescription] = useState('');
   const [key, setKey] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +72,9 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
       description,
     };
 
+    if (isProperty)
+      fieldData.maxValue = maxValue === ''? 0 : maxValue;
+
     onSave(fieldData, key);
     onClose();
   };
@@ -78,6 +83,20 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
     const generatedKey = generateFieldKey(name);
     setKey(generatedKey);
   };
+
+  const handleChangeMaxValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const result = event.target.value === ''? '' : Number(event.target.value);
+    if (value === maxValue)
+      setValue(result);
+    setMaxValue(result);
+  }
+
+  const handleBlurMaxValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const result = event.target.value === ''? 0 : Number(event.target.value);
+    if (value === maxValue)
+      setValue(result);
+    setMaxValue(result);
+  }
 
   if (!isOpen) return null;
 
@@ -136,6 +155,31 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
             />
           </div>
 
+          <div className={styles.formGroup}>
+          <label>
+            <input
+              type="checkbox"
+              checked={isProperty}
+              className={inputStyles.input}
+              onChange={(e) => setIsProperty(e.target.checked)}
+            />
+            Поле с максимальным значением
+          </label>
+        </div>
+
+          { isProperty && (
+            <div className={styles.formGroup}>
+              <label>Максимальное значение по умолчанию:</label>
+              <input
+                type="number"
+                value={maxValue}
+                onChange={(e) => handleChangeMaxValue(e)}
+                onBlur={(e) => handleBlurMaxValue(e)}
+                className={inputStyles.input}
+                required
+              />
+            </div>
+          )}
           <div className={styles.formGroup}>
             <label>Описание поля:</label>
             <textarea
