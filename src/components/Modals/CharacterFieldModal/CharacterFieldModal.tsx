@@ -34,6 +34,7 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
   categories = [] // Значение по умолчанию - пустой массив
 }) => {
   const [name, setName] = useState('');
+  const [formula, setFormula] = useState('');
   const [value, setValue] = useState<number | ''>('');
   const [maxValue, setMaxValue] = useState<number | '' | null>(null);
   const [description, setDescription] = useState('');
@@ -46,7 +47,8 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
     if (field) {
       setName(field.name);
       setValue(field.value);
-      setMaxValue(field.maxValue ? field.maxValue : null)
+      setFormula(field.formula ? field.formula : '');
+      setMaxValue(field.maxValue ? field.maxValue : null);
       setDescription(field.description || '');
       setKey(fieldKey);
       setCategory(field.category || '');
@@ -55,6 +57,8 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
       const newName = 'Новое поле'
       setName(newName);
       setValue(0);
+      setMaxValue(0);
+      setFormula('');
       setDescription('');
       setKey(generateFieldKey(newName));
       setCategory('');
@@ -78,6 +82,7 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
       name,
       value: value === ''? 0 : value,
       description,
+      formula
     };
     if (maxValue !== null){
       fieldData.maxValue = maxValue === ''? 0 : maxValue;
@@ -125,6 +130,16 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
               onChange={(e) => {setName(e.target.value); if (isKeyEditable) setKey(generateFieldKey(e.target.value))}}
               className={inputStyles.input}
               required
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Формула:</label>
+            <input
+              type="text"
+              value={formula}
+              onChange={(e) => setFormula(e.target.value)}
+              className={inputStyles.input}
             />
           </div>
 

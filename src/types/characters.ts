@@ -23,6 +23,7 @@ export interface CharacterShort {
     maxValue?: number;
     description: string;
     category?: string;
+    formula?: string;
   }
   
   export interface CreateCharacterRequest {

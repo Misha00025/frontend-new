@@ -4,6 +4,7 @@ export interface TemplateField {
     maxValue?: number;
     description: string;
     category?: string;
+    formula?: string;
   }
   
   export interface TemplateGroup {

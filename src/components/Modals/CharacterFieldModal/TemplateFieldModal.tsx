@@ -24,6 +24,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
   const [name, setName] = useState('');
   const [value, setValue] = useState<number | ''>(0);
   const [maxValue, setMaxValue] = useState<number | ''>(0);
+  const [formula, setFormula] = useState('');
   const [isProperty, setIsProperty] = useState<boolean>(false);
   const [description, setDescription] = useState('');
   const [key, setKey] = useState('');
@@ -42,12 +43,16 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
     if (field) {
       setName(field.name);
       setValue(field.value);
+      setFormula(field.formula ? field.formula : '');
+      setMaxValue(field.maxValue ? field.maxValue : 0);
       setDescription(field.description);
       setKey(generateFieldKey(field.name));
     } else {
       // Сброс формы при создании нового поля
       setName('');
       setValue(0);
+      setMaxValue(0);
+      setFormula('');
       setDescription('');
       setKey('');
     }
@@ -70,6 +75,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
       name,
       value: value === ''? 0 : value,
       description,
+      formula
     };
 
     if (isProperty)
@@ -141,6 +147,16 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
             <small className={styles.helpText}>
               Ключ будет использоваться в системе (только латинские буквы, цифры и _)
             </small>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Формула:</label>
+            <input
+              type="text"
+              value={formula}
+              onChange={(e) => setFormula(e.target.value)}
+              className={inputStyles.input}
+            />
           </div>
 
           <div className={styles.formGroup}>
