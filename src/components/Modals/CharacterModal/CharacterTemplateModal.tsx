@@ -7,6 +7,7 @@ import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CharacterTemplateModal.module.css';
 import IconButton from '../../Buttons/IconButton';
 import EditedTemplateFieldCard from '../../Cards/FieldCard/EditedTemplateFieldCard';
+import TemplateCategoryCard from '../../Cards/CategoryCard/TemplateCategoryCard';
 
 interface CharacterTemplateModalProps {
   isOpen: boolean;
@@ -199,6 +200,35 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     }
   };
 
+  const addSubcategory = (parentCategoryKey: string, subcategory: TemplateCategory) => {
+    setSchema(prev => ({
+      categories: prev.categories.map(category => 
+        category.key === parentCategoryKey
+          ? { 
+              ...category, 
+              categories: [...(category.categories || []), subcategory] 
+            }
+          : category
+      )
+    }));
+  };
+
+  const editSubcategory = (parentCategoryKey: string, subcategory: TemplateCategory) => {
+    setSchema(prev => ({
+      categories: prev.categories.map(category => 
+        category.key === parentCategoryKey
+          ? { 
+              ...category, 
+              categories: category.categories?.map(cat => 
+                cat.key === subcategory.key ? subcategory : cat
+              ) || []
+            }
+          : category
+      )
+    }));
+  };
+  
+
   const getUncategorizedFields = () => {
     const allFieldKeys = new Set(Object.keys(fields));
     const categorizedFields = new Set(schema.categories.flatMap(c => c.fields));
@@ -245,66 +275,25 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
               </button>
 
               {schema.categories.map((category, index) => (
-                <div key={category.key} className={styles.categoryCard}>
-                  <div className={styles.categoryHeader}>
-                    <h4>{category.name}</h4>
-                    <div className={styles.categoryActions}>
-                      {!(index === 0) && <IconButton 
-                        icon="arrow-up" 
-                        onClick={() => moveCategoryUp(index)}
-                        title="Переместить вверх"
-                        size="small"
-                        variant="primary"
-                      />}
-                      {!(index === schema.categories.length - 1) && <IconButton 
-                        icon="arrow-down" 
-                        onClick={() => moveCategoryDown(index)}
-                        title="Переместить вниз"
-                        size="small"
-                        variant="primary"
-                      />}
-                      <IconButton 
-                        icon="edit" 
-                        onClick={() => editCategory(category)}
-                        title="Редактировать категорию"
-                        size="small"
-                        variant="primary"
-                      />
-                      <IconButton 
-                        icon="delete" 
-                        onClick={() => removeCategory(category.key)}
-                        title="Удалить категорию"
-                        size="small"
-                        variant="danger"
-                      />
-                    </div>
-                  </div>
-                  
-                  <button 
-                    type="button" 
-                    onClick={() => addField(category.key)}
-                    className={buttonStyles.button}
-                  >
-                    Добавить поле в категорию
-                  </button>
-
-                  {category.fields.map(fieldKey => (
-                    <EditedTemplateFieldCard
-                      key={fieldKey}
-                      fieldKey={fieldKey}
-                      field={fields[fieldKey]}
-                      onEdit={editField}
-                      onRemove={removeField}
-                      onMoveToCategory={moveFieldToCategory}
-                      categories={schema.categories}
-                      selectedCategoryForField={selectedCategoryForField[fieldKey] || ''}
-                      onCategoryChange={(fieldKey, categoryKey) => 
-                        setSelectedCategoryForField(prev => ({ ...prev, [fieldKey]: categoryKey }))
-                      }
-                      currentCategoryKey={category.key}
-                    />
-                  ))}
-                </div>
+                <TemplateCategoryCard
+                  key={category.key}
+                  category={category}
+                  index={index}
+                  totalCategories={schema.categories.length}
+                  fields={fields}
+                  selectedCategoryForField={selectedCategoryForField}
+                  onEditCategory={editCategory}
+                  onRemoveCategory={removeCategory}
+                  onMoveCategoryUp={moveCategoryUp}
+                  onMoveCategoryDown={moveCategoryDown}
+                  onAddField={addField}
+                  onEditField={editField}
+                  onRemoveField={removeField}
+                  onMoveFieldToCategory={moveFieldToCategory}
+                  onCategoryChange={(fieldKey, categoryKey) => 
+                    setSelectedCategoryForField(prev => ({ ...prev, [fieldKey]: categoryKey }))
+                  }
+                />
               ))}
 
               <div className={styles.categoryCard}>

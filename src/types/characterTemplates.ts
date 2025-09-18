@@ -17,6 +17,7 @@ export interface TemplateField {
     key: string;
     name: string;
     fields: string[];
+    categories?: TemplateCategory[];
   }
 
   export interface TemplateSchema {

@@ -93,26 +93,6 @@
   border-radius: var(--border-radius-sm);
 }
 
-.categoryCard {
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  padding: 16px;
-  margin-bottom: 16px;
-  background-color: var(--bg-primary);
-}
-
-.categoryHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.categoryActions {
-  display: flex;
-  gap: 8px;
-}
-
 .fieldCard {
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-md);
