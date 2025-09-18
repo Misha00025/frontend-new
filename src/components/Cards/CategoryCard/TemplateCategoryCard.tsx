@@ -11,15 +11,16 @@ interface TemplateCategoryCardProps {
   totalCategories: number;
   fields: Record<string, TemplateField>;
   selectedCategoryForField: Record<string, string>;
+  onAddFieldToTemplate: (field: TemplateField) => string; // Возвращает ID созданного поля
   onEditCategory: (category: TemplateCategory) => void;
   onRemoveCategory: (categoryKey: string) => void;
   onMoveCategoryUp: (index: number) => void;
   onMoveCategoryDown: (index: number) => void;
-  onAddField: (categoryKey?: string) => void;
   onEditField: (fieldKey: string) => void;
   onRemoveField: (fieldKey: string) => void;
   onMoveFieldToCategory: (fieldKey: string, categoryKey: string) => void;
   onCategoryChange: (fieldKey: string, categoryKey: string) => void;
+  onUpdateCategory: (updatedCategory: TemplateCategory) => void;
 }
 
 const TemplateCategoryCard: React.FC<TemplateCategoryCardProps> = ({
@@ -28,16 +29,37 @@ const TemplateCategoryCard: React.FC<TemplateCategoryCardProps> = ({
   totalCategories,
   fields,
   selectedCategoryForField,
+  onAddFieldToTemplate,
   onEditCategory,
   onRemoveCategory,
   onMoveCategoryUp,
   onMoveCategoryDown,
-  onAddField,
   onEditField,
   onRemoveField,
   onMoveFieldToCategory,
   onCategoryChange,
+  onUpdateCategory,
 }) => {
+  const handleAddField = () => {
+    const fieldName = `Новое поле ${Object.keys(fields).length + 1}`;
+    
+    const newField = {
+      name: fieldName,
+      value: 0,
+      description: '',
+    };
+
+    const fieldKey = onAddFieldToTemplate(newField);
+    
+    const updatedCategory = {
+      ...category,
+      fields: [...category.fields, fieldKey]
+    };
+    
+    onUpdateCategory(updatedCategory);
+    // onEditField(fieldKey);
+  };
+
   return (
     <div className={styles.categoryCard}>
       <div className={styles.categoryHeader}>
@@ -80,7 +102,7 @@ const TemplateCategoryCard: React.FC<TemplateCategoryCardProps> = ({
       
       <button 
         type="button" 
-        onClick={() => onAddField(category.key)}
+        onClick={handleAddField}
         className={buttonStyles.button}
       >
         Добавить поле в категорию

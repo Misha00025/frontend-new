@@ -72,7 +72,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     }
   };
 
-  const addField = (categoryKey?: string) => {
+  const addField = () => {
     const fieldKey = `field_${Date.now()}`;
     const fieldName = `Новое поле ${Object.keys(fields).length + 1}`;
     
@@ -83,19 +83,24 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     };
 
     setFields(prev => ({ ...prev, [fieldKey]: newField }));
-
-    if (categoryKey && categoryKey !== 'other') {
-      setSchema(prev => ({
-        categories: prev.categories.map(category => 
-          category.key === categoryKey
-            ? { ...category, fields: [...category.fields, fieldKey] }
-            : category
-        )
-      }));
-    }
-
     setEditingField({ key: fieldKey, field: newField });
     setIsFieldModalOpen(true);
+  };
+
+  const addFieldToTemplate = (field: TemplateField): string => {
+    const fieldKey = `field_${Date.now()}`;
+    setFields(prev => ({ ...prev, [fieldKey]: field }));
+    setEditingField({ key: fieldKey, field: field });
+    setIsFieldModalOpen(true);
+    return fieldKey;
+  };
+  
+  const updateCategory = (updatedCategory: TemplateCategory) => {
+    setSchema(prev => ({
+      categories: prev.categories.map(c => 
+        c.key === updatedCategory.key ? updatedCategory : c
+      )
+    }));
   };
 
   const removeField = (fieldKey: string) => {
@@ -253,17 +258,18 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
                   totalCategories={schema.categories.length}
                   fields={fields}
                   selectedCategoryForField={selectedCategoryForField}
+                  onAddFieldToTemplate={addFieldToTemplate}
                   onEditCategory={editCategory}
                   onRemoveCategory={removeCategory}
                   onMoveCategoryUp={moveCategoryUp}
                   onMoveCategoryDown={moveCategoryDown}
-                  onAddField={addField}
                   onEditField={editField}
                   onRemoveField={removeField}
                   onMoveFieldToCategory={moveFieldToCategory}
                   onCategoryChange={(fieldKey, categoryKey) => 
                     setSelectedCategoryForField(prev => ({ ...prev, [fieldKey]: categoryKey }))
                   }
+                  onUpdateCategory={updateCategory}
                 />
               ))}
 
