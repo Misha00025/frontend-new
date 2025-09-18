@@ -6,6 +6,7 @@ import { getNavigationItems } from '../../config/navigation';
 import buttonStyles from '../../styles/components/Button.module.css';
 import styles from './Sidebar.module.css';
 import { names } from '../../config/names';
+import ThemeToggle from '../ThemeToggle/ThemeToggle';
 
 const DesktopSidebar: React.FC = () => {
   const { logout } = useAuth();
@@ -67,6 +68,7 @@ const DesktopSidebar: React.FC = () => {
         <button className={buttonStyles.button} onClick={logout}>
           Выйти
         </button>
+        <ThemeToggle />
       </div>
     </div>
   );
