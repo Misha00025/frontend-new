@@ -30,9 +30,8 @@ const FieldCard: React.FC<FieldCardProps> = ({
       <div className={styles.fieldContent}>
         <div className={styles.fieldHeader}>
           <h4>{field.name}</h4>
-          <span className={styles.fieldKey}>({fieldKey})</span>
         </div>
-        {field.description && <p className={styles.fieldDescription}>{field.description}</p>}
+        {/* {field.description && <p className={styles.fieldDescription}>{field.description}</p>} */}
         <div className={styles.fieldValue}>
           {field.maxValue !== undefined ? (
             <div className={styles.progressContainer}>
@@ -54,18 +53,6 @@ const FieldCard: React.FC<FieldCardProps> = ({
             </>
           )}
         </div>
-        {template && canEditCategory && (
-            <select
-              value={field.category || 'other'}
-              onChange={(e) => onChangeCategory(fieldKey, e.target.value)}
-              className={styles.categorySelect}
-            >
-              <option value="other">Другое</option>
-              {template.schema.categories.map(category => (
-                <option key={category.key} value={category.key}>{category.name}</option>
-              ))}
-            </select>
-          )}
       </div>
       {canEdit && (
         <div className={styles.actionsContainer}>

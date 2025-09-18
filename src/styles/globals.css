@@ -8,12 +8,12 @@
   
   /* Светлая тема */
   [data-theme="light"] {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f5f5f5;
+    --bg-primary: #e5d7a6;
+    --bg-secondary: #a8c07a;
     --text-primary: #333333;
     --text-secondary: #666666;
-    --accent-color: #00158f;
-    --border-color: #dddddd;
+    --accent-color: #225814;
+    --border-color: #c0c0c0;
     --danger-color: #f80b0b;
   }
   
