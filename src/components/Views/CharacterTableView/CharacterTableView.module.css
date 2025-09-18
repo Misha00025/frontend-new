@@ -16,10 +16,13 @@
 
 .categoryTitle {
   margin-bottom: 0.2rem;
-  color: var(--text-primary);
+  color: #ffffff;
+  background-color: var(--accent-color);
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.2rem;
+  padding-bottom: 0.4rem;
+  padding-top: 0.4rem;
   font-size: 1.1rem;
+  text-align: center;
 }
 
 .table {
