@@ -17,3 +17,47 @@
     display: flex;
     gap: 8px;
   }
+
+  .categoryCard {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 16px;
+    margin-bottom: 16px;
+    background-color: var(--bg-primary);
+  }
+  
+  .depth-0 {
+    margin-left: 0;
+  }
+  
+  .depth-1 {
+    margin-left: 20px;
+    background-color: var(--bg-secondary);
+  }
+  
+  .depth-2 {
+    margin-left: 40px;
+    background-color: var(--bg-tertiary);
+  }
+  
+  .categoryHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .categoryActions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .categoryContent {
+    margin-top: 12px;
+  }
+  
+  .subCategories {
+    margin-top: 16px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 16px;
+  }

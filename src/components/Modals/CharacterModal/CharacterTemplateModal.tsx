@@ -34,6 +34,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingField, setEditingField] = useState<{ key: string; field: TemplateField } | null>(null);
   const [editingCategory, setEditingCategory] = useState<TemplateCategory | null>(null);
+  const [editingCategoryParent, setEditingCategoryParent] = useState<TemplateCategory | null>(null);
   const [selectedCategoryForField, setSelectedCategoryForField] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -95,12 +96,24 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     return fieldKey;
   };
   
-  const updateCategory = (updatedCategory: TemplateCategory) => {
-    setSchema(prev => ({
-      categories: prev.categories.map(c => 
-        c.key === updatedCategory.key ? updatedCategory : c
-      )
-    }));
+  const updateCategory = (updatedCategory: TemplateCategory, parentCategory?: TemplateCategory) => {
+    if (parentCategory) {
+      // Обновляем вложенную категорию
+      setSchema(prev => ({
+        categories: prev.categories.map(c => 
+          c.key === parentCategory.key
+            ? { ...c, categories: c.categories?.map(sc => sc.key === updatedCategory.key ? updatedCategory : sc) }
+            : c
+        )
+      }));
+    } else {
+      // Обновляем категорию верхнего уровня
+      setSchema(prev => ({
+        categories: prev.categories.map(c => 
+          c.key === updatedCategory.key ? updatedCategory : c
+        )
+      }));
+    }
   };
 
   const removeField = (fieldKey: string) => {
@@ -108,11 +121,17 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     delete newFields[fieldKey];
     setFields(newFields);
 
-    setSchema(prev => ({
-      categories: prev.categories.map(category => ({
+    // Рекурсивно удаляем поле из всех категорий
+    const removeFieldFromCategories = (categories: TemplateCategory[]): TemplateCategory[] => {
+      return categories.map(category => ({
         ...category,
-        fields: category.fields.filter(f => f !== fieldKey)
-      }))
+        fields: category.fields.filter(f => f !== fieldKey),
+        categories: category.categories ? removeFieldFromCategories(category.categories) : undefined
+      }));
+    };
+
+    setSchema(prev => ({
+      categories: removeFieldFromCategories(prev.categories)
     }));
   };
 
@@ -128,11 +147,17 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
       delete newFields[editingField!.key];
       newFields[fieldKey] = field;
 
-      setSchema(prev => ({
-        categories: prev.categories.map(category => ({
+      // Рекурсивно обновляем ключи полей во всех категориях
+      const updateFieldKeyInCategories = (categories: TemplateCategory[]): TemplateCategory[] => {
+        return categories.map(category => ({
           ...category,
-          fields: category.fields.map(f => f === editingField!.key ? fieldKey : f)
-        }))
+          fields: category.fields.map(f => f === editingField!.key ? fieldKey : f),
+          categories: category.categories ? updateFieldKeyInCategories(category.categories) : undefined
+        }));
+      };
+
+      setSchema(prev => ({
+        categories: updateFieldKeyInCategories(prev.categories)
       }));
     } else {
       newFields[fieldKey] = field;
@@ -141,73 +166,172 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     setFields(newFields);
   };
 
-  const addCategory = () => {
+  const addCategory = (parentCategory?: TemplateCategory) => {
     setEditingCategory(null);
+    setEditingCategoryParent(parentCategory || null);
     setIsCategoryModalOpen(true);
   };
 
-  const editCategory = (category: TemplateCategory) => {
+  const editCategory = (category: TemplateCategory, parentCategory?: TemplateCategory) => {
     setEditingCategory(category);
+    setEditingCategoryParent(parentCategory || null);
     setIsCategoryModalOpen(true);
   };
 
-  const removeCategory = (categoryKey: string) => {
-    setSchema(prev => ({
-      categories: prev.categories.filter(category => category.key !== categoryKey)
-    }));
+  const removeCategory = (categoryKey: string, parentCategory?: TemplateCategory) => {
+    if (parentCategory) {
+      // Удаляем вложенную категорию
+      setSchema(prev => ({
+        categories: prev.categories.map(c => 
+          c.key === parentCategory.key
+            ? { ...c, categories: c.categories?.filter(sc => sc.key !== categoryKey) }
+            : c
+        )
+      }));
+    } else {
+      // Удаляем категорию верхнего уровня
+      setSchema(prev => ({
+        categories: prev.categories.filter(category => category.key !== categoryKey)
+      }));
+    }
   };
 
-  const moveCategoryUp = (index: number) => {
+  const moveCategoryUp = (index: number, parentCategory?: TemplateCategory) => {
     if (index <= 0) return;
-    const newCategories = [...schema.categories];
-    [newCategories[index - 1], newCategories[index]] = [newCategories[index], newCategories[index - 1]];
-    setSchema({ ...schema, categories: newCategories });
+    
+    if (parentCategory) {
+      // Перемещаем вложенную категорию
+      setSchema(prev => ({
+        categories: prev.categories.map(c => 
+          c.key === parentCategory.key && c.categories
+            ? { ...c, categories: moveItemInArray(c.categories, index, index - 1) }
+            : c
+        )
+      }));
+    } else {
+      // Перемещаем категорию верхнего уровня
+      setSchema(prev => ({
+        categories: moveItemInArray(prev.categories, index, index - 1)
+      }));
+    }
   };
 
-  const moveCategoryDown = (index: number) => {
-    if (index >= schema.categories.length - 1) return;
-    const newCategories = [...schema.categories];
-    [newCategories[index], newCategories[index + 1]] = [newCategories[index + 1], newCategories[index]];
-    setSchema({ ...schema, categories: newCategories });
+  const moveCategoryDown = (index: number, parentCategory?: TemplateCategory) => {
+    if (parentCategory) {
+      // Перемещаем вложенную категорию
+      const categories = parentCategory.categories || [];
+      if (index >= categories.length - 1) return;
+      
+      setSchema(prev => ({
+        categories: prev.categories.map(c => 
+          c.key === parentCategory.key && c.categories
+            ? { ...c, categories: moveItemInArray(c.categories, index, index + 1) }
+            : c
+        )
+      }));
+    } else {
+      // Перемещаем категорию верхнего уровня
+      if (index >= schema.categories.length - 1) return;
+      setSchema(prev => ({
+        categories: moveItemInArray(prev.categories, index, index + 1)
+      }));
+    }
+  };
+
+  // Вспомогательная функция для перемещения элемента в массиве
+  const moveItemInArray = <T,>(array: T[], from: number, to: number): T[] => {
+    const newArray = [...array];
+    [newArray[from], newArray[to]] = [newArray[to], newArray[from]];
+    return newArray;
   };
 
   const handleSaveCategory = (category: TemplateCategory) => {
     if (editingCategory) {
-      setSchema(prev => ({
-        categories: prev.categories.map(c => 
-          c.key === editingCategory.key ? category : c
-        )
-      }));
+      // Редактирование существующей категории
+      if (editingCategoryParent) {
+        // Редактируем вложенную категорию
+        setSchema(prev => ({
+          categories: prev.categories.map(c => 
+            c.key === editingCategoryParent.key
+              ? { ...c, categories: c.categories?.map(sc => sc.key === editingCategory.key ? category : sc) }
+              : c
+          )
+        }));
+      } else {
+        // Редактируем категорию верхнего уровня
+        setSchema(prev => ({
+          categories: prev.categories.map(c => 
+            c.key === editingCategory.key ? category : c
+          )
+        }));
+      }
     } else {
-      setSchema(prev => ({
-        categories: [...prev.categories, category]
-      }));
+      // Создание новой категории
+      if (editingCategoryParent) {
+        // Добавляем вложенную категорию
+        setSchema(prev => ({
+          categories: prev.categories.map(c => 
+            c.key === editingCategoryParent.key
+              ? { ...c, categories: [...(c.categories || []), category] }
+              : c
+          )
+        }));
+      } else {
+        // Добавляем категорию верхнего уровня
+        setSchema(prev => ({
+          categories: [...prev.categories, category]
+        }));
+      }
     }
     setIsCategoryModalOpen(false);
   };
 
   const moveFieldToCategory = (fieldKey: string, categoryKey: string) => {
-    if (categoryKey === 'other') {
-      setSchema(prev => ({
-        categories: prev.categories.map(category => ({
-          ...category,
-          fields: category.fields.filter(f => f !== fieldKey)
-        }))
-      }));
-    } else {
-      setSchema(prev => ({
-        categories: prev.categories.map(category => 
-          category.key === categoryKey
-            ? { ...category, fields: [...category.fields, fieldKey] }
-            : { ...category, fields: category.fields.filter(f => f !== fieldKey) }
-        )
-      }));
-    }
+    // Рекурсивно перемещаем поле в указанную категорию
+    const moveFieldRecursive = (categories: TemplateCategory[]): TemplateCategory[] => {
+      return categories.map(category => {
+        if (category.key === categoryKey) {
+          // Добавляем поле в целевую категорию
+          return {
+            ...category,
+            fields: [...category.fields, fieldKey]
+          };
+        } else {
+          // Удаляем поле из всех других категорий
+          return {
+            ...category,
+            fields: category.fields.filter(f => f !== fieldKey),
+            categories: category.categories ? moveFieldRecursive(category.categories) : undefined
+          };
+        }
+      });
+    };
+
+    setSchema(prev => ({
+      categories: moveFieldRecursive(prev.categories)
+    }));
   };  
 
   const getUncategorizedFields = () => {
+    // Рекурсивно собираем все поля из всех категорий
+    const getAllCategorizedFields = (categories: TemplateCategory[]): Set<string> => {
+      const fieldSet = new Set<string>();
+      
+      const collectFields = (cats: TemplateCategory[]) => {
+        cats.forEach(cat => {
+          cat.fields.forEach(field => fieldSet.add(field));
+          if (cat.categories) {
+            collectFields(cat.categories);
+          }
+        });
+      };
+      
+      collectFields(categories);
+      return fieldSet;
+    };
+
     const allFieldKeys = new Set(Object.keys(fields));
-    const categorizedFields = new Set(schema.categories.flatMap(c => c.fields));
+    const categorizedFields = getAllCategorizedFields(schema.categories);
     return Array.from(allFieldKeys).filter(key => !categorizedFields.has(key));
   };
 
@@ -246,7 +370,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
 
             <div className={styles.fieldsSection}>
               <h3>Категории полей:</h3>
-              <button type="button" onClick={addCategory} className={buttonStyles.button}>
+              <button type="button" onClick={() => addCategory()} className={buttonStyles.button}>
                 Добавить категорию
               </button>
 
@@ -256,6 +380,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
                   category={category}
                   index={index}
                   totalCategories={schema.categories.length}
+                  depth={0}
                   fields={fields}
                   selectedCategoryForField={selectedCategoryForField}
                   onAddFieldToTemplate={addFieldToTemplate}
@@ -270,6 +395,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
                     setSelectedCategoryForField(prev => ({ ...prev, [fieldKey]: categoryKey }))
                   }
                   onUpdateCategory={updateCategory}
+                  onAddSubCategory={addCategory}
                 />
               ))}
 
