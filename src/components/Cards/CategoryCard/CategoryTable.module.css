@@ -23,7 +23,7 @@
   }
   
   .categoryTitle {
-    margin-bottom: 0.2rem;
+    /* margin-bottom: 0.2rem; */
     color: #ffffff;
     background-color: var(--accent-color);
     /* border-bottom: 1px solid var(--border-color); */
@@ -89,6 +89,7 @@
   .input {
     flex: 1;
     padding: 0.25rem;
+    width: 40%;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-sm);
     background-color: var(--bg-primary);

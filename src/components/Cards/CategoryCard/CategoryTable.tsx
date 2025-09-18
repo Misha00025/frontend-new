@@ -53,8 +53,8 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   };
 
   return (
-    <div className={`${styles.categorySection} ${level > 0 ? styles.subcategory : ''}`}>
-      <h3 className={styles.categoryTitle} style={{ marginLeft: level > 0 ? `${level * 16}px` : '0' }}>
+    <div className={`${styles.categorySection} ${level > 0 ? styles.subcategory : ''}`} style={{ marginLeft: level > 0 ? `${level * 4}px` : '0' }}>
+      <h3 className={styles.categoryTitle}>
         {category.name}
       </h3>
       {category.fields.length > 0 && (
