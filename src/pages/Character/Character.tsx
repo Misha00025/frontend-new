@@ -210,6 +210,21 @@ const Character: React.FC = () => {
   }
   categoryNames.other = "Другое";
 
+  const getAllCategories = (categories: TemplateCategory[]): TemplateCategory[] => {
+    let allCategories: TemplateCategory[] = [];
+    
+    categories.forEach(category => {
+      allCategories.push(category);
+      if (category.categories && category.categories.length > 0) {
+        allCategories = allCategories.concat(getAllCategories(category.categories));
+      }
+    });
+    
+    return allCategories;
+  };
+
+  const allCategories = template ? getAllCategories(template.schema.categories) : [];
+
   return (
     <div className={commonStyles.container}>
       <h1>{character.name}</h1>
@@ -282,7 +297,7 @@ const Character: React.FC = () => {
         fieldKey={editingField?.key || ''}
         title={editingField ? 'Редактирование поля' : 'Добавление поля'}
         isKeyEditable={!editingField}
-        categories={template?.schema.categories || []}
+        categories={allCategories}
       />
     </div>
   );
