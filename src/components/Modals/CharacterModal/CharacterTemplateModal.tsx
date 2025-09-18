@@ -198,36 +198,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
         )
       }));
     }
-  };
-
-  const addSubcategory = (parentCategoryKey: string, subcategory: TemplateCategory) => {
-    setSchema(prev => ({
-      categories: prev.categories.map(category => 
-        category.key === parentCategoryKey
-          ? { 
-              ...category, 
-              categories: [...(category.categories || []), subcategory] 
-            }
-          : category
-      )
-    }));
-  };
-
-  const editSubcategory = (parentCategoryKey: string, subcategory: TemplateCategory) => {
-    setSchema(prev => ({
-      categories: prev.categories.map(category => 
-        category.key === parentCategoryKey
-          ? { 
-              ...category, 
-              categories: category.categories?.map(cat => 
-                cat.key === subcategory.key ? subcategory : cat
-              ) || []
-            }
-          : category
-      )
-    }));
-  };
-  
+  };  
 
   const getUncategorizedFields = () => {
     const allFieldKeys = new Set(Object.keys(fields));
