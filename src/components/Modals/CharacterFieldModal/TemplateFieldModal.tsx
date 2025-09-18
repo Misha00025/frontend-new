@@ -174,16 +174,16 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
           </div>
 
           <div className={styles.formGroup}>
-          <label>
-            <input
-              type="checkbox"
-              checked={isProperty}
-              className={inputStyles.input}
-              onChange={(e) => setIsProperty(e.target.checked)}
-            />
-            Поле с максимальным значением
-          </label>
-        </div>
+            <label>
+              <input
+                type="checkbox"
+                checked={isProperty}
+                className={inputStyles.input}
+                onChange={(e) => setIsProperty(e.target.checked)}
+              />
+              Поле с максимальным значением
+            </label>
+          </div>
 
           { isProperty && (
             <div className={styles.formGroup}>

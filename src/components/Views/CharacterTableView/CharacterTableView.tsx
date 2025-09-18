@@ -63,13 +63,13 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
           <div key={categoryKey} className={styles.categorySection}>
             <h3 className={styles.categoryTitle}>{categoryNames[categoryKey] || categoryKey}</h3>
             <table className={styles.table}>
-              <thead className={isMobile ? styles.mobileHeader : ''}>
+              {/* <thead className={isMobile ? styles.mobileHeader : ''}>
                 <tr>
                   <th className={styles.nameCell}>Название</th>
                   <th className={styles.valueCell}>Значение</th>
                   {showMore && <th className={styles.formulaCell}>Формула</th>}
                 </tr>
-              </thead>
+              </thead> */}
               <tbody>
                 {fields.map(([fieldKey, field, isStatic]) => (
                   <tr key={fieldKey} className={styles.row}>

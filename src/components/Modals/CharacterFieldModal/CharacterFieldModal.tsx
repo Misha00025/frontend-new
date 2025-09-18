@@ -37,6 +37,8 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
   const [formula, setFormula] = useState('');
   const [value, setValue] = useState<number | ''>('');
   const [maxValue, setMaxValue] = useState<number | '' | null>(null);
+  const [isProperty, setIsProperty] = useState<boolean>(false);
+  const [isExist, setIsExist] = useState<boolean>(false);
   const [description, setDescription] = useState('');
   const [key, setKey] = useState('');
   const [category, setCategory] = useState('');
@@ -49,6 +51,8 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
       setValue(field.value);
       setFormula(field.formula ? field.formula : '');
       setMaxValue(field.maxValue ? field.maxValue : null);
+      setIsProperty(field.maxValue ? true : false);
+      setIsExist(true)
       setDescription(field.description || '');
       setKey(fieldKey);
       setCategory(field.category || '');
@@ -57,9 +61,11 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
       const newName = 'Новое поле'
       setName(newName);
       setValue(0);
-      setMaxValue(0);
+      setMaxValue(null);
       setFormula('');
       setDescription('');
+      setIsProperty(false);
+      setIsExist(false);
       setKey(generateFieldKey(newName));
       setCategory('');
     }
@@ -82,7 +88,7 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
       name,
       value: value === ''? 0 : value,
       description,
-      formula
+      formula: formula
     };
     if (maxValue !== null){
       fieldData.maxValue = maxValue === ''? 0 : maxValue;
@@ -155,7 +161,21 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
             />
           </div>
 
-          {maxValue !== null && (
+          {!isExist && (
+            <div className={styles.formGroup}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={isProperty}
+                  className={inputStyles.input}
+                  onChange={(e) => { setIsProperty(e.target.checked); setMaxValue(e.target.checked ? 0 : null)}}
+                />
+                Поле с максимальным значением
+              </label>
+            </div>
+          )}
+
+          {isProperty && maxValue !== null && (
             <div className={styles.formGroup}>
               <label>Максимальное значение:</label>
               <input
