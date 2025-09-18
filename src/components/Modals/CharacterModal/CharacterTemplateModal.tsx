@@ -51,6 +51,19 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     }
   }, [editingTemplate, isOpen]);
 
+  const getAllCategories = (categories: TemplateCategory[]): TemplateCategory[] => {
+    let allCategories: TemplateCategory[] = [];
+    
+    categories.forEach(category => {
+      allCategories.push(category);
+      if (category.categories && category.categories.length > 0) {
+        allCategories = allCategories.concat(getAllCategories(category.categories));
+      }
+    });
+    
+    return allCategories;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -286,30 +299,36 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     setIsCategoryModalOpen(false);
   };
 
-  const moveFieldToCategory = (fieldKey: string, categoryKey: string) => {
-    // Рекурсивно перемещаем поле в указанную категорию
-    const moveFieldRecursive = (categories: TemplateCategory[]): TemplateCategory[] => {
-      return categories.map(category => {
-        if (category.key === categoryKey) {
-          // Добавляем поле в целевую категорию
-          return {
-            ...category,
-            fields: [...category.fields, fieldKey]
-          };
-        } else {
-          // Удаляем поле из всех других категорий
-          return {
-            ...category,
-            fields: category.fields.filter(f => f !== fieldKey),
-            categories: category.categories ? moveFieldRecursive(category.categories) : undefined
-          };
-        }
-      });
+  const moveFieldToCategory = (fieldKey: string, categoryKey: string | null) => {
+    const removeFieldFromAllCategories = (categories: TemplateCategory[]): TemplateCategory[] => {
+      return categories.map(category => ({
+        ...category,
+        fields: category.fields.filter(f => f !== fieldKey),
+        categories: category.categories ? removeFieldFromAllCategories(category.categories) : undefined
+      }));
     };
+    let updatedCategories = removeFieldFromAllCategories(schema.categories);
+    if (categoryKey) {
+      const addFieldToCategory = (categories: TemplateCategory[]): TemplateCategory[] => {
+        return categories.map(category => {
+          if (category.key === categoryKey) {
+            return {
+              ...category,
+              fields: [...category.fields, fieldKey]
+            };
+          } else if (category.categories) {
+            return {
+              ...category,
+              categories: addFieldToCategory(category.categories)
+            };
+          }
+          return category;
+        });
+      };
+      updatedCategories = addFieldToCategory(updatedCategories);
+    }
 
-    setSchema(prev => ({
-      categories: moveFieldRecursive(prev.categories)
-    }));
+    setSchema({ categories: updatedCategories });
   };  
 
   const getUncategorizedFields = () => {
