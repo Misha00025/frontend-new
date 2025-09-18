@@ -45,6 +45,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
       setValue(field.value);
       setFormula(field.formula ? field.formula : '');
       setMaxValue(field.maxValue ? field.maxValue : 0);
+      setIsProperty(field.maxValue ? true : false);
       setDescription(field.description);
       setKey(generateFieldKey(field.name));
     } else {
@@ -52,6 +53,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
       setName('');
       setValue(0);
       setMaxValue(0);
+      setIsProperty(false);
       setFormula('');
       setDescription('');
       setKey('');
