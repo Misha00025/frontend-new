@@ -3,15 +3,18 @@
   margin-top: 1rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  row-gap: 0.5rem;
+  column-gap: 0.5rem;
 }
 
 .categorySection {
   margin-bottom: 0;
   background: var(--bg-primary);
   border-radius: var(--border-radius);
+  border-color: var(--border-color);
+  border: 1px;
   padding: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); */
 }
 
 .categoryTitle {
