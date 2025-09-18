@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { CharacterField } from '../../../types/characters';
-import { CharacterTemplate } from '../../../types/characterTemplates';
+import { CharacterTemplate, TemplateCategory } from '../../../types/characterTemplates';
 import List from '../../List/List';
 import FieldCard from '../FieldCard/FieldCard';
 import IconButton from '../../Buttons/IconButton';
@@ -8,26 +8,35 @@ import styles from './CategoryCard.module.css';
 
 interface CategoryCardProps {
   title: string;
+  categoryKey: string;
   fields: [string, CharacterField, boolean][];
+  subcategories?: TemplateCategory[];
+  allFields: Record<string, CharacterField>;
   canEdit: boolean;
   template?: CharacterTemplate | null;
   onEdit: (fieldKey: string, field: CharacterField) => void;
   onDelete: (fieldKey: string) => void;
   onChangeCategory: (fieldKey: string, newCategory: string) => void;
+  level?: number;
 }
 
 type SortOrder = 'none' | 'asc' | 'desc';
 
 const CategoryCard: React.FC<CategoryCardProps> = ({
   title,
+  categoryKey,
   fields,
+  subcategories,
+  allFields,
   canEdit,
   template,
   onEdit,
   onDelete,
-  onChangeCategory
+  onChangeCategory,
+  level = 0
 }) => {
   const [sortOrder, setSortOrder] = useState<SortOrder>('none');
+  const [isExpanded, setIsExpanded] = useState(true);
   
   const sortedFields = useMemo(() => {
     if (sortOrder === 'none') return fields;
@@ -64,33 +73,79 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
     return 'Сортировка по убыванию';
   };
 
-  if (fields.length === 0) return null;
+  // Функция для подготовки полей подкатегорий
+  const getSubcategoryFields = (subcategory: TemplateCategory): [string, CharacterField, boolean][] => {
+    return subcategory.fields
+      .filter(key => allFields[key])
+      .map(key => [key, allFields[key], true]);
+  };
+
+  // Отображаем категорию, даже если в ней нет полей, но есть подкатегории
+  const hasContent = fields.length > 0 || (subcategories && subcategories.length > 0);
+  if (!hasContent) return null;
 
   return (
-    <div className={styles.categorySection}>
+    <div className={`${styles.categorySection} ${level > 0 ? styles.subcategory : ''}`} data-level={level}>
       <div className={styles.categoryHeader}>
-        <h3>{title}</h3>
-        <IconButton
-          icon={getSortIcon()}
-          title={getSortTitle()}
-          onClick={handleSortToggle}
-        />
-      </div>
-      <List layout="grid" gap="medium">
-        {sortedFields.map(([key, field, isStatic]) => (
-          <FieldCard
-            key={key}
-            fieldKey={key}
-            field={field}
-            canEdit={canEdit}
-            canEditCategory = {!isStatic && canEdit}
-            template={template}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onChangeCategory={onChangeCategory}
+        <div className={styles.categoryTitle}>
+          {subcategories && subcategories.length > 0 && (
+            <button 
+              className={styles.expandButton}
+              onClick={() => setIsExpanded(!isExpanded)}
+              aria-expanded={isExpanded}
+            >
+              {isExpanded ? '▼' : '►'}
+            </button>
+          )}
+          <h3>{title}</h3>
+        </div>
+        {fields.length > 0 && (
+          <IconButton
+            icon={getSortIcon()}
+            title={getSortTitle()}
+            onClick={handleSortToggle}
           />
-        ))}
-      </List>
+        )}
+      </div>
+      
+      {isExpanded && (
+        <>
+          {fields.length > 0 && (
+            <List layout="grid" gap="medium">
+              {sortedFields.map(([key, field, isStatic]) => (
+                <FieldCard
+                  key={key}
+                  fieldKey={key}
+                  field={field}
+                  canEdit={canEdit}
+                  canEditCategory={!isStatic && canEdit}
+                  template={template}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  onChangeCategory={onChangeCategory}
+                />
+              ))}
+            </List>
+          )}
+          
+          {subcategories && subcategories.map(subcategory => (
+            <CategoryCard
+              key={subcategory.key}
+              title={subcategory.name}
+              categoryKey={subcategory.key}
+              fields={getSubcategoryFields(subcategory)}
+              subcategories={subcategory.categories}
+              allFields={allFields}
+              canEdit={canEdit}
+              template={template}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onChangeCategory={onChangeCategory}
+              level={level + 1}
+            />
+          ))}
+        </>
+      )}
     </div>
   );
 };

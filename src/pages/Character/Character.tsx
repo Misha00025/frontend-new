@@ -55,36 +55,61 @@ const Character: React.FC = () => {
   };
 
   const getFieldsByCategory = () => {
-    
     if (!template || !character) return {};
     
-    const categorizedFields: Record<string, [string, CharacterField, boolean][]> = {};
-    template.schema.categories.forEach(category => {
-      categorizedFields[category.key] = [];
-    });
-    categorizedFields.other = [];
-    template.schema.categories.forEach(category => {
+    const categorizedFields: Record<string, {
+      fields: [string, CharacterField, boolean][];
+      subcategories?: TemplateCategory[];
+    }> = {};
+    
+    // Функция для рекурсивной обработки категорий
+    const processCategory = (category: TemplateCategory) => {
+      const fieldsInCategory: [string, CharacterField, boolean][] = [];
+      
+      // Добавляем поля категории
       category.fields.forEach(fieldKey => {
         if (character.fields[fieldKey]) {
-          categorizedFields[category.key].push([fieldKey, character.fields[fieldKey], true]);
+          fieldsInCategory.push([fieldKey, character.fields[fieldKey], true]);
         }
       });
-    });
+      
+      // Сохраняем подкатегории
+      categorizedFields[category.key] = {
+        fields: fieldsInCategory,
+        subcategories: category.categories
+      };
+      
+      // Обрабатываем вложенные категории
+      if (category.categories) {
+        category.categories.forEach(processCategory);
+      }
+    };
     
+    // Обрабатываем все категории шаблона
+    template.schema.categories.forEach(processCategory);
+    
+    categorizedFields.other = {
+      fields: []
+    };
+    
+    // Добавляем поля, не входящие в категории шаблона
     Object.entries(character.fields).forEach(([key, field]) => {
       let alreadyAdded = false;
-      for (const category of template.schema.categories) {
-        if (category.fields.includes(key)) {
+      
+      // Проверяем, добавлено ли поле в какую-либо категорию
+      for (const categoryData of Object.values(categorizedFields)) {
+        if (categoryData.fields.some(([fieldKey]) => fieldKey === key)) {
           alreadyAdded = true;
           break;
         }
       }
       
-      if (alreadyAdded) return;
-      if (field.category && categorizedFields[field.category]) {
-        categorizedFields[field.category].push([key, field, false]);
-      } else {
-        categorizedFields.other.push([key, field, false]);
+      if (!alreadyAdded) {
+        if (field.category && categorizedFields[field.category]) {
+          categorizedFields[field.category].fields.push([key, field, false]);
+        } else {
+          categorizedFields.other.fields.push([key, field, false]);
+        }
       }
     });
     
@@ -295,36 +320,47 @@ const Character: React.FC = () => {
         {viewMode === 'card' ? (
           <List layout='vertical' gap='small'>
             {/* Отображаем поля по категориям из шаблона */}
-            {template && template.schema.categories.map(category => (
+            {template && template.schema.categories.map(category => {
+              const categoryData = categorizedFields[category.key];
+              return (
+                <CategoryCard
+                  key={category.key}
+                  title={category.name}
+                  categoryKey={category.key}
+                  fields={categoryData?.fields || []}
+                  subcategories={category.categories}
+                  allFields={character.fields}
+                  canEdit={canEditThisCharacter}
+                  template={template}
+                  onEdit={handleEditField}
+                  onDelete={handleDeleteField}
+                  onChangeCategory={handleChangeFieldCategory}
+                />
+              );
+            })}
+            
+            {categorizedFields.other.fields.length > 0 && (
               <CategoryCard
-                key={category.key}
-                title={category.name}
-                fields={categorizedFields[category.key] || []}
+                title="Другое"
+                categoryKey="other"
+                fields={categorizedFields.other.fields}
+                allFields={character.fields}
                 canEdit={canEditThisCharacter}
                 template={template}
                 onEdit={handleEditField}
                 onDelete={handleDeleteField}
                 onChangeCategory={handleChangeFieldCategory}
               />
-            ))}
-            
-            <CategoryCard
-              title="Другое"
-              fields={categorizedFields.other || []}
-              canEdit={canEditThisCharacter}
-              template={template}
-              onEdit={handleEditField}
-              onDelete={handleDeleteField}
-              onChangeCategory={handleChangeFieldCategory}
-            />
+            )}
           </List>
         ) : (
-          <CharacterTableView
-            categorizedFields={categorizedFields}
-            categoryNames={categoryNames}
-            canEdit={canEditThisCharacter}
-            onUpdateFieldValue={handleUpdateFieldValue}
-          />
+          // <CharacterTableView
+          //   categorizedFields={categorizedFields}
+          //   categoryNames={categoryNames}
+          //   canEdit={canEditThisCharacter}
+          //   onUpdateFieldValue={handleUpdateFieldValue}
+          // />
+          null
         )}
       </div>
 
