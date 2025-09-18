@@ -1,64 +1,115 @@
 /* components/CharacterTableView/CharacterTableView.module.css */
 .tableView {
-    margin-top: 1rem;
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.categorySection {
+  margin-bottom: 0;
+  background: var(--bg-primary);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.categoryTitle {
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.row {
+  border-bottom: 1px solid var(--border-color);
+  /* border-top: 1px solid var(--border-color); */
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.nameCell {
+  padding: 0.5rem;
+  font-weight: 500;
+  width: 40%;
+  vertical-align: top;
+}
+
+.valueCell {
+  padding: 0.5rem;
+  width: 35%;
+}
+
+.formulaCell {
+  padding: 0.5rem;
+  width: 25%;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.value {
+  min-height: 1rem;
+}
+
+.editableValue {
+  min-height: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--border-radius-sm);
+}
+
+.editableValue:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+}
+
+.editContainer {
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  flex: 1;
+  padding: 0.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.maxValue {
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
+  white-space: nowrap;
+}
+
+/* Мобильная версия */
+@media (max-width: 768px) {
+  .tableView {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
   .categorySection {
-    margin-bottom: 0.0rem;
+    padding: 0.75rem;
   }
   
-  .categoryTitle {
-    margin-bottom: 0.2rem;
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.2rem;
-  }
-  
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .row {
-    border-bottom: 1px solid var(--border-color-light);
-  }
-  
-  .row:last-child {
-    border-bottom: none;
+  .mobileHeader {
+    display: none;
   }
   
   .nameCell {
-    padding: 0.5rem;
-    font-weight: 500;
-    width: 40%;
-    vertical-align: top;
+    width: 50%;
   }
   
   .valueCell {
-    padding: 0.5rem;
-    width: 60%;
+    width: 50%;
   }
-  
-  .value {
-    min-height: 0.8rem;
-  }
-  
-  .editableValue {
-    min-height: 0.8rem;
-    cursor: pointer;
-    padding: 0.25rem;
-    border-radius: var(--border-radius-sm);
-  }
-  
-  .editableValue:hover {
-    background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
-  }
-  
-  .input {
-    width: 100%;
-    padding: 0.25rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-  }
+}
