@@ -61,11 +61,14 @@ export const categorizeCharacterFields = (character: Character, template: Charac
   Object.entries(character.fields).forEach(([key, field]) => {
     let alreadyAdded = false;
     
+    // Функция для рекурсивного поиска поля в категориях
     const checkInCategory = (category: CategoryData): boolean => {
+      // Проверяем поля в текущей категории
       if (category.fields.some(([fieldKey]) => fieldKey === key)) {
         return true;
       }
       
+      // Рекурсивно проверяем подкатегории
       if (category.subcategories) {
         for (const subcategory of category.subcategories) {
           if (checkInCategory(subcategory)) return true;
@@ -75,6 +78,7 @@ export const categorizeCharacterFields = (character: Character, template: Charac
       return false;
     };
     
+    // Проверяем все категории
     for (const category of Object.values(categorizedFields)) {
       if (checkInCategory(category)) {
         alreadyAdded = true;
@@ -83,24 +87,38 @@ export const categorizeCharacterFields = (character: Character, template: Charac
     }
     
     if (!alreadyAdded) {
-      if (field.category && categorizedFields[field.category]) {
-        const findAndAddToCategory = (category: CategoryData, targetKey: string): boolean => {
-          if (category.key === targetKey) {
+      if (field.category) {
+        // Функция для рекурсивного поиска категории по короткому ключу
+        const findAndAddToCategory = (category: CategoryData, targetShortKey: string): boolean => {
+          // Проверяем, совпадает ли короткий ключ категории (последняя часть после точки)
+          const categoryShortKey = category.key.split('.').pop();
+          if (categoryShortKey === targetShortKey) {
             category.fields.push([key, field, false]);
             return true;
           }
           
+          // Рекурсивно проверяем подкатегории
           if (category.subcategories) {
             for (const subcategory of category.subcategories) {
-              if (findAndAddToCategory(subcategory, targetKey)) return true;
+              if (findAndAddToCategory(subcategory, targetShortKey)) return true;
             }
           }
           
           return false;
         };
         
+        // Ищем категорию по короткому ключу во всем дереве
+        let categoryFound = false;
         for (const category of Object.values(categorizedFields)) {
-          if (findAndAddToCategory(category, field.category)) break;
+          if (findAndAddToCategory(category, field.category)) {
+            categoryFound = true;
+            break;
+          }
+        }
+        
+        // Если категория не найдена, добавляем в "Другое"
+        if (!categoryFound) {
+          categorizedFields.other.fields.push([key, field, false]);
         }
       } else {
         categorizedFields.other.fields.push([key, field, false]);
