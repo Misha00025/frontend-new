@@ -23,7 +23,7 @@ const Character: React.FC = () => {
   const [editingField, setEditingField] = useState<{ key: string; field: CharacterField } | null>(null);
   const [isAddingField, setIsAddingField] = useState(false);
   const { canDeleteThisCharacter, canEditThisCharacter } = useActionPermissions();
-  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
+  const [viewMode, setViewMode] = useState<'card' | 'table'>('table');
 
   useEffect(() => {
     if (groupId && characterId) {
@@ -55,15 +55,18 @@ const Character: React.FC = () => {
   };
 
   const getFieldsByCategory = () => {
-    if (!template || !character) return {};
+    if (!template || !character || !character.fields) return {};
     
     const categorizedFields: Record<string, {
+      key: string;
+      name: string;
       fields: [string, CharacterField, boolean][];
-      subcategories?: TemplateCategory[];
+      subcategories?: any[];
     }> = {};
     
     // Функция для рекурсивной обработки категорий
-    const processCategory = (category: TemplateCategory) => {
+    const processCategory = (category: TemplateCategory, parentKey?: string): any => {
+      const categoryKey = parentKey ? `${parentKey}.${category.key}` : category.key;
       const fieldsInCategory: [string, CharacterField, boolean][] = [];
       
       // Добавляем поля категории
@@ -73,22 +76,32 @@ const Character: React.FC = () => {
         }
       });
       
-      // Сохраняем подкатегории
-      categorizedFields[category.key] = {
-        fields: fieldsInCategory,
-        subcategories: category.categories
-      };
-      
       // Обрабатываем вложенные категории
+      let subcategories: any[] = [];
       if (category.categories) {
-        category.categories.forEach(processCategory);
+        subcategories = category.categories.map(subCategory => 
+          processCategory(subCategory, categoryKey)
+        );
       }
+      
+      return {
+        key: categoryKey,
+        name: category.name,
+        fields: fieldsInCategory,
+        subcategories: subcategories.length > 0 ? subcategories : undefined
+      };
     };
     
     // Обрабатываем все категории шаблона
-    template.schema.categories.forEach(processCategory);
+    template.schema.categories.forEach(category => {
+      const categoryData = processCategory(category);
+      categorizedFields[category.key] = categoryData;
+    });
     
+    // Добавляем поле "Другое"
     categorizedFields.other = {
+      key: 'other',
+      name: 'Другое',
       fields: []
     };
     
@@ -97,8 +110,22 @@ const Character: React.FC = () => {
       let alreadyAdded = false;
       
       // Проверяем, добавлено ли поле в какую-либо категорию
-      for (const categoryData of Object.values(categorizedFields)) {
-        if (categoryData.fields.some(([fieldKey]) => fieldKey === key)) {
+      const checkInCategory = (category: any): boolean => {
+        if (category.fields.some(([fieldKey]: [string, any]) => fieldKey === key)) {
+          return true;
+        }
+        
+        if (category.subcategories) {
+          for (const subcategory of category.subcategories) {
+            if (checkInCategory(subcategory)) return true;
+          }
+        }
+        
+        return false;
+      };
+      
+      for (const category of Object.values(categorizedFields)) {
+        if (checkInCategory(category)) {
           alreadyAdded = true;
           break;
         }
@@ -106,12 +133,35 @@ const Character: React.FC = () => {
       
       if (!alreadyAdded) {
         if (field.category && categorizedFields[field.category]) {
-          categorizedFields[field.category].fields.push([key, field, false]);
+          // Находим категорию и добавляем поле
+          const findAndAddToCategory = (category: any, targetKey: string): boolean => {
+            if (category.key === targetKey) {
+              category.fields.push([key, field, false]);
+              return true;
+            }
+            
+            if (category.subcategories) {
+              for (const subcategory of category.subcategories) {
+                if (findAndAddToCategory(subcategory, targetKey)) return true;
+              }
+            }
+            
+            return false;
+          };
+          
+          for (const category of Object.values(categorizedFields)) {
+            if (findAndAddToCategory(category, field.category)) break;
+          }
         } else {
           categorizedFields.other.fields.push([key, field, false]);
         }
       }
     });
+    
+    // Удаляем пустую категорию "Другое"
+    if (categorizedFields.other.fields.length === 0) {
+      delete categorizedFields.other;
+    }
     
     return categorizedFields;
   };
@@ -322,13 +372,15 @@ const Character: React.FC = () => {
             {/* Отображаем поля по категориям из шаблона */}
             {template && template.schema.categories.map(category => {
               const categoryData = categorizedFields[category.key];
+              if (!categoryData) return null;
+              
               return (
                 <CategoryCard
                   key={category.key}
                   title={category.name}
                   categoryKey={category.key}
-                  fields={categoryData?.fields || []}
-                  subcategories={category.categories}
+                  fields={categoryData.fields}
+                  subcategories={categoryData.subcategories}
                   allFields={character.fields}
                   canEdit={canEditThisCharacter}
                   template={template}
@@ -339,7 +391,7 @@ const Character: React.FC = () => {
               );
             })}
             
-            {categorizedFields.other.fields.length > 0 && (
+            {categorizedFields.other && (
               <CategoryCard
                 title="Другое"
                 categoryKey="other"
@@ -354,13 +406,11 @@ const Character: React.FC = () => {
             )}
           </List>
         ) : (
-          // <CharacterTableView
-          //   categorizedFields={categorizedFields}
-          //   categoryNames={categoryNames}
-          //   canEdit={canEditThisCharacter}
-          //   onUpdateFieldValue={handleUpdateFieldValue}
-          // />
-          null
+          <CharacterTableView
+            categorizedFields={categorizedFields}
+            canEdit={canEditThisCharacter}
+            onUpdateFieldValue={handleUpdateFieldValue}
+          />
         )}
       </div>
 

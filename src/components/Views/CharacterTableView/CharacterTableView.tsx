@@ -1,22 +1,29 @@
 // components/CharacterTableView/CharacterTableView.tsx
 import React, { useState, useEffect } from 'react';
 import { CharacterField } from '../../../types/characters';
+import { TemplateCategory } from '../../../types/characterTemplates';
 import styles from './CharacterTableView.module.css';
 import { usePlatform } from '../../../hooks/usePlatform';
 
+interface CategoryData {
+  key: string;
+  name: string;
+  fields: [string, CharacterField, boolean][];
+  subcategories?: CategoryData[];
+}
+
 interface CharacterTableViewProps {
-  categorizedFields: { [category: string]: [string, CharacterField, boolean][] };
-  categoryNames: { [category: string]: string };
+  categorizedFields: { [category: string]: CategoryData };
   canEdit: boolean;
   onUpdateFieldValue: (fieldKey: string, newValue: string) => void;
 }
 
-const CharacterTableView: React.FC<CharacterTableViewProps> = ({
-  categorizedFields,
-  categoryNames,
-  canEdit,
-  onUpdateFieldValue
-}) => {
+const CategoryTable: React.FC<{
+  category: CategoryData;
+  canEdit: boolean;
+  onUpdateFieldValue: (fieldKey: string, newValue: string) => void;
+  level?: number;
+}> = ({ category, canEdit, onUpdateFieldValue, level = 0 }) => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
   const isMobile = usePlatform();
@@ -55,62 +62,79 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
   };
 
   return (
-    <div className={styles.tableView}>
-      {Object.entries(categorizedFields).map(([categoryKey, fields]) => {
-        if (fields.length === 0) return null;
-
-        return (
-          <div key={categoryKey} className={styles.categorySection}>
-            <h3 className={styles.categoryTitle}>{categoryNames[categoryKey] || categoryKey}</h3>
-            <table className={styles.table}>
-              {/* <thead className={isMobile ? styles.mobileHeader : ''}>
-                <tr>
-                  <th className={styles.nameCell}>Название</th>
-                  <th className={styles.valueCell}>Значение</th>
-                  {showMore && <th className={styles.formulaCell}>Формула</th>}
-                </tr>
-              </thead> */}
-              <tbody>
-                {fields.map(([fieldKey, field, isStatic]) => (
-                  <tr key={fieldKey} className={styles.row}>
-                    <td className={styles.nameCell}>{field.name}</td>
-                    <td className={styles.valueCell}>
-                      {editingField === fieldKey ? (
-                        <div className={styles.editContainer}>
-                          <input
-                            type="text"
-                            value={tempValue}
-                            onChange={(e) => setTempValue(e.target.value)}
-                            onBlur={() => handleSaveEdit(fieldKey)}
-                            onKeyDown={(e) => handleKeyPress(e, fieldKey)}
-                            autoFocus
-                            className={styles.input}
-                          />
-                          {field.maxValue !== undefined && (
-                            <span className={styles.maxValue}> / {field.maxValue}</span>
-                          )}
-                        </div>
-                      ) : (
-                        <div
-                          onClick={() => handleStartEdit(fieldKey, field.value.toString() || '')}
-                          className={canEdit ? styles.editableValue : styles.value}
-                        >
-                          {formatValue(field) || '—'}
-                        </div>
+    <div className={`${styles.categorySection} ${level > 0 ? styles.subcategory : ''}`}>
+      <h3 className={styles.categoryTitle} style={{ marginLeft: level > 0 ? `${level * 16}px` : '0' }}>
+        {category.name}
+      </h3>
+      {category.fields.length > 0 && (
+        <table className={styles.table}>
+          <tbody>
+            {category.fields.map(([fieldKey, field, isStatic]) => (
+              <tr key={fieldKey} className={styles.row}>
+                <td className={styles.nameCell}>{field.name}</td>
+                <td className={styles.valueCell}>
+                  {editingField === fieldKey ? (
+                    <div className={styles.editContainer}>
+                      <input
+                        type="text"
+                        value={tempValue}
+                        onChange={(e) => setTempValue(e.target.value)}
+                        onBlur={() => handleSaveEdit(fieldKey)}
+                        onKeyDown={(e) => handleKeyPress(e, fieldKey)}
+                        autoFocus
+                        className={styles.input}
+                      />
+                      {field.maxValue !== undefined && (
+                        <span className={styles.maxValue}> / {field.maxValue}</span>
                       )}
-                    </td>
-                    {showMore && (
-                      <td className={styles.formulaCell}>
-                        {field.formula || '—'}
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      })}
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => handleStartEdit(fieldKey, field.value.toString() || '')}
+                      className={canEdit ? styles.editableValue : styles.value}
+                    >
+                      {formatValue(field) || '—'}
+                    </div>
+                  )}
+                </td>
+                {showMore && (
+                  <td className={styles.formulaCell}>
+                    {field.formula || '—'}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {category.subcategories && category.subcategories.map(subcategory => (
+        <CategoryTable
+          key={subcategory.key}
+          category={subcategory}
+          canEdit={canEdit}
+          onUpdateFieldValue={onUpdateFieldValue}
+          level={level + 1}
+        />
+      ))}
+    </div>
+  );
+};
+
+const CharacterTableView: React.FC<CharacterTableViewProps> = ({
+  categorizedFields,
+  canEdit,
+  onUpdateFieldValue
+}) => {
+  return (
+    <div className={styles.tableView}>
+      {Object.values(categorizedFields).map(category => (
+        <CategoryTable
+          key={category.key}
+          category={category}
+          canEdit={canEdit}
+          onUpdateFieldValue={onUpdateFieldValue}
+        />
+      ))}
     </div>
   );
 };
