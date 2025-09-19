@@ -49,6 +49,11 @@ const Profile: React.FC = () => {
           </div>
         </div>
       )}
+      <div className={styles.footer}>
+        <button className={buttonStyles.button} onClick={logout}>
+          Выйти
+        </button>
+      </div>
     </div>
   );
 };
