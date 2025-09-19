@@ -13,6 +13,7 @@ import CategoryCard from '../../components/Cards/CategoryCard/CategoryCard';
 import CharacterTableView from '../../components/Views/CharacterTableView/CharacterTableView';
 import CharacterCardsView from '../../components/Views/CharacterCardsView/CharacterCardsView';
 import { getFieldsByCategory } from '../../utils/characterFields';
+import IconButton from '../../components/Buttons/IconButton';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -227,28 +228,19 @@ const Character: React.FC = () => {
 
   return (
     <div className={commonStyles.container}>
-      <h1>{character.name}</h1>
-      <p>{character.description}</p>
+      <List layout='horizontal'>
+        {canDeleteThisCharacter && (<IconButton 
+          title='Удалить персонажа'
+          icon='delete'
+          onClick={handleDeleteCharacter}
+          variant='danger'
+        />)}
+        <h1>{character.name}</h1> 
+      </List>
+      
+      {/* <p>{character.description}</p> */}
 
       {error && <div className={commonStyles.error}>{error}</div>}
-      {canEditThisCharacter && (
-        <div className={commonStyles.actions}>
-          <button 
-            className={buttonStyles.button}
-            onClick={handleAddField}
-          >
-            Добавить поле
-          </button>
-          { canDeleteThisCharacter && (
-            <button 
-              className={buttonStyles.button}
-              onClick={handleDeleteCharacter}
-            >
-              Удалить персонажа
-            </button>
-          )}
-        </div>
-      )}
       
       <div className={uiStyles.fields}>
         <List layout='horizontal'>
@@ -268,8 +260,17 @@ const Character: React.FC = () => {
             >
               📊
             </button>
+            
           </div>
+          
         </List>
+        {canEditThisCharacter && (<List layout='horizontal'>
+          <IconButton 
+            title='Добавить поле'
+            icon='add'
+            onClick={handleAddField}
+          />
+        </List>)}
         {viewMode === 'card' ? (
           <CharacterCardsView
             character={character}

@@ -50,8 +50,8 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
       setName(field.name);
       setValue(field.value);
       setFormula(field.formula ? field.formula : '');
-      setMaxValue(field.maxValue ? field.maxValue : null);
-      setIsProperty(field.maxValue ? true : false);
+      setMaxValue(field.maxValue !== undefined ? field.maxValue : null);
+      setIsProperty(field.maxValue !== undefined ? true : false);
       setIsExist(true)
       setDescription(field.description || '');
       setKey(fieldKey);
