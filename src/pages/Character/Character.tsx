@@ -3,16 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Character as CharacterData, UpdateCharacterRequest, CharacterField } from '../../types/characters';
 import { charactersAPI, characterTemplatesAPI } from '../../services/api';
 import CharacterFieldModal from '../../components/Modals/CharacterFieldModal/CharacterFieldModal';
-import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from './Character.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import { CharacterTemplate, TemplateCategory } from '../../types/characterTemplates';
 import List from '../../components/List/List';
-import CategoryCard from '../../components/Cards/CategoryCard/CategoryCard';
 import CharacterTableView from '../../components/Views/CharacterTableView/CharacterTableView';
 import CharacterCardsView from '../../components/Views/CharacterCardsView/CharacterCardsView';
-import { getFieldsByCategory } from '../../utils/characterFields';
 import IconButton from '../../components/Buttons/IconButton';
 
 const Character: React.FC = () => {
@@ -235,24 +232,17 @@ const Character: React.FC = () => {
           onClick={handleDeleteCharacter}
           variant='danger'
         />)}
-        <h1>{character.name}</h1> 
+        <h1 style={{marginBottom: '2px'}}>{character.name}</h1> 
       </List>
       
-      {/* <p>{character.description}</p> */}
+      <p>{character.description}</p>
 
       {error && <div className={commonStyles.error}>{error}</div>}
       
-      <div className={uiStyles.fields}>
+      <div className={uiStyles.fields} style={{marginTop: '0px'}}>
         <List layout='horizontal'>
           <h2>Поля персонажа</h2>
           <div className={uiStyles.viewSwitcher}>
-            <button 
-              className={`${uiStyles.viewButton} ${viewMode === 'card' ? uiStyles.active : ''}`}
-              onClick={() => setViewMode('card')}
-              title="Карточный вид"
-            >
-              📋
-            </button>
             <button 
               className={`${uiStyles.viewButton} ${viewMode === 'table' ? uiStyles.active : ''}`}
               onClick={() => setViewMode('table')}
@@ -260,7 +250,13 @@ const Character: React.FC = () => {
             >
               📊
             </button>
-            
+            <button 
+              className={`${uiStyles.viewButton} ${viewMode === 'card' ? uiStyles.active : ''}`}
+              onClick={() => setViewMode('card')}
+              title="Карточный вид"
+            >
+              📋
+            </button>
           </div>
           
         </List>

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { CharacterField } from '../../../types/characters';
 import { CategoryData } from '../../../utils/characterFields';
 import styles from './CategoryTable.module.css';
+import IconButton from '../../Buttons/IconButton';
 
 interface CategoryTableProps {
   category: CategoryData;
@@ -72,7 +73,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   };
 
   return (
-    <div className={`${styles.categorySection} ${level > 0 ? styles.subcategory : ''}`} style={{ marginLeft: level > 0 ? `${level * 4}px` : '0' }}>
+    <div className={`${styles.categorySection} ${level > 0 ? styles.subcategory : ''}`} style={{ margin: level > 0 ? `${level * 4}px` : '0' }}>
       <h3 className={styles.categoryTitle}>
         {category.name}
       </h3>
@@ -81,7 +82,15 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
           <tbody>
             {category.fields.map(([fieldKey, field, isStatic]) => (
               <tr key={fieldKey} className={styles.row}>
-                <td className={styles.nameCell}>{field.name}</td>
+                <td className={styles.nameCell}>
+                  {field.name}
+                  {/* <IconButton 
+                    title='Редактировать поле'
+                    icon='edit'
+                    onClick={()=>null}
+                    variant='secondary'
+                  /> */}
+                </td>
                 <td className={styles.valueCell}>
                   {editingField === fieldKey ? (
                     <div className={styles.editContainer}>

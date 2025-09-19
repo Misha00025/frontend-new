@@ -16,19 +16,18 @@
 }
 
 .categorySection.subcategory {
-  /* margin-top: 0.25rem; */
   margin-bottom: 0.25rem;
-  border-left: 3px solid var(--accent-color);
-  /* padding-left: 0.75rem; */
+  border: 0px;
+  /* border-left: 2px solid var(--accent-color); */
 }
 
 .categoryTitle {
-  /* margin-bottom: 0.2rem; */
   color: #ffffff;
   background-color: var(--accent-color);
-  /* border-bottom: 1px solid var(--border-color); */
   padding-bottom: 0.4rem;
   padding-top: 0.4rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
   font-size: 1.1rem;
   text-align: center;
 }
