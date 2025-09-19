@@ -8,9 +8,11 @@ import List from '../../components/List/List';
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
+import { usePlatform } from '../../hooks/usePlatform';
 
 const GroupItems: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
+  const isMobile = usePlatform();
   const [items, setItems] = useState<GroupItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +89,7 @@ const GroupItems: React.FC = () => {
         </div>
       )}
 
-      <List layout="grid" gap="medium">
+      <List layout={isMobile ? "vertical" : "grid"} gap="medium" gridSize='large'>
         {items.map(item => (
           <ItemCard
             key={item.id}

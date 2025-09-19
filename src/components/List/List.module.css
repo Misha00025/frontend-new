@@ -13,7 +13,6 @@
 
 .layout-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 }
 
 .gap-small {
@@ -26,4 +25,16 @@
 
 .gap-large {
   gap: 1.5rem;
+}
+
+.grid-small {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.grid-medium {
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+.grid-large {
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
 }

@@ -11,9 +11,11 @@ import uiStyles from '../../styles/ui.module.css';
 import ItemCard from '../../components/Cards/ItemCard';
 import List from '../../components/List/List';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
+import { usePlatform } from '../../hooks/usePlatform';
 
 const CharacterItems: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
+  const isMobile = usePlatform();
   const [items, setItems] = useState<CharacterItem[]>([]);
   const [groupItems, setGroupItems] = useState<GroupItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -104,16 +106,16 @@ const CharacterItems: React.FC = () => {
         {items.length === 0 ? (
           <p>Предметов пока нет</p>
         ) : (
-          <List layout="grid" gap="small">
+          <List layout={isMobile ? "vertical" : "grid"} gap="small" gridSize='large'>
             {items.map(item => (
-            <ItemCard
-              key={item.id}
-              item={item}
-              onEdit={() => handleEditItem(item)}
-              onDelete={() => handleDeleteItem(item.id)}
-              showAmount={true}
-              showActions={canEditThisCharacter}
-            />
+              <ItemCard
+                key={item.id}
+                item={item}
+                onEdit={() => handleEditItem(item)}
+                onDelete={() => handleDeleteItem(item.id)}
+                showAmount={true}
+                showActions={canEditThisCharacter}
+              />
             ))}
           </List>
         )}
