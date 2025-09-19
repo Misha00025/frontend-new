@@ -2,74 +2,41 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupUser, User } from '../../types/groupUsers';
 import { groupUsersAPI } from '../../services/api';
-import buttonStyles from '../../styles/components/Button.module.css';
-import inputStyles from '../../styles/components/Input.module.css';
 import styles from '../../styles/common.module.css';
-import stylesUi from '../../styles/ui.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
+import UserSearch from '../../components/UsersManagement/UserSearch';
+import UsersList from '../../components/UsersManagement/UsersList';
+import { useUserManagement } from '../../hooks/useUserManagement';
 
 const GroupUsers: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const [groupUsers, setGroupUsers] = useState<GroupUser[]>([]);
-  const [searchNickname, setSearchNickname] = useState('');
-  const [searchResults, setSearchResults] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const { canManageGroupUsers } = useActionPermissions();
+  const { loading, error, success, executeOperation } = useUserManagement();
 
   useEffect(() => {
     if (groupId) {
       loadGroupUsers();
     }
-  }, [groupId]);
+  }, [groupId, loading]);
 
   const loadGroupUsers = async () => {
-    try {
-      setLoading(true);
-      const users = await groupUsersAPI.getGroupUsers(parseInt(groupId!));
-      setGroupUsers(users);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load group users');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = async () => {
-    if (!searchNickname.trim()) return;
-
-    try {
-      setLoading(true);
-      const users = await groupUsersAPI.searchUsers(searchNickname);
-      setSearchResults(users);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to search users');
-    } finally {
-      setLoading(false);
-    }
+    const users = await groupUsersAPI.getGroupUsers(parseInt(groupId!));
+    setGroupUsers(users);
   };
 
   const handleAddUser = async (user: User, isAdmin: boolean) => {
-    try {
-      await groupUsersAPI.addUserToGroup(parseInt(groupId!), user.id, isAdmin);
-      setSuccess(`Пользователь ${user.nickname} успешно добавлен в группу`);
-      setSearchResults([]);
-      setSearchNickname('');
-      loadGroupUsers(); // Перезагружаем список пользователей группы
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add user to group');
-    }
+    await executeOperation(
+      () => groupUsersAPI.addUserToGroup(parseInt(groupId!), user.id, isAdmin),
+      `Пользователь ${user.nickname} успешно добавлен в группу`
+    );
   };
 
   const handleRemoveUser = async (userId: number) => {
-    try {
-      await groupUsersAPI.removeUserFromGroup(parseInt(groupId!), userId);
-      setSuccess('Пользователь успешно удален из группы');
-      loadGroupUsers(); // Перезагружаем список пользователей группы
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to remove user from group');
-    }
+    await executeOperation(
+      () => groupUsersAPI.removeUserFromGroup(parseInt(groupId!), userId),
+      `'Пользователь успешно удален из группы'`
+    );
   };
 
   if (loading) return <div className={styles.container}>Загрузка...</div>;
@@ -82,73 +49,26 @@ const GroupUsers: React.FC = () => {
       {success && <div className={styles.success}>{success}</div>}
 
       {canManageGroupUsers && (
-        <div className={styles.section}>
-          <h2>Добавить пользователя</h2>
-          <div className={styles.searchBox}>
-            <input
-              type="text"
-              placeholder="Введите никнейм пользователя"
-              value={searchNickname}
-              onChange={(e) => setSearchNickname(e.target.value)}
-              className={inputStyles.input}
-            />
-              <button onClick={handleSearch} className={buttonStyles.button}>
-                Поиск
-              </button>
-          </div>
-          
-          {searchResults.length > 0 && (
-            <div className={stylesUi.searchResults}>
-              <h3>Результаты поиска:</h3>
-              {searchResults.map(user => (
-                <div key={user.id} className={stylesUi.userCard}>
-                  <img src={user.imageLink || '/default-avatar.png'} alt={user.nickname} className={styles.avatar} />
-                  <div className={stylesUi.userInfo}>
-                    <h4>{user.visibleName}</h4>
-                    <p>@{user.nickname}</p>
-                  </div>
-                  <div className={stylesUi.actions}>
-                    <button onClick={() => handleAddUser(user, false)} className={buttonStyles.button}>
-                      Добавить
-                    </button>
-                    <button onClick={() => handleAddUser(user, true)} className={buttonStyles.button}>
-                      Добавить как администратора
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <UserSearch
+          onSearch={groupUsersAPI.searchUsers}
+          onAddUser={handleAddUser}
+          permissionOptions={[
+            { label: 'Пользователь', value: false },
+            { label: 'Администратор', value: true }
+          ]}
+          title="Добавить пользователя"
+        />
       )}
 
       <div className={styles.section}>
         <h2>Пользователи группы</h2>
-        {groupUsers.length === 0 ? (
-          <p>В группе пока нет пользователей</p>
-        ) : (
-          <div className={stylesUi.usersList}>
-            {groupUsers.map(groupUser => (
-              <div key={groupUser.user.id} className={stylesUi.userCard}>
-                <img src={groupUser.user.imageLink || '/default-avatar.png'} alt={groupUser.user.nickname} className={stylesUi.avatar} />
-                <div className={stylesUi.userInfo}>
-                  <h4>{groupUser.user.visibleName}</h4>
-                  <p>@{groupUser.user.nickname} {groupUser.isAdmin && '(Администратор)'}</p>
-                </div>
-                {canManageGroupUsers && (
-                  <div className={stylesUi.actions}>
-                    <button 
-                      onClick={() => handleRemoveUser(groupUser.user.id)} 
-                      className={buttonStyles.button}
-                    >
-                      Удалить
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+        <UsersList
+          users={groupUsers.map(gu => ({ user: gu.user, permission: gu.isAdmin }))}
+          onRemoveUser={handleRemoveUser}
+          formatPermission={(isAdmin) => isAdmin ? '(Администратор)' : ''}
+          canManage={canManageGroupUsers}
+          emptyMessage="В группе пока нет пользователей"
+        />
       </div>
     </div>
   );

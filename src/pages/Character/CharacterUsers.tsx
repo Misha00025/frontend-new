@@ -4,21 +4,17 @@ import { User } from '../../types/groupUsers';
 import { CharacterUser } from '../../types/characterUsers';
 import { characterUsersAPI } from '../../services/api';
 import { groupUsersAPI } from '../../services/api';
-import buttonStyles from '../../styles/components/Button.module.css';
-import inputStyles from '../../styles/components/Input.module.css';
 import styles from '../../styles/common.module.css';
-import stylesUi from '../../styles/ui.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
+import { useUserManagement } from '../../hooks/useUserManagement';
+import UserSearch from '../../components/UsersManagement/UserSearch';
+import UsersList from '../../components/UsersManagement/UsersList';
 
 const CharacterUsers: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
   const [characterUsers, setCharacterUsers] = useState<CharacterUser[]>([]);
-  const [searchNickname, setSearchNickname] = useState('');
-  const [searchResults, setSearchResults] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const { canManageCharacterUsers } = useActionPermissions();
+  const { loading, error, success, executeOperation } = useUserManagement();
 
   useEffect(() => {
     if (groupId && characterId) {
@@ -27,51 +23,22 @@ const CharacterUsers: React.FC = () => {
   }, [groupId, characterId]);
 
   const loadCharacterUsers = async () => {
-    try {
-      setLoading(true);
-      const users = await characterUsersAPI.getCharacterUsers(parseInt(groupId!), parseInt(characterId!));
-      setCharacterUsers(users);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load character users');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = async () => {
-    if (!searchNickname.trim()) return;
-
-    try {
-      setLoading(true);
-      const users = await groupUsersAPI.searchUsers(searchNickname);
-      setSearchResults(users);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to search users');
-    } finally {
-      setLoading(false);
-    }
+    const users = await characterUsersAPI.getCharacterUsers(parseInt(groupId!), parseInt(characterId!));
+    setCharacterUsers(users);
   };
 
   const handleAddUser = async (user: User, canWrite: boolean) => {
-    try {
-      await characterUsersAPI.addUserToCharacter(parseInt(groupId!), parseInt(characterId!), user.id, canWrite);
-      setSuccess(`Пользователь ${user.nickname} успешно добавлен к персонажу`);
-      setSearchResults([]);
-      setSearchNickname('');
-      loadCharacterUsers(); // Перезагружаем список пользователей персонажа
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add user to character');
-    }
+    await executeOperation(
+      () => characterUsersAPI.addUserToCharacter(parseInt(groupId!), parseInt(characterId!), user.id, canWrite),
+      `Игрок ${user.nickname} успешно добавлен персонажу`
+    );
   };
 
   const handleRemoveUser = async (userId: number) => {
-    try {
-      await characterUsersAPI.removeUserFromCharacter(parseInt(groupId!), parseInt(characterId!), userId);
-      setSuccess('Пользователь успешно удален из персонажа');
-      loadCharacterUsers(); // Перезагружаем список пользователей персонажа
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to remove user from character');
-    }
+    await executeOperation(
+      () => characterUsersAPI.removeUserFromCharacter(parseInt(groupId!), parseInt(characterId!), userId),
+      'Игрок успешно удалён'
+    );
   };
 
   if (loading) return <div className={styles.container}>Загрузка...</div>;
@@ -83,72 +50,25 @@ const CharacterUsers: React.FC = () => {
       {error && <div className={styles.error}>{error}</div>}
       {success && <div className={styles.success}>{success}</div>}
       {canManageCharacterUsers && (
-        <div className={styles.section}>
-          <h2>Добавить игрока</h2>
-          <div className={styles.searchBox}>
-            <input
-              type="text"
-              placeholder="Введите никнейм пользователя"
-              value={searchNickname}
-              onChange={(e) => setSearchNickname(e.target.value)}
-              className={inputStyles.input}
-            />
-            <button onClick={handleSearch} className={buttonStyles.button}>
-              Поиск
-            </button>
-          </div>
-
-          {searchResults.length > 0 && (
-            <div className={styles.searchResults}>
-              <h3>Результаты поиска:</h3>
-              {searchResults.map(user => (
-                <div key={user.id} className={stylesUi.userCard}>
-                  <img src={user.imageLink || '/default-avatar.png'} alt={user.nickname} className={stylesUi.avatar} />
-                  <div className={stylesUi.userInfo}>
-                    <h4>{user.visibleName}</h4>
-                    <p>@{user.nickname}</p>
-                  </div>
-                  <div className={stylesUi.actions}>
-                    <button onClick={() => handleAddUser(user, false)} className={buttonStyles.button}>
-                      Добавить (чтение)
-                    </button>
-                    <button onClick={() => handleAddUser(user, true)} className={buttonStyles.button}>
-                      Добавить (редактирование)
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <UserSearch
+          onSearch={groupUsersAPI.searchUsers}
+          onAddUser={handleAddUser}
+          permissionOptions={[
+            { label: 'Наблюдатель', value: false },
+            { label: 'Игрок', value: true }
+          ]}
+          title="Добавить пользователя"
+        />
       )}
       <div className={styles.section}>
-        <h2>Игроки персонажа</h2>
-        {characterUsers.length === 0 ? (
-          <p>К персонажу пока не добавлены игроки</p>
-        ) : (
-          <div className={stylesUi.usersList}>
-            {characterUsers.map(characterUser => (
-              <div key={characterUser.user.id} className={stylesUi.userCard}>
-                <img src={characterUser.user.imageLink || '/default-avatar.png'} alt={characterUser.user.nickname} className={stylesUi.avatar} />
-                <div className={stylesUi.userInfo}>
-                  <h4>{characterUser.user.visibleName}</h4>
-                  <p>@{characterUser.user.nickname} {characterUser.canWrite ? '(Редактор)' : '(Читатель)'}</p>
-                </div>
-                {canManageCharacterUsers && (
-                  <div className={stylesUi.actions}>
-                    <button 
-                      onClick={() => handleRemoveUser(characterUser.user.id)} 
-                      className={buttonStyles.button}
-                    >
-                      Удалить
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+        <h2>Пользователи группы</h2>
+        <UsersList
+          users={characterUsers.map(cu => ({ user: cu.user, permission: cu.canWrite }))}
+          onRemoveUser={handleRemoveUser}
+          formatPermission={(canWrite: boolean) => canWrite ? '(Игрок)' : '(Наблюдатель)'}
+          canManage={canManageCharacterUsers}
+          emptyMessage="В группе пока нет пользователей"
+        />
       </div>
     </div>
   );
