@@ -13,12 +13,14 @@ export const navigationConfig: NavigationConfig = {
     { id: 'characters', label: 'Персонажи', path: '/group/:groupId/characters', icon: '🎭' },
     { id: 'items', label: 'Предметы', path: '/group/:groupId/items', icon: '🎒' },
     // { id: 'notes', label: 'Заметки', path: '/group/:groupId/notes', icon: '📝' },
+    { id: 'skills', label: 'Книга способностей', path: '/group/:groupId/skills', icon: '📖'},
     { id: 'back', label: 'Назад к группам', path: '/groups', icon: '←', isBackButton: true },
   ],
   character: [
     { id: 'character', label: 'Карточка', path: '/group/:groupId/character/:characterId', icon: '👤' },
     { id: 'character-users', label: 'Игроки', path: '/group/:groupId/character/:characterId/users', icon: '👥' },
     { id: 'character-items', label: 'Предметы', path: '/group/:groupId/character/:characterId/items', icon: '🎒' },
+    { id: 'character-skills', label: 'Способности', path: '/group/:groupId/character/:characterId/skills', icon: '🔮'},
     { id: 'back', label: 'Назад к персонажам', path: '/group/:groupId/characters', icon: '←', isBackButton: true },
   ],
 };
