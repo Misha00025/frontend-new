@@ -106,7 +106,7 @@ const CharacterItems: React.FC = () => {
         {items.length === 0 ? (
           <p>Предметов пока нет</p>
         ) : (
-          <List layout={isMobile ? "vertical" : "grid"} gap="small" gridSize='large'>
+          <List layout="grid" gap="small" gridSize={isMobile ? "small" : "large"}>
             {items.map(item => (
               <ItemCard
                 key={item.id}
