@@ -23,11 +23,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const savedAccessToken = storage.getAccessToken();
     const savedRefreshToken = storage.getRefreshToken();
     
-    if (savedAccessToken) {
+    if (savedAccessToken && savedAccessToken !== 'undefined') {
       setAccessToken(savedAccessToken);
-    } else if (savedRefreshToken) {
-      // Пытаемся обновить токен при загрузке приложения
+    } else if (savedRefreshToken && savedRefreshToken !== 'undefined') {
       refreshToken();
+    } else {
+      logout()
     }
   }, []);
 
@@ -39,6 +40,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     try {
       const refreshData: RefreshResponse = await authAPI.refresh(refreshToken);
+      if (!refreshData.accessToken){
+        storage.setRefreshToken('')
+        throw new Error('Token Expired')
+      }
       setAccessToken(refreshData.accessToken);
       storage.setAccessToken(refreshData.accessToken);
     } catch (error) {
@@ -52,6 +57,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const loginData: AuthResponse = await authAPI.login({ username, password });
       
+      if (!loginData.token)
+        throw new Error('Invalid username or password');
+
       storage.setRefreshToken(loginData.token);
       
       const refreshData: RefreshResponse = await authAPI.refresh(loginData.token);
