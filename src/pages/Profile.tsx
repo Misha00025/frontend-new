@@ -13,8 +13,22 @@ const Profile: React.FC = () => {
     fetchProfile();
   }, []); // Убрали fetchProfile из зависимостей
 
-  if (loading) return <div className={styles.container}>Загрузка...</div>;
-  if (error) return <div className={styles.container}>Ошибка: {error}</div>;
+  if (loading) return <div className={styles.container}>
+    Загрузка...
+    <div className={styles.footer}>
+      <button className={buttonStyles.button} onClick={logout}>
+        Выйти
+      </button>
+    </div>    
+  </div>;
+  if (error) return <div className={styles.container}>
+    Ошибка: {error}
+    <div className={styles.footer}>
+      <button className={buttonStyles.button} onClick={logout}>
+        Выйти
+      </button>
+    </div>
+  </div>;
 
   return (
     <div className={styles.container}>
@@ -32,11 +46,6 @@ const Profile: React.FC = () => {
             <p><strong>ID:</strong> {profile.id}</p>
             <p><strong>Никнейм:</strong> {profile.nickname}</p>
             <p><strong>Видимое имя:</strong> {profile.visibleName}</p>
-          </div>
-          <div className={styles.footer}>
-            <button className={buttonStyles.button} onClick={logout}>
-              Выйти
-            </button>
           </div>
         </div>
       )}
