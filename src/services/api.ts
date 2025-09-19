@@ -86,8 +86,6 @@ const processQueue = (error: any = null) => {
 export const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
   const accessToken = storage.getAccessToken();
   const refreshToken = storage.getRefreshToken();
-  
-  // Добавляем токен в заголовки, если он есть
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,
@@ -99,43 +97,31 @@ export const makeAuthenticatedRequest = async (endpoint: string, options: Reques
       ...options,
       headers,
     });
-    
-    // Если получили 401 и есть refreshToken, пытаемся обновить токен
+
     if (response.status === 401 && refreshToken && !isRefreshing) {
       isRefreshing = true;
-      
       try {
-        // Пытаемся обновить токен
         const refreshData = await authAPI.refresh(refreshToken);
         const newAccessToken = refreshData.accessToken;
         
-        // Сохраняем новый accessToken
         storage.setAccessToken(newAccessToken);
         
-        // Обновляем заголовки с новым токеном
         const newHeaders = {
           ...headers,
           'Authorization': newAccessToken,
         };
-        
-        // Повторяем исходный запрос с новым токеном
         const retryResponse = await fetch(`${API_BASE}${endpoint}`, {
           ...options,
           headers: newHeaders,
         });
-        
         isRefreshing = false;
-        processQueue(); // Успешно обрабатываем очередь
-        
+        processQueue();
         return retryResponse;
       } catch (refreshError) {
         isRefreshing = false;
-        processQueue(refreshError); // Обрабатываем очередь с ошибкой
-        
-        // Если не удалось обновить токен, делаем logout
+        processQueue(refreshError);
         storage.clearTokens();
         window.location.reload();
-        
         throw new Error('Session expired. Please login again.');
       }
     }
@@ -146,7 +132,6 @@ export const makeAuthenticatedRequest = async (endpoint: string, options: Reques
   }
 };
 
-// Отдельная функция для обработки обновления токена
 export const refreshToken = async (): Promise<boolean> => {
   try {
     const refreshToken = storage.getRefreshToken();

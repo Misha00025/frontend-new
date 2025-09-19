@@ -52,6 +52,25 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
     return field.value.toString();
   };
 
+  const renderProgressBar = (field: CharacterField) => {
+    const percentage = (field.value / field.maxValue!) * 100;
+    return (
+      <div className={styles.progressContainer}>
+        <div 
+          className={styles.progressBar}
+          style={{ 
+            width: `${percentage}%`,
+            backgroundColor: `hsl(${percentage * 1.2}, 70%, 45%)`
+          }}
+        >
+          <span className={styles.progressText}>
+            {field.value}/{field.maxValue}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={`${styles.categorySection} ${level > 0 ? styles.subcategory : ''}`} style={{ marginLeft: level > 0 ? `${level * 4}px` : '0' }}>
       <h3 className={styles.categoryTitle}>
@@ -84,7 +103,11 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
                       onClick={() => handleStartEdit(fieldKey, field.value.toString() || '')}
                       className={canEdit ? styles.editableValue : styles.value}
                     >
-                      {formatValue(field) || '—'}
+                      {field.maxValue !== undefined ? (
+                        renderProgressBar(field)
+                      ) : (
+                        formatValue(field) || '—'
+                      )}
                     </div>
                   )}
                 </td>

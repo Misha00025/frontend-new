@@ -1,130 +1,157 @@
 /* components/CharacterTableView/CharacterTableView.module.css */
 .tableView {
-    margin-top: 1rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    row-gap: 0.5rem;
-    column-gap: 0.5rem;
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  row-gap: 0.5rem;
+  column-gap: 0.5rem;
+}
+
+.categorySection {
+  margin-bottom: 0;
+  background: var(--bg-primary);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  /* padding: 1rem; */
+}
+
+.categorySection.subcategory {
+  /* margin-top: 0.25rem; */
+  margin-bottom: 0.25rem;
+  border-left: 3px solid var(--accent-color);
+  /* padding-left: 0.75rem; */
+}
+
+.categoryTitle {
+  /* margin-bottom: 0.2rem; */
+  color: #ffffff;
+  background-color: var(--accent-color);
+  /* border-bottom: 1px solid var(--border-color); */
+  padding-bottom: 0.4rem;
+  padding-top: 0.4rem;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0.5rem;
+}
+
+.row {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.nameCell {
+  padding: 0.5rem;
+  font-weight: 500;
+  width: 60%;
+  vertical-align: top;
+}
+
+.valueCell {
+  padding: 0.5rem;
+  width: 40%;
+}
+
+.formulaCell {
+  padding: 0.5rem;
+  width: 25%;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.value {
+  min-height: 1rem;
+}
+
+.editableValue {
+  min-height: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--border-radius-sm);
+}
+
+.editableValue:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+}
+
+.editContainer {
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  flex: 1;
+  padding: 0.25rem;
+  width: 40%;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.maxValue {
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
+  white-space: nowrap;
+}
+  
+.progressContainer {
+  width: 100%;
+  background-color: var(--progress-bg, var(--bg-primary));
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  position: relative;
+  height: 20px;
+}
+
+.progressBar {
+  height: 100%;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progressText {
+  position: absolute;
+  left: 8px;
+  color: var(--text-primary);
+}
+
+[data-theme="dark"]{
+  .progressText{
+    text-shadow: 0 0 2px rgba(0, 0, 0, 1);
+  }
+}
+
+/* Мобильная версия */
+@media (max-width: 768px) {
+  .tableView {
+    gap: 0.75rem;
   }
   
   .categorySection {
-    margin-bottom: 0;
-    background: var(--bg-primary);
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-    /* padding: 1rem; */
+    padding: 0.75rem;
   }
   
   .categorySection.subcategory {
-    /* margin-top: 0.25rem; */
-    margin-bottom: 0.25rem;
-    border-left: 3px solid var(--accent-color);
-    /* padding-left: 0.75rem; */
+    padding-left: 0.5rem;
   }
   
-  .categoryTitle {
-    /* margin-bottom: 0.2rem; */
-    color: #ffffff;
-    background-color: var(--accent-color);
-    /* border-bottom: 1px solid var(--border-color); */
-    padding-bottom: 0.4rem;
-    padding-top: 0.4rem;
-    font-size: 1.1rem;
-    text-align: center;
-  }
-  
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 0.5rem;
-  }
-  
-  .row {
-    border-bottom: 1px solid var(--border-color);
-  }
-  
-  .row:last-child {
-    border-bottom: none;
+  .mobileHeader {
+    display: none;
   }
   
   .nameCell {
-    padding: 0.5rem;
-    font-weight: 500;
-    width: 60%;
-    vertical-align: top;
+    width: 70%;
   }
   
   .valueCell {
-    padding: 0.5rem;
-    width: 40%;
+    width: 30%;
   }
-  
-  .formulaCell {
-    padding: 0.5rem;
-    width: 25%;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-  }
-  
-  .value {
-    min-height: 1rem;
-  }
-  
-  .editableValue {
-    min-height: 1rem;
-    cursor: pointer;
-    padding: 0.25rem;
-    border-radius: var(--border-radius-sm);
-  }
-  
-  .editableValue:hover {
-    background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
-  }
-  
-  .editContainer {
-    display: flex;
-    align-items: center;
-  }
-  
-  .input {
-    flex: 1;
-    padding: 0.25rem;
-    width: 40%;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-  }
-  
-  .maxValue {
-    color: var(--text-secondary);
-    margin-left: 0.25rem;
-    white-space: nowrap;
-  }
-  
-  /* Мобильная версия */
-  @media (max-width: 768px) {
-    .tableView {
-      gap: 0.75rem;
-    }
-    
-    .categorySection {
-      padding: 0.75rem;
-    }
-    
-    .categorySection.subcategory {
-      padding-left: 0.5rem;
-    }
-    
-    .mobileHeader {
-      display: none;
-    }
-    
-    .nameCell {
-      width: 70%;
-    }
-    
-    .valueCell {
-      width: 30%;
-    }
-  }
+}
