@@ -23,6 +23,7 @@ import './styles/globals.css';
 import { PermissionsProvider } from './contexts/PermissionsContext';
 import WorkInProgress from './pages/WorkInProgress';
 import GroupSkills from './pages/Group/GroupSkills';
+import CharacterSkills from './pages/Character/CharacterSkills';
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
@@ -72,7 +73,7 @@ const AppContent: React.FC = () => {
         <Route path="/group/:groupId/character/:characterId" element={<Character />} />
         <Route path="/group/:groupId/character/:characterId/users" element={<CharacterUsers />} />
         <Route path="/group/:groupId/character/:characterId/items" element={<CharacterItems />} />
-        <Route path="/group/:groupId/character/:characterId/skills" element={<WorkInProgress title='Способности' />} />
+        <Route path="/group/:groupId/character/:characterId/skills" element={<CharacterSkills />} />
         <Route path="/group/:groupId/items" element={<GroupItems />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
