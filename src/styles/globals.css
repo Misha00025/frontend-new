@@ -8,11 +8,11 @@
   
   /* Светлая тема */
   [data-theme="light"] {
-    --bg-primary: #e5d7a6;
-    --bg-secondary: #a8c07a;
+    --bg-primary: #ece1e7;
+    --bg-secondary: #c7d7e0;
     --text-primary: #333333;
     --text-secondary: #666666;
-    --accent-color: #225814;
+    --accent-color: #6a936f;
     --border-color: #c0c0c0;
     --danger-color: #f80b0b;
   }
