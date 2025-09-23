@@ -28,6 +28,7 @@ import {
   UpdateCharacterItemRequest
 } from '../types/characterItems';
 import { useAuth } from '../contexts/AuthContext';
+import { CreateGroupSkillRequest, CreateSkillAttributeRequest, GroupSkill, GroupSkillsResponse, SkillAttributeDefinition, SkillAttributesResponse, UpdateGroupSkillRequest } from '../types/groupSkills';
 
 
 const API_BASE = 'https://thedun.ru';
@@ -487,5 +488,135 @@ export const userAPI = {
     }
     
     return response.json();
+  },
+};
+
+
+export const groupSkillsAPI = {
+  // Получить все навыки группы
+  getSkills: async (groupId: number): Promise<GroupSkill[]> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch group skills');
+    }
+    const data: GroupSkillsResponse = await response.json();
+    return data.skills;
+  },
+
+  // Получить конкретный навык
+  getSkill: async (groupId: number, skillId: number): Promise<GroupSkill> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills/${skillId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch skill');
+    }
+    return response.json();
+  },
+
+  // Создать новый навык
+  createSkill: async (groupId: number, skillData: CreateGroupSkillRequest): Promise<GroupSkill> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(skillData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create skill');
+    }
+    return response.json();
+  },
+
+  // Обновить навык
+  updateSkill: async (groupId: number, skillId: number, skillData: UpdateGroupSkillRequest): Promise<GroupSkill> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills/${skillId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(skillData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update skill');
+    }
+    return response.json();
+  },
+
+  // Удалить навык
+  deleteSkill: async (groupId: number, skillId: number): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills/${skillId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete skill');
+    }
+  },
+
+  // Получить атрибуты навыков группы
+  getSkillAttributes: async (groupId: number): Promise<SkillAttributeDefinition[]> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills/attributes`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch skill attributes');
+    }
+    const data: SkillAttributesResponse = await response.json();
+    return data.attributes;
+  },
+
+  // Добавить/обновить атрибут навыка
+  updateSkillAttributes: async (groupId: number, attributesData: CreateSkillAttributeRequest[]): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills/attributes`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({attributes: attributesData}),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update skill attribute');
+    }
+  },
+
+  // Получить навыки с фильтрацией по атрибутам
+  getSkillsWithFilter: async (groupId: number, filters: Record<string, string>): Promise<GroupSkill[]> => {
+    const params = new URLSearchParams(filters).toString();
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills?${params}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch filtered skills');
+    }
+    const data: GroupSkillsResponse = await response.json();
+    return data.skills;
+  },
+};
+
+export const characterSkillsAPI = {
+  // Получить навыки персонажа
+  getCharacterSkills: async (groupId: number, characterId: number): Promise<GroupSkill[]> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/skills`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch character skills');
+    }
+    const data: GroupSkillsResponse = await response.json();
+    return data.skills;
+  },
+
+  // Добавить навык персонажу
+  addSkillToCharacter: async (groupId: number, characterId: number, skillId: number): Promise<GroupSkill> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/skills/${skillId}`, {
+      method: 'PUT',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add skill to character');
+    }
+    return response.json();
+  },
+
+  // Удалить навык у персонажа
+  removeSkillFromCharacter: async (groupId: number, characterId: number, skillId: number): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/skills/${skillId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to remove skill from character');
+    }
   },
 };

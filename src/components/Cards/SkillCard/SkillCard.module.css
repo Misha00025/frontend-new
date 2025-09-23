@@ -1,0 +1,114 @@
+.skillCard {
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-md);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .header:hover {
+    background-color: var(--bg-primary);
+  }
+  
+  .titleSection {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .skillName {
+    margin: 0 0 0.5rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-primary);
+  }
+  
+  .attributesPreview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .attributeTag {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+  
+  .expandButton {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    margin-left: 1rem;
+    color: var(--text-secondary);
+  }
+  
+  .expandedContent {
+    padding: 0 1rem 1rem 1rem;
+    border-top: 1px solid var(--border-color);
+  }
+  
+  .description {
+    margin: 1rem 0;
+    padding: 1rem;
+    background-color: var(--bg-primary);
+    border-radius: var(--border-radius-sm);
+  }
+  
+  .attributesDetails {
+    margin: 1rem 0;
+  }
+  
+  .attributesDetails h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-secondary);
+  }
+  
+  .attribute {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    background-color: var(--bg-primary);
+    border-radius: var(--border-radius-sm);
+  }
+  
+  .attributeName {
+    font-weight: bold;
+    color: var(--text-primary);
+  }
+  
+  .attributeValue {
+    color: var(--accent-color);
+    font-weight: bold;
+  }
+  
+  .attributeDescription {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0 0;
+    width: 100%;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+  }
