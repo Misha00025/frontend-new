@@ -1,7 +1,7 @@
 // pages/GroupSkills.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { GroupSkill, SkillAttributeDefinition } from '../../types/groupSkills';
+import { GroupSkill, SkillAttributeDefinition, SkillGroup } from '../../types/groupSkills';
 import { groupSkillsAPI } from '../../services/api';
 import SkillCard from '../../components/Cards/SkillCard/SkillCard';
 import SkillModal from '../../components/Modals/SkillModal/SkillModal';
@@ -11,6 +11,7 @@ import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import { usePlatform } from '../../hooks/usePlatform';
+import GroupSection from '../../components/Cards/SkillCard/GroupSection';
 
 const GroupSkills: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -95,6 +96,72 @@ const GroupSkills: React.FC = () => {
     setEditingSkill(null);
   };
 
+  const groupSkillsByAttributes = useMemo((): SkillGroup[] => {
+    if (!skills.length || !attributes.length) return [];
+
+    // Получаем атрибуты для группировки (только с isFiltered: true)
+    const filteredAttributes = attributes.filter(attr => attr.isFiltered);
+    
+    if (!filteredAttributes.length) {
+      // Если нет фильтруемых атрибутов, возвращаем одну группу "Все навыки"
+      return [{
+        name: 'Все навыки',
+        attributeKey: '',
+        skills: skills,
+        children: []
+      }];
+    }
+
+    // Рекурсивная функция для создания вложенной группировки
+    const createGroups = (
+      currentSkills: GroupSkill[], 
+      attrs: SkillAttributeDefinition[], 
+      level: number = 0
+    ): SkillGroup[] => {
+      if (level >= attrs.length || !currentSkills.length) {
+        return [];
+      }
+
+      const currentAttr = attrs[level];
+      const groupsMap = new Map<string, GroupSkill[]>();
+
+      // Группируем навыки по текущему атрибуту
+      currentSkills.forEach(skill => {
+        const attribute = skill.attributes.find(attr => attr.key === currentAttr.key);
+        const value = attribute?.value || 'Другое';
+        
+        if (!groupsMap.has(value)) {
+          groupsMap.set(value, []);
+        }
+        groupsMap.get(value)!.push(skill);
+      });
+
+      // Создаем группы для текущего уровня
+      const groups: SkillGroup[] = [];
+      groupsMap.forEach((groupSkills, value) => {
+        const groupName = value === 'Другое' ? 'Другое' : 
+                         currentAttr.knownValues.includes(value) ? currentAttr.name + ": " + value : 'Другое';
+        
+        groups.push({
+          name: groupName,
+          attributeKey: currentAttr.key,
+          skills: level === attrs.length - 1 ? groupSkills : [],
+          children: level < attrs.length - 1 ? 
+                   createGroups(groupSkills, attrs, level + 1) : []
+        });
+      });
+
+      // Сортируем группы: сначала известные значения, потом "Другое"
+      return groups.sort((a, b) => {
+        if (a.name === 'Другое') return 1;
+        if (b.name === 'Другое') return -1;
+        return a.name.localeCompare(b.name);
+      });
+    };
+
+    return createGroups(skills, filteredAttributes);
+  }, [skills, attributes]);
+
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
 
   return (
@@ -120,16 +187,18 @@ const GroupSkills: React.FC = () => {
         </div>
       )}
 
-      <List layout={isMobile ? "vertical" : "grid"} gap="medium" gridSize='large'>
-        {skills.map(skill => (
-          <SkillCard
-            key={skill.id}
-            skill={skill}
-            onEdit={canEditGroup ? () => handleEditSkill(skill) : undefined}
-            onDelete={canEditGroup ? () => handleDeleteSkill(skill.id) : undefined}
-            showActions={canEditGroup}
-          />
-        ))}
+      <List layout={"vertical"} gap="medium" gridSize='small'>
+      {groupSkillsByAttributes.map((group, index) => (
+        <GroupSection
+          key={index}
+          group={group}
+          level={0}
+          isMobile={isMobile}
+          onEditSkill={canEditGroup ? handleEditSkill : undefined}
+          onDeleteSkill={canEditGroup ? handleDeleteSkill : undefined}
+          showActions={canEditGroup}
+        />
+      ))}
       </List>
 
       {canEditGroup && (

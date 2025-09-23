@@ -45,3 +45,10 @@ export interface CreateSkillAttributeRequest {
   description?: string;
   isFiltered?: boolean;
 }
+
+export interface SkillGroup {
+  name: string;
+  attributeKey: string;
+  skills: GroupSkill[];
+  children: SkillGroup[];
+}
