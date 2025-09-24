@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { GroupSkill, SkillAttribute } from '../../../types/groupSkills';
 import IconButton from '../../Buttons/IconButton';
 import styles from './SkillCard.module.css';
+import ReactMarkdown from 'react-markdown';
 
 interface SkillCardProps {
   skill: GroupSkill;
@@ -46,7 +47,7 @@ const SkillCard: React.FC<SkillCardProps> = ({
       {isExpanded && (
         <div className={styles.expandedContent}>
           <div className={styles.description}>
-            <p>{skill.description}</p>
+            <ReactMarkdown>{skill.description}</ReactMarkdown>
           </div>
           
           {/* <div className={styles.attributesDetails}>

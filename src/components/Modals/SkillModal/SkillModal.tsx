@@ -6,6 +6,8 @@ import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './SkillModal.module.css';
 import { generateKey } from '../../../utils/generateKey';
 import IconButton from '../../Buttons/IconButton';
+import MDEditor from '@uiw/react-md-editor';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 interface SkillModalProps {
   isOpen: boolean;
@@ -30,6 +32,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
   const [newAttribute, setNewAttribute] = useState<Partial<SkillAttribute>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { theme } = useTheme()
 
   useEffect(() => {
     if (editingSkill) {
@@ -132,13 +135,21 @@ const SkillModal: React.FC<SkillModalProps> = ({
 
           <div className={styles.formGroup}>
             <label>Описание:</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className={inputStyles.input}
-              rows={3}
-              required
-            />
+            <div className={styles.editorContainer} data-color-mode={theme}>
+              <MDEditor
+                value={description}
+                onChange={(value) => setDescription(value || '')}
+                preview="edit"
+                height={300}
+                style={{ width: '100%' }}
+                previewOptions={{
+                  disallowedElements: ['script', 'style']
+                }}
+              />
+            </div>
+            <div className={styles.markdownHint}>
+              Поддерживает Markdown: **жирный**, *курсив*, `код`, списки и многое другое
+            </div>
           </div>
 
           <div className={styles.attributesSection}>
