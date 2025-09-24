@@ -3,7 +3,7 @@ import styles from './List.module.css';
 
 interface ListProps {
   children: React.ReactNode;
-  layout?: 'vertical' | 'horizontal' | 'grid';
+  layout?: 'vertical' | 'horizontal' | 'grid' | 'start-grid';
   className?: string;
   gap?: 'small' | 'medium' | 'large';
   gridSize?: 'small' | 'medium' | 'large'
@@ -21,7 +21,7 @@ const List: React.FC<ListProps> = ({
   const gridClass = styles[`grid-${gridSize}`];
   
   return (
-    <div className={`${styles.list} ${layoutClass} ${gapClass} ${className} ${layout === 'grid' ? gridClass : ''}`}>
+    <div className={`${styles.list} ${layoutClass} ${gapClass} ${className} ${layout === 'grid' || layout === 'start-grid' ? gridClass : ''}`}>
       {children}
     </div>
   );

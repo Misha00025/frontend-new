@@ -15,6 +15,11 @@
   display: grid;
 }
 
+.layout-start-grid {
+  display: grid;
+  align-items: start;
+}
+
 .gap-small {
   gap: 0.5rem;
 }

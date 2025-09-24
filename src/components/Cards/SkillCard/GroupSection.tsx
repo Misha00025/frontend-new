@@ -34,7 +34,7 @@ const GroupSection: React.FC<GroupSectionProps> = ({
       </div>
 
       {group.skills.length > 0 && (
-        <List layout={isMobile ? "vertical" : "grid"} gap="medium" gridSize='large'>
+        <List layout={isMobile ? "vertical" : "start-grid"} gap="medium" gridSize='large'>
           {group.skills.map(skill => (
             <SkillCard
               key={skill.id}
