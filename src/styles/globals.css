@@ -49,3 +49,53 @@
     background-color: var(--bg-secondary);
     border-radius: var(--border-radius-md);
   }
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+}
+
+.container {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Предотвращаем выход контента за пределы экрана */
+* {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* Исправления для GroupSection */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* Убедитесь, что отступы не создают горизонтальную прокрутку */
+  .group-section {
+    margin-left: 0 !important;
+    padding: 0 10px;
+  }
+  
+  /* Исправления для SkillCard */
+  .skillCard {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .attributesPreview {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  
+  .attributeTag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+}
