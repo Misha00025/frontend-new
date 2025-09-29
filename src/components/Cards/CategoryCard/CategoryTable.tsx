@@ -50,6 +50,9 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
     if (field.maxValue !== undefined) {
       return `${field.value} / ${field.maxValue}`;
     }
+    if (field.modifier !== undefined){
+      return `${field.value} (${field.modifier > 0? '+' : ''}${field.modifier})`
+    }
     return field.value.toString();
   };
 
