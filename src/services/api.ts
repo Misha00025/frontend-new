@@ -84,11 +84,14 @@ const processQueue = (error: any = null) => {
   failedQueue = [];
 };
 
-export const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}): Promise<Response> => {
+export const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}, contentType: string | null = 'application/json'): Promise<Response> => {
   const accessToken = storage.getAccessToken();
   const refreshToken = storage.getRefreshToken();
-  const headers = {
-    'Content-Type': 'application/json',
+  const headers = contentType ? {
+    'Content-Type': contentType,
+    ...options.headers,
+    ...(accessToken ? { 'Authorization': accessToken } : {}),
+  } : {
     ...options.headers,
     ...(accessToken ? { 'Authorization': accessToken } : {}),
   };
@@ -489,6 +492,22 @@ export const userAPI = {
     
     return response.json();
   },
+
+  updateProfile: async (userId: number, profileData: { visibleName: string, imageLink?: string }): Promise<UserProfile> => {
+    const response = await makeAuthenticatedRequest(`/api/users/${userId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(profileData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update profile');
+    }
+
+    return response.json();
+  },
 };
 
 
@@ -618,5 +637,26 @@ export const characterSkillsAPI = {
     if (!response.ok) {
       throw new Error('Failed to remove skill from character');
     }
+  },
+};
+
+export const uploadAPI = {
+  uploadImage: async (file: File): Promise<{ url: string; fileName: string; size: number }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Для FormData не устанавливаем Content-Type вручную, браузер сделает это автоматически
+    const response = await makeAuthenticatedRequest('/upload', {
+      method: 'POST',
+      body: formData,
+    },
+      null
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to upload image');
+    }
+
+    return response.json();
   },
 };
