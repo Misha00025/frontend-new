@@ -5,6 +5,7 @@ export interface TemplateField {
     description: string;
     category?: string;
     formula?: string;
+    modifierFormula?: string;
   }
   
   export interface TemplateGroup {

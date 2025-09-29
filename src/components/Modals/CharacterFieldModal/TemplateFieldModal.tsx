@@ -25,7 +25,9 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
   const [value, setValue] = useState<number | ''>(0);
   const [maxValue, setMaxValue] = useState<number | ''>(0);
   const [formula, setFormula] = useState('');
+  const [modifierFormula, setModifierFormula] = useState<string>(':value:');
   const [isProperty, setIsProperty] = useState<boolean>(false);
+  const [isModifier, setIsModifier] = useState<boolean>(false);
   const [description, setDescription] = useState('');
   const [key, setKey] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +48,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
       setFormula(field.formula ? field.formula : '');
       setMaxValue(field.maxValue ? field.maxValue : 0);
       setIsProperty(field.maxValue ? true : false);
+      setIsModifier(field.modifierFormula ? true : false);
       setDescription(field.description);
       setKey(generateFieldKey(field.name));
     } else {
@@ -54,6 +57,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
       setValue(0);
       setMaxValue(0);
       setIsProperty(false);
+      setIsModifier(false);
       setFormula('');
       setDescription('');
       setKey('');
@@ -82,6 +86,8 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
 
     if (isProperty)
       fieldData.maxValue = maxValue === ''? 0 : maxValue;
+    if (isModifier)
+      fieldData.modifierFormula = modifierFormula;
 
     onSave(fieldData, key);
     onClose();
@@ -173,7 +179,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
             />
           </div>
 
-          <div className={styles.formGroup}>
+          {!isModifier && <div className={styles.formGroup}>
             <label>
               <input
                 type="checkbox"
@@ -183,7 +189,19 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
               />
               Поле с максимальным значением
             </label>
-          </div>
+          </div>}
+
+          {!isProperty && <div className={styles.formGroup}>
+            <label>
+              <input
+                type="checkbox"
+                checked={isModifier}
+                className={inputStyles.input}
+                onChange={(e) => setIsModifier(e.target.checked)}
+              />
+              Поле с модификатором
+            </label>
+          </div>}
 
           { isProperty && (
             <div className={styles.formGroup}>
@@ -195,6 +213,18 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
                 onBlur={(e) => handleBlurMaxValue(e)}
                 className={inputStyles.input}
                 required
+              />
+            </div>
+          )}
+
+          {isModifier && (
+            <div className={styles.formGroup}>
+              <label>Формула модификатора:</label>
+              <input
+                type='text'
+                value={modifierFormula}
+                onChange={(e) => setModifierFormula(e.target.value)}
+                className={inputStyles.input}
               />
             </div>
           )}
