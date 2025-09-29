@@ -1,3 +1,4 @@
+// GroupCard.tsx
 import React from 'react';
 import { Group } from '../../types/group';
 import buttonStyles from '../../styles/components/Button.module.css';
@@ -18,17 +19,34 @@ const GroupCard: React.FC<GroupCardProps> = ({
 }) => {
   return (
     <div className={styles.groupCard}>
-      {group.icon && (
-        <img src={group.icon} alt={group.name} className={styles.groupIcon} />
-      )}
-      <h3 className={styles.groupName}>{group.name}</h3>
+      <div className={styles.avatarSection}>
+        {group.icon ? (
+          <img 
+            src={group.icon} 
+            alt={group.name} 
+            className={styles.avatar}
+          />
+        ) : (
+          <div className={styles.avatarPlaceholder}>
+            Нет иконки
+          </div>
+        )}
+      </div>
+      
+      <div className={styles.info}>
+        <h3 className={styles.groupName}>{group.name}</h3>
+        <div className={styles.groupId}>ID: {group.id}</div>
+      </div>
+
       {showAction && (
-        <button 
-          className={buttonStyles.button}
-          onClick={() => onSelect(group)}
-        >
-          {actionLabel}
-        </button>
+        <div className={styles.footer}>
+          <button 
+            className={buttonStyles.button}
+            onClick={() => onSelect(group)}
+          >
+            {actionLabel}
+          </button>
+        </div>
       )}
     </div>
   );

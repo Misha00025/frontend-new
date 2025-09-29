@@ -186,6 +186,22 @@ export const groupAPI = {
     
     return response.json();
   },
+
+  updateGroup: async (groupId: number, groupData: { name?: string; icon?: string }): Promise<Group> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(groupData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update group');
+    }
+
+    return response.json();
+  },
 };
 
 
