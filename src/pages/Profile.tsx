@@ -95,7 +95,7 @@ const Profile: React.FC = () => {
   };
 
   const removeAvatar = () => {
-    setFormData(prev => ({ ...prev, imageLink: '' }));
+    setFormData(prev => ({ ...prev, imageLink: 'none' }));
   };
 
   if (loading) return <div className={styles.container}>Загрузка...</div>;
