@@ -2,6 +2,8 @@ import React from 'react';
 import { User } from '../../types/groupUsers';
 import buttonStyles from '../../styles/components/Button.module.css';
 import stylesUi from '../../styles/ui.module.css';
+import IconButton from '../Buttons/IconButton';
+import List from '../List/List';
 
 interface UsersListProps {
   users: {
@@ -12,6 +14,7 @@ interface UsersListProps {
   formatPermission: (permission: any) => string;
   canManage: boolean;
   emptyMessage: string;
+  layout?: 'vertical' | 'grid'
 }
 
 const UsersList: React.FC<UsersListProps> = ({
@@ -19,14 +22,15 @@ const UsersList: React.FC<UsersListProps> = ({
   onRemoveUser,
   formatPermission,
   canManage,
-  emptyMessage
+  emptyMessage,
+  layout = 'vertical'
 }) => {
   if (users.length === 0) {
     return <p>{emptyMessage}</p>;
   }
 
   return (
-    <div className={stylesUi.usersList}>
+    <List layout={layout}>
       {users.map(item => (
         <div key={item.user.id} className={stylesUi.userCard}>
           <img src={item.user.imageLink || '/default-avatar.png'} alt={item.user.nickname} className={stylesUi.avatar} />
@@ -36,17 +40,17 @@ const UsersList: React.FC<UsersListProps> = ({
           </div>
           {canManage && (
             <div className={stylesUi.actions}>
-              <button 
-                onClick={() => onRemoveUser(item.user.id)} 
-                className={buttonStyles.button}
-              >
-                Удалить
-              </button>
+              <IconButton 
+                icon='delete'
+                title='Удалить'
+                onClick={() => onRemoveUser(item.user.id)}
+                variant='danger'
+              />
             </div>
           )}
         </div>
       ))}
-    </div>
+    </List>
   );
 };
 

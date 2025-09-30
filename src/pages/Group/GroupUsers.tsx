@@ -1,3 +1,4 @@
+// GroupUsers.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupUser, User } from '../../types/groupUsers';
@@ -7,6 +8,7 @@ import { useActionPermissions } from '../../hooks/useActionPermissions';
 import UserSearch from '../../components/UsersManagement/UserSearch';
 import UsersList from '../../components/UsersManagement/UsersList';
 import { useUserManagement } from '../../hooks/useUserManagement';
+import CharacterUsersTable from '../../components/UsersManagement/CharacterUsersTable';
 
 const GroupUsers: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -35,7 +37,7 @@ const GroupUsers: React.FC = () => {
   const handleRemoveUser = async (userId: number) => {
     await executeOperation(
       () => groupUsersAPI.removeUserFromGroup(parseInt(groupId!), userId),
-      `'Пользователь успешно удален из группы'`
+      `Пользователь успешно удален из группы`
     );
   };
 
@@ -70,6 +72,17 @@ const GroupUsers: React.FC = () => {
           emptyMessage="В группе пока нет пользователей"
         />
       </div>
+
+      {/* Секция управления пользователями персонажей (только для админов) */}
+      {canManageGroupUsers && groupId && (
+        <div className={styles.section}>
+          <CharacterUsersTable 
+            groupId={parseInt(groupId)} 
+            canManage={canManageGroupUsers}
+            groupUsers={groupUsers.map(gu => gu.user)}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -28,20 +28,12 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
       <p className={styles.characterDescription}>{character.description}</p>
       
       {showAction && (
-        <div>
-          <button 
-            className={buttonStyles.button}
-            onClick={onSelect}
-          >
-            {actionLabel}
-          </button>
-          {canEditGroup && (<Link 
-            to={`/group/${groupId}/character/${character.id}/users`}
-            className={` ${commonStyles.link}`}
-          >
-            Игроки
-          </Link>)}
-        </div>
+        <button 
+          className={buttonStyles.button}
+          onClick={onSelect}
+        >
+          {actionLabel}
+        </button>
       )}
     </div>
   );
