@@ -131,6 +131,7 @@ const CharacterSkills: React.FC = () => {
                 isMobile={isMobile}
                 onDeleteSkill={canEditThisCharacter ? handleRemoveSkill : undefined}
                 showActions={canEditThisCharacter}
+                collapse={false}
               />
             ))}
           </List>
