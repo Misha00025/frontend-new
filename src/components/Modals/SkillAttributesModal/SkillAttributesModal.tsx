@@ -5,7 +5,6 @@ import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './SkillAttributesModal.module.css';
 import IconButton from '../../Buttons/IconButton';
-import List from '../../List/List';
 
 interface SkillAttributesModalProps {
   isOpen: boolean;
@@ -66,6 +65,21 @@ const SkillAttributesModal: React.FC<SkillAttributesModalProps> = ({
     ));
   };
 
+  // Функции для сортировки
+  const moveAttributeUp = (index: number) => {
+    if (index <= 0) return;
+    const newAttributes = [...localAttributes];
+    [newAttributes[index - 1], newAttributes[index]] = [newAttributes[index], newAttributes[index - 1]];
+    setLocalAttributes(newAttributes);
+  };
+
+  const moveAttributeDown = (index: number) => {
+    if (index >= localAttributes.length - 1) return;
+    const newAttributes = [...localAttributes];
+    [newAttributes[index], newAttributes[index + 1]] = [newAttributes[index + 1], newAttributes[index]];
+    setLocalAttributes(newAttributes);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -90,47 +104,83 @@ const SkillAttributesModal: React.FC<SkillAttributesModalProps> = ({
         
         {error && <div className={styles.error}>{error}</div>}
         
-        <div className={styles.attributesList}>
+        <div className={styles.attributesTable}>
           <h3>Существующие атрибуты</h3>
-          {localAttributes.map((attr, index) => (
-            <List layout='horizontal' gap='small'>
-              <input
-                type="text"
-                value={attr.key}
-                onChange={(e) => handleUpdateAttribute(index, 'key', e.target.value)}
-                className={inputStyles.input}
-                placeholder="Ключ"
-              />
-              <input
-                type="text"
-                value={attr.name}
-                onChange={(e) => handleUpdateAttribute(index, 'name', e.target.value)}
-                className={inputStyles.input}
-                placeholder="Название"
-              />
-              <input
-                type="text"
-                value={attr.description || ''}
-                onChange={(e) => handleUpdateAttribute(index, 'description', e.target.value)}
-                className={inputStyles.input}
-                placeholder="Описание"
-              />
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={attr.isFiltered}
-                  onChange={(e) => handleUpdateAttribute(index, 'isFiltered', e.target.checked)}
-                />
-                Фильтруемый
-              </label>
-              <IconButton
-                icon='delete'
-                title='удалить'
-                onClick={() => handleRemoveAttribute(index)}
-                variant='danger'
-              />
-            </List>
-          ))}
+          <div className={styles.tableContainer}>
+            <div className={styles.tableHeader}>
+              <div className={styles.columnOrder}>Порядок</div>
+              <div className={styles.columnKey}>Ключ</div>
+              <div className={styles.columnName}>Название</div>
+              <div className={styles.columnDescription}>Описание</div>
+              <div className={styles.columnFiltered}>Фильтруемый</div>
+              <div className={styles.columnActions}>Действия</div>
+            </div>
+            
+            {localAttributes.map((attr, index) => (
+              <div key={index} className={styles.tableRow}>
+                <div className={styles.columnOrder}>
+                  <div className={styles.orderControls}>
+                    {index !== 0 && (<IconButton
+                      icon='arrow-up'
+                      title='Поднять'
+                      onClick={() => moveAttributeUp(index)}
+                    />)}
+                    {index !== localAttributes.length && (<IconButton
+                      icon='arrow-down'
+                      title='Опустить'
+                      onClick={() => moveAttributeDown(index)}
+                    />)}
+                  </div>
+                </div>
+                <div className={styles.columnKey}>
+                  <input
+                    type="text"
+                    value={attr.key}
+                    onChange={(e) => handleUpdateAttribute(index, 'key', e.target.value)}
+                    className={inputStyles.input}
+                    placeholder="Ключ"
+                  />
+                </div>
+                <div className={styles.columnName}>
+                  <input
+                    type="text"
+                    value={attr.name}
+                    onChange={(e) => handleUpdateAttribute(index, 'name', e.target.value)}
+                    className={inputStyles.input}
+                    placeholder="Название"
+                  />
+                </div>
+                <div className={styles.columnDescription}>
+                  <input
+                    type="text"
+                    value={attr.description || ''}
+                    onChange={(e) => handleUpdateAttribute(index, 'description', e.target.value)}
+                    className={inputStyles.input}
+                    placeholder="Описание"
+                  />
+                </div>
+                <div className={styles.columnFiltered}>
+                  <label className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={attr.isFiltered}
+                      onChange={(e) => handleUpdateAttribute(index, 'isFiltered', e.target.checked)}
+                    />
+                    Фильтруемый
+                  </label>
+                </div>
+                <div className={styles.columnActions}>
+                  <IconButton
+                    icon='delete'
+                    title='Удалить'
+                    onClick={() => handleRemoveAttribute(index)}
+                    variant='danger'
+                    size='small'
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className={styles.addAttribute}>
