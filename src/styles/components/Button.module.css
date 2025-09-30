@@ -7,6 +7,7 @@
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
+      font-size: small;
     }
     
   .button:hover {

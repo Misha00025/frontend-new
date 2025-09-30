@@ -8,8 +8,8 @@ export const navigationConfig: NavigationConfig = {
   ],
   group: [
     { id: 'group-dashboard', label: 'Группа', path: '/group/:groupId', icon: '👥' },
-    { id: 'users', label: 'Пользователи', path: '/group/:groupId/users', icon: '👥' },
-    { id: 'templates', label: 'Шаблоны', path: '/group/:groupId/templates', icon: '📋' },
+    // { id: 'users', label: 'Пользователи', path: '/group/:groupId/users', icon: '👥' },
+    // { id: 'templates', label: 'Шаблоны', path: '/group/:groupId/templates', icon: '📋' },
     { id: 'characters', label: 'Персонажи', path: '/group/:groupId/characters', icon: '🎭' },
     { id: 'items', label: 'Предметы', path: '/group/:groupId/items', icon: '🎒' },
     // { id: 'notes', label: 'Заметки', path: '/group/:groupId/notes', icon: '📝' },
@@ -18,7 +18,7 @@ export const navigationConfig: NavigationConfig = {
   ],
   character: [
     { id: 'character', label: 'Карточка', path: '/group/:groupId/character/:characterId', icon: '👤' },
-    { id: 'character-users', label: 'Игроки', path: '/group/:groupId/character/:characterId/users', icon: '👥' },
+    // { id: 'character-users', label: 'Игроки', path: '/group/:groupId/character/:characterId/users', icon: '👥' },
     { id: 'character-items', label: 'Предметы', path: '/group/:groupId/character/:characterId/items', icon: '🎒' },
     { id: 'character-skills', label: 'Способности', path: '/group/:groupId/character/:characterId/skills', icon: '🔮'},
     { id: 'back', label: 'Назад к персонажам', path: '/group/:groupId/characters', icon: '←', isBackButton: true },

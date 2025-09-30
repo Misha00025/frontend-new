@@ -7,6 +7,7 @@ import styles from '../../styles/common.module.css';
 import buttonStyles from '../../styles/components/Button.module.css';
 import GroupEditModal from '../../components/Modals/CreateGroupModal/EditGroupModal';
 import { usePermissions } from '../../contexts/PermissionsContext';
+import { Link } from 'react-router-dom';
 
 const GroupDashboard: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -83,12 +84,26 @@ const GroupDashboard: React.FC = () => {
           {/* Кнопки управления */}
           <div className={styles.footer}>
             {isGroupAdmin && (
-              <button 
-                className={buttonStyles.button}
-                onClick={() => setIsEditModalOpen(true)}
-              >
-                Редактировать группу
-              </button>
+              <div>
+                <button 
+                  className={`${buttonStyles.button}  ${styles.link}`}
+                  onClick={() => setIsEditModalOpen(true)}
+                >
+                  Редактировать группу
+                </button>
+                <Link 
+                  to={`/group/${groupId}/users`}
+                  className={`${styles.link}`}
+                >
+                  Пользователи
+                </Link>
+                <Link 
+                  to={`/group/${groupId}/templates`}
+                  className={`${styles.link}`}
+                >
+                  Шаблоны
+                </Link>
+              </div>
             )}
           </div>
         </div>
