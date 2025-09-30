@@ -142,6 +142,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
                 preview="edit"
                 height={300}
                 style={{ width: '100%' }}
+                spellCheck={true}
                 previewOptions={{
                   disallowedElements: ['script', 'style']
                 }}
