@@ -101,7 +101,7 @@ const GroupSkills: React.FC = () => {
 
   return (
     <div className={commonStyles.container}>
-      <h1>Способности группы</h1>
+      <h1>Книга способностей</h1>
 
       {error && <div className={commonStyles.error}>{error}</div>}
 
