@@ -74,7 +74,7 @@ const GroupItems: React.FC = () => {
 
   return (
     <div className={commonStyles.container}>
-      <h1>Предметы группы</h1>
+      <h1>Каталог предметов</h1>
 
       {error && <div className={commonStyles.error}>{error}</div>}
 
