@@ -1,5 +1,5 @@
 // components/Modals/SkillModal.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GroupSkill, CreateGroupSkillRequest, UpdateGroupSkillRequest, SkillAttribute, SkillAttributeDefinition } from '../../../types/groupSkills';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
@@ -32,7 +32,8 @@ const SkillModal: React.FC<SkillModalProps> = ({
   const [newAttribute, setNewAttribute] = useState<Partial<SkillAttribute>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { theme } = useTheme()
+  const { theme } = useTheme();
+  const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (editingSkill) {
@@ -46,6 +47,44 @@ const SkillModal: React.FC<SkillModalProps> = ({
     }
     setNewAttribute({});
   }, [editingSkill, isOpen]);
+
+  // Добавляем обработчик горячих клавиш
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!editorRef.current?.contains(e.target as Node)) return;
+
+      const isCtrl = e.ctrlKey || e.metaKey;
+      if (!isCtrl) return;
+
+      // Преобразуем код клавиши в символ независимо от раскладки
+      const keyMap: { [key: string]: string } = {
+        'KeyB': 'b',
+        'KeyI': 'i',
+        'KeyK': 'k',
+        'KeyL': 'l'
+      };
+
+      const key = keyMap[e.code];
+      if (key) {
+        e.preventDefault();
+        
+        // Создаем новое событие с английским символом
+        const newEvent = new KeyboardEvent('keydown', {
+          key: key,
+          code: e.code,
+          ctrlKey: true,
+          metaKey: e.metaKey,
+          bubbles: true,
+          cancelable: true
+        });
+        
+        e.target?.dispatchEvent(newEvent);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleAddAttribute = () => {
     if (!newAttribute.key || !newAttribute.value) {
@@ -135,21 +174,25 @@ const SkillModal: React.FC<SkillModalProps> = ({
 
           <div className={styles.formGroup}>
             <label>Описание:</label>
-            <div className={styles.editorContainer} data-color-mode={theme}>
+            <div ref={editorRef} className={styles.editorContainer} data-color-mode={theme}>
               <MDEditor
                 value={description}
                 onChange={(value) => setDescription(value || '')}
                 preview="edit"
                 height={300}
                 style={{ width: '100%' }}
-                spellCheck={true}
+                textareaProps={{
+                  lang: 'ru',
+                  className: styles.markdownTextarea,
+                  spellCheck: true
+                }}
                 previewOptions={{
                   disallowedElements: ['script', 'style']
                 }}
               />
             </div>
             <div className={styles.markdownHint}>
-              Поддерживает Markdown: **жирный**, *курсив*, `код`, списки и многое другое
+              Поддерживает Markdown: **жирный**, *курсив*, `код`, списки и многое другое.
             </div>
           </div>
 
