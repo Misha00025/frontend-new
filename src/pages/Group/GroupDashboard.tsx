@@ -8,6 +8,8 @@ import buttonStyles from '../../styles/components/Button.module.css';
 import GroupEditModal from '../../components/Modals/CreateGroupModal/EditGroupModal';
 import { usePermissions } from '../../contexts/PermissionsContext';
 import { Link } from 'react-router-dom';
+import List from '../../components/List/List';
+import { usePlatform } from '../../hooks/usePlatform';
 
 const GroupDashboard: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -16,6 +18,7 @@ const GroupDashboard: React.FC = () => {
   const [group, setGroup] = useState<Group | null>(null);
   const [loading, setLoading] = useState(true);
   const { isGroupAdmin } = usePermissions();
+  const isMobile = usePlatform();
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -82,9 +85,9 @@ const GroupDashboard: React.FC = () => {
           </div>
 
           {/* Кнопки управления */}
-          <div className={styles.footer}>
+          <div className={isMobile ? styles.footer : ''}>
             {isGroupAdmin && (
-              <div>
+              <List>
                 <button 
                   className={`${buttonStyles.button}  ${styles.link}`}
                   onClick={() => setIsEditModalOpen(true)}
@@ -103,7 +106,7 @@ const GroupDashboard: React.FC = () => {
                 >
                   Шаблоны
                 </Link>
-              </div>
+              </List>
             )}
           </div>
         </div>
