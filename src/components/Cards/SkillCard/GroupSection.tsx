@@ -26,7 +26,7 @@ const GroupSection: React.FC<GroupSectionProps> = ({
   const [isCollapsed, setIsCollapsed] = useState(collapse);
 
   return (
-    <div style={{ marginLeft: level * 20 }}>
+    <div style={{ marginLeft: isMobile ? 0 : level * 20 }}>
       <div 
         style={{ 
           padding: '10px 0', 

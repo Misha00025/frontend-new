@@ -1,9 +1,8 @@
 // pages/GroupSkills.tsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { GroupSkill, SkillAttributeDefinition, SkillGroup } from '../../types/groupSkills';
+import { GroupSkill, SkillAttributeDefinition } from '../../types/groupSkills';
 import { groupSkillsAPI } from '../../services/api';
-import SkillCard from '../../components/Cards/SkillCard/SkillCard';
 import SkillModal from '../../components/Modals/SkillModal/SkillModal';
 import SkillAttributesModal from '../../components/Modals/SkillAttributesModal/SkillAttributesModal';
 import List from '../../components/List/List';

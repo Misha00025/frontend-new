@@ -86,28 +86,30 @@ const GroupDashboard: React.FC = () => {
 
           {/* Кнопки управления */}
           <div className={isMobile ? styles.footer : ''}>
-            {isGroupAdmin && (
-              <List>
-                <button 
-                  className={`${buttonStyles.button}  ${styles.link}`}
-                  onClick={() => setIsEditModalOpen(true)}
-                >
-                  Редактировать группу
-                </button>
-                <Link 
-                  to={`/group/${groupId}/users`}
-                  className={`${styles.link}`}
-                >
-                  Пользователи
-                </Link>
-                <Link 
-                  to={`/group/${groupId}/templates`}
-                  className={`${styles.link}`}
-                >
-                  Шаблоны
-                </Link>
-              </List>
-            )}
+            <List>
+              {isGroupAdmin && (
+                
+                  <button 
+                    className={`${buttonStyles.button}  ${styles.link}`}
+                    onClick={() => setIsEditModalOpen(true)}
+                  >
+                    Редактировать группу
+                  </button>
+                  
+              )}
+              <Link 
+                to={`/group/${groupId}/users`}
+                className={`${styles.link}`}
+              >
+                Пользователи
+              </Link>
+              <Link 
+                to={`/group/${groupId}/templates`}
+                className={`${styles.link}`}
+              >
+                Шаблоны
+              </Link>
+            </List>
           </div>
         </div>
       )}
