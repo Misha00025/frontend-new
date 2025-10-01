@@ -15,6 +15,7 @@ interface SkillModalProps {
   onSave: (skillData: CreateGroupSkillRequest | UpdateGroupSkillRequest) => Promise<void>;
   editingSkill?: GroupSkill | null;
   availableAttributes: SkillAttributeDefinition[];
+  possibleValuesForFilteredAttributes: { [key: string]: string[] };
   title: string;
 }
 
@@ -24,6 +25,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
   onSave,
   editingSkill,
   availableAttributes,
+  possibleValuesForFilteredAttributes,
   title
 }) => {
   const [name, setName] = useState('');
@@ -34,6 +36,8 @@ const SkillModal: React.FC<SkillModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const { theme } = useTheme();
   const editorRef = useRef<HTMLDivElement>(null);
+  const [customValues, setCustomValues] = useState<{[key: string]: string}>({});
+
 
   useEffect(() => {
     if (editingSkill) {
@@ -43,10 +47,30 @@ const SkillModal: React.FC<SkillModalProps> = ({
     } else {
       setName('');
       setDescription('');
-      setAttributes([]);
+      
+      // Автоматически добавляем isFiltered атрибуты при создании
+      const filteredAttributes = availableAttributes
+        .filter(attr => attr.isFiltered)
+        .map(attr => ({
+          key: attr.key,
+          name: attr.name,
+          description: attr.description,
+          value: '' // Пустое значение по умолчанию
+        }));
+      
+      setAttributes(filteredAttributes);
+    }
+    if (!isOpen) {
+      setCustomValues({});
     }
     setNewAttribute({});
-  }, [editingSkill, isOpen]);
+  }, [editingSkill, isOpen, availableAttributes]);
+
+  const handleUpdateAttribute = (index: number, updates: Partial<SkillAttribute>) => {
+    setAttributes(prev => prev.map((attr, i) => 
+      i === index ? { ...attr, ...updates } : attr
+    ));
+  };
 
   // Добавляем обработчик горячих клавиш
   useEffect(() => {
@@ -132,6 +156,24 @@ const SkillModal: React.FC<SkillModalProps> = ({
     setError(null);
   
     try {
+      // Проверяем, что все обязательные фильтруемые атрибуты заполнены
+      const requiredFilteredAttributes = availableAttributes
+        .filter(attr => attr.isFiltered)
+        .map(attr => attr.key);
+  
+      const missingAttributes = requiredFilteredAttributes.filter(attrKey => 
+        !attributes.some(attr => attr.key === attrKey && attr.value.trim())
+      );
+  
+      if (missingAttributes.length > 0) {
+        const missingNames = missingAttributes.map(key => 
+          availableAttributes.find(attr => attr.key === key)?.name || key
+        );
+        setError(`Пожалуйста, заполните обязательные атрибуты: ${missingNames.join(', ')}`);
+        setLoading(false);
+        return;
+      }
+  
       const skillData = {
         name,
         description,
@@ -149,6 +191,110 @@ const SkillModal: React.FC<SkillModalProps> = ({
     } finally {
       setLoading(false);
     }
+  };
+  
+
+  // Функция рендеринга поля ввода для атрибута
+  const renderAttributeValueInput = (attr: SkillAttribute, index: number, isNew: boolean = false) => {
+    const attributeDef = availableAttributes.find(a => a.key === attr.key);
+    const isFiltered = attributeDef?.isFiltered;
+    const possibleValues = possibleValuesForFilteredAttributes[attr.key] || [];
+    
+    const currentValue = isNew ? newAttribute.value || '' : attr.value;
+    const showCustomInput = customValues[attr.key] || 
+                           (isFiltered && !possibleValues.includes(currentValue));
+
+    if (isFiltered && possibleValues.length > 0) {
+      return (
+        <div className={styles.attributeValueContainer}>
+          <select
+            value={showCustomInput ? '__custom__' : currentValue}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              
+              if (newValue === '__custom__') {
+                setCustomValues(prev => ({ ...prev, [attr.key]: currentValue || '' }));
+                if (isNew) {
+                  setNewAttribute(prev => ({ ...prev, value: '' }));
+                } else {
+                  handleUpdateAttribute(index, { value: '' });
+                }
+              } else {
+                // Использовать выбранное значение
+                setCustomValues(prev => {
+                  const newCustom = { ...prev };
+                  delete newCustom[attr.key];
+                  return newCustom;
+                });
+                if (isNew) {
+                  setNewAttribute(prev => ({ ...prev, value: newValue }));
+                } else {
+                  handleUpdateAttribute(index, { value: newValue });
+                }
+              }
+            }}
+            className={inputStyles.input}
+          >
+            {possibleValues.map(value => (
+              <option key={value} value={value}>{value}</option>
+            ))}
+            <option value="__custom__">✏️ Ввести своё значение...</option>
+          </select>
+
+          {showCustomInput && (
+            <div className={styles.customInputContainer}>
+              <input
+                type="text"
+                value={customValues[attr.key] || currentValue}
+                onChange={(e) => {
+                  const customValue = e.target.value;
+                  setCustomValues(prev => ({ ...prev, [attr.key]: customValue }));
+                  
+                  if (isNew) {
+                    setNewAttribute(prev => ({ ...prev, value: customValue }));
+                  } else {
+                    handleUpdateAttribute(index, { value: customValue });
+                  }
+                }}
+                className={inputStyles.input}
+                placeholder="Введите своё значение"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setCustomValues(prev => {
+                    const newCustom = { ...prev };
+                    delete newCustom[attr.key];
+                    return newCustom;
+                  });
+                  if (isNew) {
+                    setNewAttribute(prev => ({ ...prev, value: '' }));
+                  } else {
+                    handleUpdateAttribute(index, { value: '' });
+                  }
+                }}
+                className={buttonStyles.button}
+              >
+                ×
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+    return (
+      <input
+        type="text"
+        value={currentValue}
+        onChange={(e) => isNew
+          ? setNewAttribute(prev => ({ ...prev, value: e.target.value }))
+          : handleUpdateAttribute(index, { value: e.target.value })
+        }
+        className={inputStyles.input}
+        placeholder="Значение"
+        required
+      />
+    );
   };
 
   if (!isOpen) return null;
@@ -199,18 +345,31 @@ const SkillModal: React.FC<SkillModalProps> = ({
           <div className={styles.attributesSection}>
             <h3>Атрибуты навыка</h3>
             
-            {attributes.map((attr, index) => (
-              <div key={index} className={styles.attributeItem}>
-                <span className={styles.attributeName}>{attr.name}: {attr.value}</span>
-                <IconButton 
+            {/* Список существующих атрибутов с возможностью редактирования */}
+            {attributes.map((attr, index) => {
+              const attributeDef = availableAttributes.find(a => a.key === attr.key);
+              const isFiltered = attributeDef?.isFiltered;
+              
+              return (
+                <div key={index} className={styles.attributeItem}>
+                  <div className={styles.attributeContent}>
+                    <div className={styles.attributeHeader}>
+                      <span className={styles.attributeName}>{attr.name}</span>
+                      {isFiltered && <span className={styles.filteredBadge}>🔍</span>}
+                    </div>
+                    {renderAttributeValueInput(attr, index)}
+                  </div>
+                  <IconButton 
                     icon='delete'
                     title='Удалить'
                     onClick={() => handleRemoveAttribute(index)}
                     variant='danger'
-                />
-              </div>
-            ))}
+                  />
+                </div>
+              );
+            })}
 
+            {/* Секция добавления нового атрибута */}
             <div className={styles.addAttribute}>
               <h4>Добавить атрибут</h4>
               
@@ -221,7 +380,8 @@ const SkillModal: React.FC<SkillModalProps> = ({
                   setNewAttribute({
                     key: e.target.value,
                     name: selected?.name || '',
-                    description: selected?.description
+                    description: selected?.description,
+                    value: ''
                   });
                 }}
                 className={inputStyles.input}
@@ -229,7 +389,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
                 <option value="">Выберите атрибут</option>
                 {availableAttributes.map(attr => (
                   <option key={attr.key} value={attr.key}>
-                    {attr.name} ({attr.key})
+                    {attr.name} ({attr.key}) {attr.isFiltered ? '🔍' : ''}
                   </option>
                 ))}
               </select>
@@ -253,13 +413,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
                 </>
               )}
 
-              <input
-                type="text"
-                value={newAttribute.value || ''}
-                onChange={(e) => setNewAttribute(prev => ({ ...prev, value: e.target.value }))}
-                className={inputStyles.input}
-                placeholder="Значение"
-              />
+              {newAttribute.key && renderAttributeValueInput(newAttribute as SkillAttribute, -1, true)}
 
               <div className={styles.attributeActions}>
                 {newAttribute.key ? (
@@ -274,7 +428,6 @@ const SkillModal: React.FC<SkillModalProps> = ({
               </div>
             </div>
           </div>
-
           <div className={styles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена

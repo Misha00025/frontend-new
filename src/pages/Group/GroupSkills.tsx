@@ -1,5 +1,5 @@
 // pages/GroupSkills.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupSkill, SkillAttributeDefinition } from '../../types/groupSkills';
 import { groupSkillsAPI } from '../../services/api';
@@ -43,6 +43,25 @@ const GroupSkills: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const getPossibleValuesForFilteredAttributes = useCallback(() => {
+    const possibleValues: { [key: string]: string[] } = {};
+    
+    attributes
+      .filter(attr => attr.isFiltered)
+      .forEach(attr => {
+        const values = new Set<string>();
+        skills.forEach(skill => {
+          const skillAttr = skill.attributes.find(a => a.key === attr.key);
+          if (skillAttr) {
+            values.add(skillAttr.value);
+          }
+        });
+        possibleValues[attr.key] = Array.from(values);
+        possibleValues[attr.key].sort();
+      });
+    return possibleValues;
+  }, [skills, attributes]);
 
   const loadAttributes = async () => {
     try {
@@ -143,6 +162,7 @@ const GroupSkills: React.FC = () => {
             onSave={editingSkill ? handleUpdateSkill : handleCreateSkill}
             editingSkill={editingSkill}
             availableAttributes={attributes}
+            possibleValuesForFilteredAttributes={getPossibleValuesForFilteredAttributes()}
             title={editingSkill ? 'Редактирование навыка' : 'Создание навыка'}
           />
 

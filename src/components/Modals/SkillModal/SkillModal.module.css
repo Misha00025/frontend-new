@@ -65,11 +65,47 @@
     padding-top: 1rem;
     border-top: 1px solid var(--border-color);
   }
+
+  .attributeContainer{
+    display: flex;
+  }
   
   .attributeActions {
     margin-top: 1rem;
   }
   
+  .attributeValueContainer {
+    display: flex;
+    width: 100%;
+  }
+  
+  .customInputContainer {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    align-items: center;
+  }
+  
+  .customInputContainer input {
+    flex: 1;
+  }
+  
+  .customInputContainer button {
+    padding: 0.25rem 0.5rem;
+    height: auto;
+    white-space: nowrap;
+  }
+  
+  /* Подсказка для фильтруемых атрибутов */
+  .filteredAttributeHint {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
   .buttons {
     display: flex;
     gap: 1rem;
@@ -83,4 +119,26 @@
     padding: 0.5rem;
     background-color: #ffeeee;
     border-radius: var(--border-radius-sm);
+  }
+
+
+  .attributeHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .filteredBadge {
+    font-size: 0.8rem;
+    background-color: var(--accent-primary);
+    color: white;
+    padding: 0.1rem 0.3rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.7rem;
+  }
+  
+  /* Сделаем фильтруемые атрибуты визуально отличными */
+  .attributeItem:has(.filteredBadge) {
+    border-left: 3px solid var(--accent-primary);
   }
