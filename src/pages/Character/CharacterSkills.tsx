@@ -191,7 +191,7 @@ const CharacterSkills: React.FC = () => {
         />
       )}
 
-      {(
+      {canEditGroup && (
         <SkillModal 
           isOpen={isSkillModalOpen}
           onClose={() => {setIsSkillModalOpen(false); setEditingSkill(null)}}
