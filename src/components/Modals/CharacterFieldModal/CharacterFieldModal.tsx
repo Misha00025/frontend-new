@@ -199,7 +199,7 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
           </div>
 
           {/* Поле выбора категории, только если есть категории */}
-          {categories.length > 0 && (
+          {/* {categories.length > 0 && (
             <div className={styles.formGroup}>
               <label>Категория:</label>
               <select
@@ -213,7 +213,7 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
                 ))}
               </select>
             </div>
-          )}
+          )} */}
 
           <div className={styles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
