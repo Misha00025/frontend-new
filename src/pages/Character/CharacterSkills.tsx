@@ -1,8 +1,8 @@
 // pages/CharacterSkills.tsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterSkill } from '../../types/characterSkills';
-import { GroupSkill, SkillAttributeDefinition, SkillGroup } from '../../types/groupSkills';
+import { CreateGroupSkillRequest, GroupSkill, SkillAttributeDefinition, SkillGroup, UpdateGroupSkillRequest } from '../../types/groupSkills';
 import { characterSkillsAPI, groupSkillsAPI } from '../../services/api';
 import CharacterSkillModal from '../../components/Modals/SkillModal/CharacterSkillModal';
 import SkillCard from '../../components/Cards/SkillCard/SkillCard';
@@ -13,6 +13,7 @@ import { useActionPermissions } from '../../hooks/useActionPermissions';
 import { usePlatform } from '../../hooks/usePlatform';
 import GroupSection from '../../components/Cards/SkillCard/GroupSection';
 import { groupSkillsByAttributes } from '../../utils/groupSkillsByAttributes';
+import SkillModal from '../../components/Modals/SkillModal/SkillModal';
 
 const CharacterSkills: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -22,8 +23,10 @@ const CharacterSkills: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { canEditThisCharacter } = useActionPermissions();
+  const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
+  const { canEditThisCharacter, canEditGroup } = useActionPermissions();
   const [attributes, setAttributes] = useState<SkillAttributeDefinition[]>([]);
+  const [editingSkill, setEditingSkill] = useState<GroupSkill | null>(null);
 
   useEffect(() => {
     if (groupId && characterId) {
@@ -94,6 +97,44 @@ const CharacterSkills: React.FC = () => {
     }
   };
 
+
+  
+  const getPossibleValuesForFilteredAttributes = useCallback(() => {
+    const possibleValues: { [key: string]: string[] } = {};
+    
+    attributes
+      .filter(attr => attr.isFiltered)
+      .forEach(attr => {
+        const values = new Set<string>();
+        skills.forEach(skill => {
+          const skillAttr = skill.attributes.find(a => a.key === attr.key);
+          if (skillAttr) {
+            values.add(skillAttr.value);
+          }
+        });
+        possibleValues[attr.key] = Array.from(values);
+        possibleValues[attr.key].sort();
+      });
+    return possibleValues;
+  }, [skills, attributes]);
+
+  const handleCreateSkill = async (skillData: any) => {
+      await groupSkillsAPI.createSkill(parseInt(groupId!), skillData);
+      loadSkills();
+    };
+  
+  const handleUpdateSkill = async (skillData: any) => {
+    if (!editingSkill) return;
+    await groupSkillsAPI.updateSkill(parseInt(groupId!), editingSkill.id, skillData);
+    loadSkills();
+  };
+
+  
+  const handleEditSkill = (skill: GroupSkill) => {
+    setEditingSkill(skill);
+    setIsSkillModalOpen(true);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
@@ -129,6 +170,7 @@ const CharacterSkills: React.FC = () => {
                 group={group}
                 level={0}
                 isMobile={isMobile}
+                onEditSkill={canEditGroup ? handleEditSkill : undefined}
                 onDeleteSkill={canEditThisCharacter ? handleRemoveSkill : undefined}
                 showActions={canEditThisCharacter}
                 collapse={false}
@@ -146,6 +188,18 @@ const CharacterSkills: React.FC = () => {
           groupSkills={groupSkills}
           existingSkills={skills}
           title="Добавление способности персонажу"
+        />
+      )}
+
+      {(
+        <SkillModal 
+          isOpen={isSkillModalOpen}
+          onClose={() => {setIsSkillModalOpen(false); setEditingSkill(null)}}
+          onSave={editingSkill ? handleUpdateSkill : handleCreateSkill}
+          editingSkill={editingSkill}
+          availableAttributes={attributes}
+          possibleValuesForFilteredAttributes={getPossibleValuesForFilteredAttributes()}
+          title={editingSkill ? 'Редактирование навыка' : 'Создание навыка'}
         />
       )}
     </div>
