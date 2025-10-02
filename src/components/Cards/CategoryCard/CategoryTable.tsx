@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { CharacterField } from '../../../types/characters';
 import { CategoryData } from '../../../utils/characterFields';
 import styles from './CategoryTable.module.css';
-import IconButton from '../../Buttons/IconButton';
+import IconButton from '../../commons/Buttons/IconButton/IconButton';
 
 interface CategoryTableProps {
   category: CategoryData;

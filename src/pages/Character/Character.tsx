@@ -10,7 +10,7 @@ import { CharacterTemplate, TemplateCategory } from '../../types/characterTempla
 import List from '../../components/List/List';
 import CharacterTableView from '../../components/Views/CharacterTableView/CharacterTableView';
 import CharacterCardsView from '../../components/Views/CharacterCardsView/CharacterCardsView';
-import IconButton from '../../components/Buttons/IconButton';
+import IconButton from '../../components/commons/Buttons/IconButton/IconButton';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();

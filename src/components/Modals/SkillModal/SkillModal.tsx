@@ -5,7 +5,7 @@ import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './SkillModal.module.css';
 import { generateKey } from '../../../utils/generateKey';
-import IconButton from '../../Buttons/IconButton';
+import IconButton from '../../commons/Buttons/IconButton/IconButton';
 import MDEditor from '@uiw/react-md-editor';
 import { useTheme } from '../../../contexts/ThemeContext';
 

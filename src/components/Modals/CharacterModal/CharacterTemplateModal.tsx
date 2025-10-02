@@ -5,7 +5,7 @@ import CategoryModal from './CategoryModal';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CharacterTemplateModal.module.css';
-import IconButton from '../../Buttons/IconButton';
+import IconButton from '../../commons/Buttons/IconButton/IconButton';
 import EditedTemplateFieldCard from '../../Cards/FieldCard/EditedTemplateFieldCard';
 import TemplateCategoryCard from '../../Cards/CategoryCard/TemplateCategoryCard';
 

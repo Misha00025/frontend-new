@@ -1,7 +1,7 @@
 import React from 'react';
 import { CharacterField } from '../../../types/characters';
 import { CharacterTemplate } from '../../../types/characterTemplates';
-import IconButton from '../../Buttons/IconButton';
+import IconButton from '../../commons/Buttons/IconButton/IconButton';
 import styles from './FieldCard.module.css';
 
 interface FieldCardProps {

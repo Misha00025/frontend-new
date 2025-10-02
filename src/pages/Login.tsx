@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import ThemeToggle from '../components/ThemeToggle/ThemeToggle';
+import ThemeToggle from '../components/commons/Buttons/ThemeToggle/ThemeToggle';
 import buttonStyles from '../styles/components/Button.module.css';
 import inputStyles from '../styles/components/Input.module.css';
 import commonStyles from '../styles/common.module.css';

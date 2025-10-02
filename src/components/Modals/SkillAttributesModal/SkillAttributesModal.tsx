@@ -4,7 +4,7 @@ import { SkillAttributeDefinition } from '../../../types/groupSkills';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './SkillAttributesModal.module.css';
-import IconButton from '../../Buttons/IconButton';
+import IconButton from '../../commons/Buttons/IconButton/IconButton';
 
 interface SkillAttributesModalProps {
   isOpen: boolean;

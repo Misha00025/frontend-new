@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { useGroup } from '../../contexts/GroupContext';
-import { getNavigationItems } from '../../config/navigation';
-import buttonStyles from '../../styles/components/Button.module.css';
+import { useAuth } from '../../../hooks/useAuth';
+import { useGroup } from '../../../contexts/GroupContext';
+import { getNavigationItems } from '../../../config/navigation';
+import buttonStyles from '../../../styles/components/Button.module.css';
 import styles from './Sidebar.module.css';
-import { names } from '../../config/names';
-import ThemeToggle from '../ThemeToggle/ThemeToggle';
+import { names } from '../../../config/names';
+import ThemeToggle from '../Buttons/ThemeToggle/ThemeToggle';
 
 const DesktopSidebar: React.FC = () => {
   const { logout } = useAuth();

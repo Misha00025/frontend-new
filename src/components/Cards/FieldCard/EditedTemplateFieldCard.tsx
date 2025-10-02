@@ -1,6 +1,6 @@
 import React from 'react';
 import { TemplateField, TemplateCategory } from '../../../types/characterTemplates';
-import IconButton from '../../Buttons/IconButton';
+import IconButton from '../../commons/Buttons/IconButton/IconButton';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './EditedTemplateFieldCard.module.css';
 

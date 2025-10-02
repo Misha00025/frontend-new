@@ -7,7 +7,7 @@ import CharacterTemplateModal from '../../components/Modals/CharacterModal/Chara
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
-import IconButton from '../../components/Buttons/IconButton';
+import IconButton from '../../components/commons/Buttons/IconButton/IconButton';
 import TemplatePreview from '../../components/Views/TemplatePreview/TemplatePreview';
 
 const CharacterTemplates: React.FC = () => {

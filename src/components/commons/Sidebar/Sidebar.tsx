@@ -1,7 +1,7 @@
 import React from 'react';
 import MobileSidebar from './MobileSidebar';
 import DesktopSidebar from './DesktopSidebar';
-import { usePlatform } from '../../hooks/usePlatform';
+import { usePlatform } from '../../../hooks/usePlatform';
 
 const Sidebar: React.FC = () => {
   const isMobile = usePlatform();

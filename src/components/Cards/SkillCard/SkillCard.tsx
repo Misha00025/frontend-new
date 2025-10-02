@@ -1,7 +1,7 @@
 // components/Cards/SkillCard.tsx
 import React, { useState } from 'react';
 import { GroupSkill, SkillAttribute } from '../../../types/groupSkills';
-import IconButton from '../../Buttons/IconButton';
+import IconButton from '../../commons/Buttons/IconButton/IconButton';
 import styles from './SkillCard.module.css';
 import ReactMarkdown from 'react-markdown';
 

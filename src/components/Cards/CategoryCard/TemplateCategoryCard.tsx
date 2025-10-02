@@ -2,7 +2,7 @@ import React from 'react';
 import { TemplateCategory, TemplateField } from '../../../types/characterTemplates';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import styles from './TemplateCategoryCard.module.css';
-import IconButton from '../../Buttons/IconButton';
+import IconButton from '../../commons/Buttons/IconButton/IconButton';
 import EditedTemplateFieldCard from '../../Cards/FieldCard/EditedTemplateFieldCard';
 
 interface TemplateCategoryCardProps {

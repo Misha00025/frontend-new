@@ -1,7 +1,7 @@
 import React from 'react';
 import { GroupItem } from '../../types/groupItems';
 import { CharacterItem } from '../../types/characterItems';
-import IconButton from '../Buttons/IconButton';
+import IconButton from '../commons/Buttons/IconButton/IconButton';
 import styles from './ItemCard.module.css';
 
 interface ItemCardProps {

@@ -4,7 +4,7 @@ import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import styles from './CharacterCard.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
-import IconButton from '../Buttons/IconButton';
+import IconButton from '../commons/Buttons/IconButton/IconButton';
 import { Link, useParams } from 'react-router-dom';
 
 interface CharacterCardProps {

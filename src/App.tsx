@@ -5,7 +5,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { GroupProvider } from './contexts/GroupContext';
 import { useProfile } from './hooks/useProfile';
-import Sidebar from './components/Sidebar/Sidebar';
+import Sidebar from './components/commons/Sidebar/Sidebar';
 import Login from './pages/Login';
 import CompleteRegistration from './pages/CompleteRegistration';
 import Dashboard from './pages/Dashboard';

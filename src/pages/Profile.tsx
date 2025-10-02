@@ -6,6 +6,7 @@ import inputStyles from '../styles/components/Input.module.css';
 import styles from '../styles/common.module.css';
 import { useAuth } from '../contexts/AuthContext';
 import { uploadAPI, userAPI } from '../services/api';
+import ThemeToggle from '../components/commons/Buttons/ThemeToggle/ThemeToggle';
 
 const Profile: React.FC = () => {
   const { profile, loading, error, fetchProfile } = useProfile();
@@ -210,6 +211,7 @@ const Profile: React.FC = () => {
             >
               Выйти
             </button>
+            <ThemeToggle />
           </>
         )}
       </div>

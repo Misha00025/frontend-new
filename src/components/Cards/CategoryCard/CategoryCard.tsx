@@ -3,7 +3,7 @@ import { CharacterField } from '../../../types/characters';
 import { CharacterTemplate, TemplateCategory } from '../../../types/characterTemplates';
 import List from '../../List/List';
 import FieldCard from '../FieldCard/FieldCard';
-import IconButton from '../../Buttons/IconButton';
+import IconButton from '../../commons/Buttons/IconButton/IconButton';
 import styles from './CategoryCard.module.css';
 
 interface CategoryCardProps {
