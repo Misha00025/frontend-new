@@ -20,8 +20,8 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = ({ template }) => {
 
   return (
     <div className={''}>
-      <h2>{template.name}</h2>
-      <p>{template.description}</p>
+      {/* <h2>{template.name}</h2> */}
+      {/* <p>{template.description}</p> */}
 
       <div className={uiStyles.fields} style={{ marginTop: '0px' }}>
         <List layout='horizontal'>
