@@ -242,32 +242,22 @@ const Character: React.FC = () => {
       
       <div className={uiStyles.fields} style={{marginTop: '0px'}}>
         <List layout='horizontal'>
-          <h2>Поля персонажа</h2>
-          <div className={uiStyles.viewSwitcher}>
-            <button 
-              className={`${uiStyles.viewButton} ${viewMode === 'table' ? uiStyles.active : ''}`}
-              onClick={() => setViewMode('table')}
-              title="Табличный вид"
-            >
-              📊
-            </button>
-            <button 
-              className={`${uiStyles.viewButton} ${viewMode === 'card' ? uiStyles.active : ''}`}
-              onClick={() => setViewMode('card')}
-              title="Карточный вид"
-            >
-              📋
-            </button>
-          </div>
-          
+          <h2>
+            Поля персонажа
+          </h2>
+          <IconButton
+              icon='view'
+              title='Сменить вид'
+              onClick={() => setViewMode(viewMode === 'table' ? 'card' : 'table')}
+            />          
         </List>
-        {canEditThisCharacter && (<List layout='horizontal'>
+        {/* {canEditThisCharacter && (<List layout='horizontal'>
           <IconButton 
             title='Добавить поле'
             icon='add'
             onClick={handleAddField}
           />
-        </List>)}
+        </List>)} */}
         {viewMode === 'card' ? (
           <CharacterCardsView
             character={character}
