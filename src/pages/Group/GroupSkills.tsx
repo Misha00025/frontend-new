@@ -38,7 +38,7 @@ const GroupSkills: React.FC = () => {
       setTimeout(() => {
         const element = document.getElementById(`skill-${lastUpdatedSkillId}`);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }, 100);
     }
