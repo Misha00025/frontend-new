@@ -24,12 +24,30 @@
 .categoryTitle {
   color: #ffffff;
   background-color: var(--accent-color);
-  padding-bottom: 0.4rem;
-  padding-top: 0.4rem;
+  height: 3rem;
   margin-top: 0;
   margin-bottom: 1.5rem;
   font-size: 1.1rem;
   text-align: center;
+  vertical-align: middle;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 0 1rem;
+}
+
+.titleCenter {
+  flex: 1;
+  text-align: center;
+}
+
+.addButtonContainer {
+  position: absolute;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .table {

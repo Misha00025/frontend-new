@@ -144,8 +144,9 @@ const Character: React.FC = () => {
     setIsFieldModalOpen(true);
   };
 
-  const handleAddField = () => {
-    setEditingField(null);
+  const handleAddField = (category?: string) => {
+    console.log(`add field to category: ${category}`)
+    setEditingField(category ? {key: '', field: {name:'', description:'', value:0, category:category}} : null);
     setIsAddingField(true);
     setIsFieldModalOpen(true);
   };
@@ -282,6 +283,7 @@ const Character: React.FC = () => {
             template={template}
             canEdit={canEditThisCharacter}
             onUpdateFieldValue={handleUpdateFieldValue}
+            onAddField={canEditThisCharacter ? handleAddField : undefined}
           />
         )}
       </div>
@@ -292,7 +294,7 @@ const Character: React.FC = () => {
         onSave={handleSaveField}
         field={editingField?.field || null}
         fieldKey={editingField?.key || ''}
-        title={editingField ? 'Редактирование поля' : 'Добавление поля'}
+        title={isAddingField ? 'Редактирование поля' : 'Добавление поля'}
         isKeyEditable={!editingField}
         categories={allCategories}
       />

@@ -10,13 +10,15 @@ interface CategoryTableProps {
   canEdit: boolean;
   onUpdateFieldValue: (fieldKey: string, newValue: string) => void;
   level?: number;
+  onAddField?: (category?:string) => void;
 }
 
 const CategoryTable: React.FC<CategoryTableProps> = ({
   category,
   canEdit,
   onUpdateFieldValue,
-  level = 0
+  level = 0,
+  onAddField = undefined
 }) => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
@@ -78,8 +80,22 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   return (
     <div className={`${styles.categorySection} ${level > 0 ? styles.subcategory : ''}`} style={{ margin: level > 0 ? `${level * 4}px` : '0' }}>
       <h3 className={styles.categoryTitle}>
-        {category.name}
+        <span className={styles.titleCenter}>{category.name}</span>
+        {onAddField && (
+          <div className={styles.addButtonContainer}>
+            <IconButton 
+              icon='add'
+              title='Добавить поле'
+              onClick={() => {
+                const keyParts = category.key.split('.');
+                const lastPart = keyParts[keyParts.length - 1];
+                onAddField(lastPart);
+              }}
+            />
+          </div>
+        )}
       </h3>
+      
       {category.fields.length > 0 && (
         <table className={styles.table}>
           <tbody>
@@ -135,6 +151,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
           canEdit={canEdit}
           onUpdateFieldValue={onUpdateFieldValue}
           level={level + 1}
+          onAddField={onAddField}
         />
       ))}
     </div>
