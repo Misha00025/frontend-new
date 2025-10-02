@@ -1,7 +1,7 @@
 // pages/GroupSkills.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { GroupSkill, SkillAttributeDefinition } from '../../types/groupSkills';
+import { GroupSkill, SkillAttributeDefinition, SkillGroup } from '../../types/groupSkills';
 import { groupSkillsAPI } from '../../services/api';
 import SkillModal from '../../components/Modals/SkillModal/SkillModal';
 import SkillAttributesModal from '../../components/Modals/SkillAttributesModal/SkillAttributesModal';
@@ -24,6 +24,7 @@ const GroupSkills: React.FC = () => {
   const [isAttributesModalOpen, setIsAttributesModalOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState<GroupSkill | null>(null);
   const { canEditGroup } = useActionPermissions();
+  const [lastUpdatedSkillId, setLastUpdatedSkillId] = useState<number | null>(null);
 
   useEffect(() => {
     if (groupId) {
@@ -31,6 +32,17 @@ const GroupSkills: React.FC = () => {
       loadAttributes();
     }
   }, [groupId]);
+
+  useEffect(() => {
+    if (lastUpdatedSkillId) {
+      setTimeout(() => {
+        const element = document.getElementById(`skill-${lastUpdatedSkillId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 100);
+    }
+  }, [lastUpdatedSkillId, skills]);
 
   const loadSkills = async () => {
     try {
@@ -73,13 +85,15 @@ const GroupSkills: React.FC = () => {
   };
 
   const handleCreateSkill = async (skillData: any) => {
-    await groupSkillsAPI.createSkill(parseInt(groupId!), skillData);
+    const newSkill = await groupSkillsAPI.createSkill(parseInt(groupId!), skillData);
+    setLastUpdatedSkillId(newSkill.id);
     loadSkills();
   };
 
   const handleUpdateSkill = async (skillData: any) => {
     if (!editingSkill) return;
-    await groupSkillsAPI.updateSkill(parseInt(groupId!), editingSkill.id, skillData);
+    const updatedSkill = await groupSkillsAPI.updateSkill(parseInt(groupId!), editingSkill.id, skillData);
+    setLastUpdatedSkillId(updatedSkill.id);
     loadSkills();
   };
 
@@ -114,6 +128,19 @@ const GroupSkills: React.FC = () => {
     setIsAttributesModalOpen(false);
     setEditingSkill(null);
   };
+
+  const checkContainSkill = (group: SkillGroup) => {
+    var success: boolean = false
+    group.skills.forEach((skill) => {
+      success = success || skill.id == lastUpdatedSkillId
+    })
+    if (!success){
+      group.children.forEach((child) => {
+        success = success || checkContainSkill(child)
+      })
+    }
+    return success
+  }
 
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
 
@@ -150,6 +177,7 @@ const GroupSkills: React.FC = () => {
           onEditSkill={canEditGroup ? handleEditSkill : undefined}
           onDeleteSkill={canEditGroup ? handleDeleteSkill : undefined}
           showActions={canEditGroup}
+          collapse={!checkContainSkill(group)}
         />
       ))}
       </List>

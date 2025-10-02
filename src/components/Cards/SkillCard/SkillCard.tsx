@@ -21,7 +21,7 @@ const SkillCard: React.FC<SkillCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className={styles.skillCard}>
+    <div id={`skill-${skill.id}`} className={styles.skillCard}>
       <div className={styles.header} onClick={() => setIsExpanded(!isExpanded)}>
         <div className={styles.titleSection}>
           <h3 className={styles.skillName} title={skill.name}>{skill.name}</h3>

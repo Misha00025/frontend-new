@@ -21,7 +21,7 @@ const GroupSection: React.FC<GroupSectionProps> = ({
   onEditSkill,
   onDeleteSkill,
   showActions,
-  collapse = true
+  collapse = true,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(collapse);
 
