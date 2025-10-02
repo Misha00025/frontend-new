@@ -91,6 +91,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
                 const lastPart = keyParts[keyParts.length - 1];
                 onAddField(lastPart);
               }}
+              size='small'
             />
           </div>
         )}
