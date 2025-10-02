@@ -20,6 +20,7 @@ interface CharacterFieldModalProps {
   fieldKey: string;
   title: string;
   isKeyEditable?: boolean;
+  allFieldKeys?: string[]
   categories?: TemplateCategory[]; // Добавляем опциональный пропс для категорий
 }
 
@@ -31,6 +32,7 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
   fieldKey,
   title,
   isKeyEditable = true,
+  allFieldKeys = [],
   categories = [] // Значение по умолчанию - пустой массив
 }) => {
   const [name, setName] = useState('');
@@ -84,6 +86,11 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
       return;
     }
 
+    if (!isExist && allFieldKeys.includes(key)){
+      setError('Ключ нового поля не должен совпадать с существующими')
+      return;
+    }
+
     const fieldData: CharacterField = {
       name,
       value: value === ''? 0 : value,
@@ -120,7 +127,6 @@ const CharacterFieldModal: React.FC<CharacterFieldModalProps> = ({
                 onChange={(e) => {setKey(e.target.value)}}
                 className={inputStyles.input}
                 required
-                disabled={true}
               />
               <small className={styles.helpText}>
                 Ключ используется в системе (только латинские буквы, цифры и _)

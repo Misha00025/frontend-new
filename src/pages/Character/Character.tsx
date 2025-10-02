@@ -222,6 +222,10 @@ const Character: React.FC = () => {
     return allCategories;
   };
 
+  const getAllKeys = () => {
+    return Object.keys(character.fields)
+  }
+
   const allCategories = template ? getAllCategories(template.schema.categories) : [];
 
   return (
@@ -287,6 +291,7 @@ const Character: React.FC = () => {
         title={!isAddingField ? 'Редактирование поля' : 'Добавление поля'}
         isKeyEditable={isAddingField}
         categories={allCategories}
+        allFieldKeys={getAllKeys()}
       />
     </div>
   );
