@@ -8,6 +8,7 @@ import CharacterCardsView from '../CharacterCardsView/CharacterCardsView';
 import CharacterTableView from '../CharacterTableView/CharacterTableView';
 import styles from './TemplatePreview.module.css';
 import List from '../../List/List';
+import IconButton from '../../commons/Buttons/IconButton/IconButton';
 
 interface TemplatePreviewProps {
   template: CharacterTemplate;
@@ -25,22 +26,11 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = ({ template }) => {
       <div className={uiStyles.fields} style={{ marginTop: '0px' }}>
         <List layout='horizontal'>
           <h3>Поля шаблона</h3>
-          <div className={uiStyles.viewSwitcher}>
-            <button 
-              className={`${uiStyles.viewButton} ${viewMode === 'table' ? uiStyles.active : ''}`}
-              onClick={() => setViewMode('table')}
-              title="Табличный вид"
-            >
-              📊
-            </button>
-            <button 
-              className={`${uiStyles.viewButton} ${viewMode === 'card' ? uiStyles.active : ''}`}
-              onClick={() => setViewMode('card')}
-              title="Карточный вид"
-            >
-              📋
-            </button>
-          </div>
+          <IconButton
+            icon='view'
+            title='Изменить вид'
+            onClick={() => {viewMode === 'card' ? setViewMode('table') : setViewMode('card')}}
+          />
         </List>
 
         {viewMode === 'card' ? (
