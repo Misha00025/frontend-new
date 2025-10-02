@@ -294,8 +294,8 @@ const Character: React.FC = () => {
         onSave={handleSaveField}
         field={editingField?.field || null}
         fieldKey={editingField?.key || ''}
-        title={isAddingField ? 'Редактирование поля' : 'Добавление поля'}
-        isKeyEditable={!editingField}
+        title={!isAddingField ? 'Редактирование поля' : 'Добавление поля'}
+        isKeyEditable={isAddingField}
         categories={allCategories}
       />
     </div>
