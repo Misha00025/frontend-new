@@ -143,7 +143,7 @@ const CharacterUsersTable: React.FC<CharacterUsersTableProps> = ({
                 </div>
                 <div className={styles.usersCell}>
                   <UsersList
-                    users={users.map(cu => ({ user: cu.user, permission: cu.canWrite }))}
+                    users={users.sort((a,b) => a.canWrite > b.canWrite ? -1 : 1).map(cu => ({ user: cu.user, permission: cu.canWrite }))}
                     onRemoveUser={(userId) => handleRemoveCharacterUser(parseInt(characterId), userId)}
                     formatPermission={(canWrite: boolean) => canWrite ? '(Игрок)' : '(Наблюдатель)'}
                     canManage={canManage}
