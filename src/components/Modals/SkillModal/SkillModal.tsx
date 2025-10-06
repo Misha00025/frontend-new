@@ -156,24 +156,6 @@ const SkillModal: React.FC<SkillModalProps> = ({
     setError(null);
   
     try {
-      // Проверяем, что все обязательные фильтруемые атрибуты заполнены
-      const requiredFilteredAttributes = availableAttributes
-        .filter(attr => attr.isFiltered)
-        .map(attr => attr.key);
-  
-      const missingAttributes = requiredFilteredAttributes.filter(attrKey => 
-        !attributes.some(attr => attr.key === attrKey && attr.value.trim())
-      );
-  
-      if (missingAttributes.length > 0) {
-        const missingNames = missingAttributes.map(key => 
-          availableAttributes.find(attr => attr.key === key)?.name || key
-        );
-        setError(`Пожалуйста, заполните обязательные атрибуты: ${missingNames.join(', ')}`);
-        setLoading(false);
-        return;
-      }
-  
       const skillData = {
         name,
         description,
