@@ -11,6 +11,7 @@ export interface GroupSkill {
   name: string;
   description: string;
   attributes: SkillAttribute[];
+  isSecret: boolean;
 }
 
 export interface GroupSkillsResponse {

@@ -30,6 +30,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [secret, setSecret] = useState(false);
   const [attributes, setAttributes] = useState<SkillAttribute[]>([]);
   const [newAttribute, setNewAttribute] = useState<Partial<SkillAttribute>>({});
   const [loading, setLoading] = useState(false);
@@ -44,20 +45,19 @@ const SkillModal: React.FC<SkillModalProps> = ({
       setName(editingSkill.name);
       setDescription(editingSkill.description);
       setAttributes([...editingSkill.attributes]);
+      setSecret(editingSkill.isSecret)
     } else {
       setName('');
       setDescription('');
-      
-      // Автоматически добавляем isFiltered атрибуты при создании
+      setSecret(false);
       const filteredAttributes = availableAttributes
         .filter(attr => attr.isFiltered)
         .map(attr => ({
           key: attr.key,
           name: attr.name,
           description: attr.description,
-          value: '' // Пустое значение по умолчанию
+          value: ''
         }));
-      
       setAttributes(filteredAttributes);
     }
     if (!isOpen) {
@@ -163,7 +163,8 @@ const SkillModal: React.FC<SkillModalProps> = ({
           key: attr.key,
           name: attr.name,
           value: attr.value
-        }))
+        })),
+        isSecret: secret
       };
   
       await onSave(skillData);
@@ -323,7 +324,15 @@ const SkillModal: React.FC<SkillModalProps> = ({
               Поддерживает Markdown: **жирный**, *курсив*, `код`, списки и многое другое.
             </div>
           </div>
-
+          <label>
+              <input
+                type="checkbox"
+                checked={secret}
+                className={inputStyles.input}
+                onChange={(e) => setSecret(e.target.checked)}
+              />
+              Скрытый
+            </label>
           <div className={styles.attributesSection}>
             <h3>Атрибуты навыка</h3>
             
