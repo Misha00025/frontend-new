@@ -1,32 +1,70 @@
-// components/Cards/SkillCard.tsx
 import React, { useState } from 'react';
-import { GroupSkill, SkillAttribute } from '../../../types/groupSkills';
+import { GroupItem } from '../../../types/groupItems';
+import { CharacterItem } from '../../../types/characterItems';
 import IconButton from '../../commons/Buttons/IconButton/IconButton';
-import styles from './SkillCard.module.css';
+import styles from './ItemCard.module.css';
 import ReactMarkdown from 'react-markdown';
 
-interface SkillCardProps {
-  skill: GroupSkill;
+interface ItemCardProps {
+  item: GroupItem | CharacterItem;
   onEdit?: () => void;
   onDelete?: () => void;
   showActions?: boolean;
+  showAmount?: boolean;
 }
 
-const SkillCard: React.FC<SkillCardProps> = ({
-  skill,
+const ItemCard: React.FC<ItemCardProps> = ({
+  item,
   onEdit,
   onDelete,
-  showActions = true
+  showActions = true,
+  showAmount = false
 }) => {
+  const isCharacterItem = 'amount' in item;
   const [isExpanded, setIsExpanded] = useState(false);
+  
+  const getExtendedAttributes = () => {
+    const extendedAttrs = [];
+    
+    extendedAttrs.push({
+      key: 'price',
+      name: 'Цена',
+      value: item.price
+    });
+    
+    if (showAmount && isCharacterItem) {
+      extendedAttrs.push({
+        key: 'amount',
+        name: 'Количество',
+        value: item.amount
+      });
+      
+      extendedAttrs.push({
+        key: 'total',
+        name: 'Общая стоимость',
+        value: item.amount * item.price
+      });
+    }
+    
+    if (item.attributes) {
+      extendedAttrs.push(...item.attributes);
+    }
+    
+    return extendedAttrs;
+  };
+
+  const extendedAttributes = getExtendedAttributes();
 
   return (
-    <div id={`skill-${skill.id}`} className={styles.skillCard}>
+    <div className={styles.itemCard}>
       <div className={styles.header} onClick={() => setIsExpanded(!isExpanded)}>
+        {item.image_link && (
+          <img src={item.image_link} alt={item.name} className={styles.itemImage} />
+        )}
         <div className={styles.titleSection}>
-          <h3 className={styles.skillName} title={skill.name}>{skill.name}</h3>
+          <h3 className={styles.itemName} title={item.name}>{item.name}</h3>
           <div className={styles.attributesPreview}>
-            {skill.attributes.map(attr => (
+            {extendedAttributes.map(attr => (
               <span key={attr.key} className={styles.attributeTag}>
                 {attr.name}: {attr.value}
               </span>
@@ -43,13 +81,11 @@ const SkillCard: React.FC<SkillCardProps> = ({
           {isExpanded ? '▲' : '▼'}
         </button>
       </div>
-      
       {isExpanded && (
         <div className={styles.expandedContent}>
           <div className={styles.description}>
-            <ReactMarkdown>{skill.description}</ReactMarkdown>
+            <ReactMarkdown>{item.description}</ReactMarkdown>
           </div>
-          
           {showActions && (
             <div className={styles.actions}>
               {onEdit && (
@@ -78,4 +114,4 @@ const SkillCard: React.FC<SkillCardProps> = ({
   );
 };
 
-export default SkillCard;
+export default ItemCard;

@@ -1,7 +1,10 @@
+import { SkillAttribute } from "./groupSkills";
+
 export interface CharacterItem {
   id: number;
   name: string;
   description: string;
+  attributes?: SkillAttribute[];
   amount: number;
   price: number;
   image_link: string | null;

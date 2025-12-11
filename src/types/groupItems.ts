@@ -1,7 +1,10 @@
+import { SkillAttribute } from "./groupSkills";
+
 export interface GroupItem {
   id: number;
   name: string;
   description: string;
+  attributes?: SkillAttribute[];
   price: number;
   image_link: string | null;
 }

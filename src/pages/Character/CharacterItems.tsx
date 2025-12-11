@@ -8,7 +8,7 @@ import CharacterItemModal from '../../components/Modals/ItemModal/CharacterItemM
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from '../../styles/ui.module.css';
-import ItemCard from '../../components/Cards/ItemCard';
+import ItemCard from '../../components/Cards/ItemCard/ItemCard';
 import List from '../../components/List/List';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import { usePlatform } from '../../hooks/usePlatform';
@@ -106,7 +106,7 @@ const CharacterItems: React.FC = () => {
         {items.length === 0 ? (
           <p>Предметов пока нет</p>
         ) : (
-          <List layout="grid" gap="small" gridSize={isMobile ? "small" : "large"}>
+          <List layout="start-grid" gap="small" gridSize={isMobile ? "small" : "large"}>
             {items.map(item => (
               <ItemCard
                 key={item.id}

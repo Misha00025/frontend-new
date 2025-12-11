@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { GroupItem } from '../../types/groupItems';
 import { groupItemsAPI } from '../../services/api';
 import GroupItemModal from '../../components/Modals/ItemModal/GroupItemModal';
-import ItemCard from '../../components/Cards/ItemCard';
+import ItemCard from '../../components/Cards/ItemCard/ItemCard';
 import List from '../../components/List/List';
 import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
@@ -89,7 +89,7 @@ const GroupItems: React.FC = () => {
         </div>
       )}
 
-      <List layout={isMobile ? "vertical" : "grid"} gap="medium" gridSize='large'>
+      <List layout={isMobile ? "vertical" : "start-grid"} gap="medium" gridSize='large'>
         {items.map(item => (
           <ItemCard
             key={item.id}
