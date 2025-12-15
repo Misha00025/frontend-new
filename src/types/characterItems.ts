@@ -15,6 +15,7 @@ export interface CharacterItemsResponse {
 }
 
 export interface CreateCharacterItemRequest {
+  id?: number;
   name: string;
   description: string;
   amount: number;

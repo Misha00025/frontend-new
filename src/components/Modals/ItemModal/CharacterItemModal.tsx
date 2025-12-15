@@ -29,10 +29,9 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
   const [imageLink, setImageLink] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [creationMode, setCreationMode] = useState<'new' | 'existing'>('new');
+  const [creationMode, setCreationMode] = useState<'new' | 'existing'>('existing');
   const [selectedGroupItem, setSelectedGroupItem] = useState<GroupItem | null>(null);
 
-  // Заполняем форму данными при редактировании
   useEffect(() => {
     if (editingItem) {
       setName(editingItem.name);
@@ -40,14 +39,14 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
       setAmount(editingItem.amount);
       setPrice(editingItem.price);
       setImageLink(editingItem.image_link || '');
-      setCreationMode('new'); // При редактировании всегда используем режим "новый"
+      setCreationMode('existing'); 
     } else {
-      // Сброс формы при создании нового предмета
       setName('');
       setDescription('');
       setAmount(1);
       setPrice(0);
       setImageLink('');
+      setCreationMode('existing'); 
       setSelectedGroupItem(null);
     }
   }, [editingItem, isOpen]);
@@ -119,6 +118,7 @@ const handleAmountBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     try {
       const itemData = {
+        id: selectedGroupItem?.id ?? 0,
         name,
         description,
         amount: amount === '' ? 1 : amount < 0 ? 0 : amount,
@@ -190,31 +190,59 @@ const handleAmountBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
             </select>
           </div>
         )}
-
         <form onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
-            <label>Название:</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className={inputStyles.input}
-              required
-              disabled={creationMode === 'existing' && !editingItem}
-            />
-          </div>
+          
+          {creationMode === 'new' && (
+          <>
+            <div className={styles.formGroup}>
+              <label>Название:</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className={inputStyles.input}
+                required
+                disabled={editingItem ? true : false}
+              />
+            </div>
 
-          <div className={styles.formGroup}>
-            <label>Описание:</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className={inputStyles.input}
-              rows={3}
-              required
-              disabled={creationMode === 'existing' && !editingItem}
-            />
-          </div>
+            <div className={styles.formGroup}>
+              <label>Описание:</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className={inputStyles.input}
+                rows={3}
+                required
+                disabled={editingItem ? true : false}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Цена за единицу:</label>
+              <input
+                type="number"
+                value={price}
+                onChange={handlePriceChange}
+                onBlur={handlePriceBlur}
+                className={inputStyles.input}
+                required
+                disabled={editingItem ? true : false}
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Ссылка на изображение (в разработке):</label>
+              <input
+                type="text"
+                value={imageLink}
+                onChange={(e) => setImageLink(e.target.value)}
+                className={inputStyles.input}
+                disabled={editingItem ? true : false}
+              />
+            </div>
+          </>
+          )}
 
           <div className={styles.formGroup}>
             <label>Количество:</label>
@@ -226,30 +254,6 @@ const handleAmountBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
               className={inputStyles.input}
               required
               min="0"
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Цена за единицу:</label>
-            <input
-              type="number"
-              value={price}
-              onChange={handlePriceChange}
-              onBlur={handlePriceBlur}
-              className={inputStyles.input}
-              required
-              disabled={creationMode === 'existing' && !editingItem}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Ссылка на изображение (в разработке):</label>
-            <input
-              type="text"
-              value={imageLink}
-              onChange={(e) => setImageLink(e.target.value)}
-              className={inputStyles.input}
-              disabled={creationMode === 'existing' && !editingItem}
             />
           </div>
 

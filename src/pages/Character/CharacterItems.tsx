@@ -53,7 +53,12 @@ const CharacterItems: React.FC = () => {
   };
 
   const handleCreateItem = async (itemData: CreateCharacterItemRequest) => {
-    await characterItemsAPI.createCharacterItem(parseInt(groupId!), parseInt(characterId!), itemData);
+    if (itemData.id){
+      await characterItemsAPI.updateCharacterItem(parseInt(groupId!), parseInt(characterId!), itemData.id, itemData)
+    }
+    else{
+      await characterItemsAPI.createCharacterItem(parseInt(groupId!), parseInt(characterId!), itemData);
+    }
     loadItems();
   };
 
