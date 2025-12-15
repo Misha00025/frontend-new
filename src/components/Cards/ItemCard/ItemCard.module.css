@@ -5,7 +5,16 @@
   overflow: hidden;
   border: 1px solid var(--border-color);
 }
-  
+
+.itemCardHide{
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius-md);
+  margin-bottom: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  opacity: 0.7;
+}
+
 .header {
   display: flex;
   justify-content: space-between;

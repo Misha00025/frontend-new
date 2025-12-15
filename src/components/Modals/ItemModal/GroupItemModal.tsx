@@ -108,7 +108,7 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
     setAttributes(prev => [...prev, {
       key: generateKey(newAttribute.name!),
       name: newAttribute.name!,
-      description: newAttribute.description,
+      description: "",
       value: newAttribute.value!
     }]);
 
@@ -257,14 +257,7 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
                 value={newAttribute.name || ''}
                 onChange={(e) => setNewAttribute(prev => ({ ...prev, name: e.target.value }))}
                 className={inputStyles.input}
-                placeholder="Название нового атрибута"
-              />
-              <input
-                type="text"
-                value={newAttribute.description || ''}
-                onChange={(e) => setNewAttribute(prev => ({ ...prev, description: e.target.value }))}
-                className={inputStyles.input}
-                placeholder="Описание"
+                placeholder="Название"
               />
               {renderAttributeValueInput(newAttribute as SkillAttribute, -1, true)}
 

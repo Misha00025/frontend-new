@@ -7,6 +7,7 @@ export interface GroupItem {
   attributes?: SkillAttribute[];
   price: number;
   image_link: string | null;
+  isSecret: boolean;
 }
 
 export interface GroupItemsResponse {

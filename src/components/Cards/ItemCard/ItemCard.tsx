@@ -56,7 +56,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
   const extendedAttributes = getExtendedAttributes();
 
   return (
-    <div className={styles.itemCard}>
+    <div className={item.isSecret && !isCharacterItem ? styles.itemCardHide : styles.itemCard}>
       <div className={styles.header} onClick={() => setIsExpanded(!isExpanded)}>
         {item.image_link && (
           <img src={item.image_link} alt={item.name} className={styles.itemImage} />

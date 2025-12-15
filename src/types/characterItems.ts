@@ -8,6 +8,7 @@ export interface CharacterItem {
   amount: number;
   price: number;
   image_link: string | null;
+  isSecret: boolean;
 }
 
 export interface CharacterItemsResponse {
