@@ -32,13 +32,14 @@ const ItemCard: React.FC<ItemCardProps> = ({
       value: item.price
     });
     
-    if (showAmount && isCharacterItem) {
+    if (showAmount && isCharacterItem && item.amount !== 1) {
       extendedAttrs.push({
         key: 'amount',
         name: 'Количество',
         value: item.amount
       });
-      
+    }
+    if (showAmount && isCharacterItem && item.amount > 1) { 
       extendedAttrs.push({
         key: 'total',
         name: 'Общая стоимость',
