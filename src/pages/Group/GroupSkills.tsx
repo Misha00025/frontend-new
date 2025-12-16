@@ -1,5 +1,5 @@
 // pages/GroupSkills.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupSkill, SkillAttributeDefinition, SkillGroup } from '../../types/groupSkills';
 import { groupSkillsAPI } from '../../services/api';
@@ -12,11 +12,13 @@ import { useActionPermissions } from '../../hooks/useActionPermissions';
 import { usePlatform } from '../../hooks/usePlatform';
 import GroupSection from '../../components/Cards/SkillCard/GroupSection';
 import { groupSkillsByAttributes } from '../../utils/groupSkillsByAttributes';
+import SearchBar from '../../components/commons/Search/SearchBar';
 
 const GroupSkills: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const isMobile = usePlatform();
   const [skills, setSkills] = useState<GroupSkill[]>([]);
+  const [allSkills, setAllSkills] = useState<GroupSkill[]>([]); // Все навыки без фильтрации
   const [attributes, setAttributes] = useState<SkillAttributeDefinition[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,6 +27,11 @@ const GroupSkills: React.FC = () => {
   const [editingSkill, setEditingSkill] = useState<GroupSkill | null>(null);
   const { canEditGroup } = useActionPermissions();
   const [lastUpdatedSkillId, setLastUpdatedSkillId] = useState<number | null>(null);
+  
+  // Состояния для поиска и фильтрации
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedAttribute, setSelectedAttribute] = useState<string>('');
+  const [attributeValue, setAttributeValue] = useState<string>('');
 
   useEffect(() => {
     if (groupId) {
@@ -48,6 +55,7 @@ const GroupSkills: React.FC = () => {
     try {
       setLoading(true);
       const skillsData = await groupSkillsAPI.getSkills(parseInt(groupId!));
+      setAllSkills(skillsData);
       setSkills(skillsData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load skills');
@@ -56,6 +64,41 @@ const GroupSkills: React.FC = () => {
     }
   };
 
+  // Фильтрация навыков
+  useEffect(() => {
+    if (!allSkills.length) return;
+
+    let filtered = [...allSkills];
+
+    // Поиск по тексту
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(skill => 
+        skill.name.toLowerCase().includes(term) ||
+        skill.description.toLowerCase().includes(term) ||
+        skill.attributes.some(attr => 
+          attr.name.toLowerCase().includes(term) ||
+          attr.value.toLowerCase().includes(term)
+        )
+      );
+    }
+
+    // Фильтрация по атрибуту
+    if (selectedAttribute) {
+      filtered = filtered.filter(skill =>
+        skill.attributes.some(attr => {
+          if (attributeValue) {
+            return attr.name === selectedAttribute && attr.value === attributeValue;
+          }
+          return attr.name === selectedAttribute;
+        })
+      );
+    }
+
+    setSkills(filtered);
+  }, [allSkills, searchTerm, selectedAttribute, attributeValue]);
+
+  // Получение возможных значений для атрибутов
   const getPossibleValuesForFilteredAttributes = useCallback(() => {
     const possibleValues: { [key: string]: string[] } = {};
     
@@ -63,7 +106,7 @@ const GroupSkills: React.FC = () => {
       .filter(attr => attr.isFiltered)
       .forEach(attr => {
         const values = new Set<string>();
-        skills.forEach(skill => {
+        allSkills.forEach(skill => {
           const skillAttr = skill.attributes.find(a => a.key === attr.key);
           if (skillAttr) {
             values.add(skillAttr.value);
@@ -73,7 +116,32 @@ const GroupSkills: React.FC = () => {
         possibleValues[attr.key].sort();
       });
     return possibleValues;
-  }, [skills, attributes]);
+  }, [allSkills, attributes]);
+
+  // Получение уникальных атрибутов для фильтрации
+  const availableAttributes = useMemo(() => {
+    const attrs = new Set<string>();
+    allSkills.forEach(skill => {
+      skill.attributes.forEach(attr => {
+        attrs.add(attr.name);
+      });
+    });
+    return Array.from(attrs);
+  }, [allSkills]);
+
+  // Получение возможных значений для выбранного атрибута
+  const attributeValues = useMemo(() => {
+    if (!selectedAttribute) return [];
+    const values = new Set<string>();
+    allSkills.forEach(skill => {
+      skill.attributes.forEach(attr => {
+        if (attr.name === selectedAttribute) {
+          values.add(attr.value);
+        }
+      });
+    });
+    return Array.from(values).sort();
+  }, [allSkills, selectedAttribute]);
 
   const loadAttributes = async () => {
     try {
@@ -140,7 +208,13 @@ const GroupSkills: React.FC = () => {
       })
     }
     return success
-  }
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setSelectedAttribute('');
+    setAttributeValue('');
+  };
 
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
 
@@ -149,6 +223,27 @@ const GroupSkills: React.FC = () => {
       <h1>Книга способностей</h1>
 
       {error && <div className={commonStyles.error}>{error}</div>}
+
+      {/* Панель поиска и фильтрации */}
+      <SearchBar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        selectedAttribute={selectedAttribute}
+        onAttributeChange={(attr) => {
+          setSelectedAttribute(attr);
+          setAttributeValue(''); // Сбрасываем значение при смене атрибута
+        }}
+        attributeValue={attributeValue}
+        onAttributeValueChange={setAttributeValue}
+        availableAttributes={availableAttributes}
+        attributeValues={attributeValues}
+        onClearFilters={handleClearFilters}
+        resultsCount={skills.length}
+        totalCount={allSkills.length}
+        placeholder="Поиск по названию, описанию или атрибуту..."
+        attributeLabel="Атрибут"
+        valueLabel="Значение"
+      />
 
       {canEditGroup && (
         <div className={commonStyles.actions}>
@@ -168,18 +263,29 @@ const GroupSkills: React.FC = () => {
       )}
 
       <List layout={"vertical"} gap="medium" gridSize='small'>
-      {groupSkillsByAttributes(skills, attributes).map((group, index) => (
-        <GroupSection
-          key={index}
-          group={group}
-          level={0}
-          isMobile={isMobile}
-          onEditSkill={canEditGroup ? handleEditSkill : undefined}
-          onDeleteSkill={canEditGroup ? handleDeleteSkill : undefined}
-          showActions={canEditGroup}
-          collapse={!checkContainSkill(group)}
-        />
-      ))}
+        {groupSkillsByAttributes(skills, attributes).map((group, index) => (
+          <GroupSection
+            key={index}
+            group={group}
+            level={0}
+            isMobile={isMobile}
+            onEditSkill={canEditGroup ? handleEditSkill : undefined}
+            onDeleteSkill={canEditGroup ? handleDeleteSkill : undefined}
+            showActions={canEditGroup}
+            collapse={!checkContainSkill(group)}
+          />
+        ))}
+        {skills.length === 0 && !loading && (
+          <div className={commonStyles.noResults}>
+            <p>По вашему запросу ничего не найдено</p>
+            <button 
+              className={buttonStyles.button}
+              onClick={handleClearFilters}
+            >
+              Очистить фильтры
+            </button>
+          </div>
+        )}
       </List>
 
       {canEditGroup && (

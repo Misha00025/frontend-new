@@ -1,0 +1,173 @@
+/* components/SearchAndFilterBar/SearchAndFilterBar.module.css */
+.container {
+  margin-bottom: 1rem;
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.container.collapsed {
+  max-height: 60px;
+}
+
+.container.expanded {
+  max-height: 500px;
+}
+
+.header {
+  padding: 0.5rem 1rem;
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0; /* Для корректного сжатия */
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.resultsBadge {
+  padding: 0.25rem 0.5rem;
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 60px;
+  text-align: center;
+}
+
+.filtersBadge {
+  padding: 0.25rem 0.5rem;
+  background-color: var(--accent-color);
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clearButton {
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  line-height: 1;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clearButton.hidden {
+  visibility: hidden;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.toggleButton {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filtersContent {
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filterLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
+}
+
+.filterActions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color-light);
+}
+
+.clearFullButton {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+/* Анимация для кнопки очистки */
+.clearButton:not(.hidden):hover {
+  background-color: #ff4444;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+  .container.collapsed {
+    max-height: 70px;
+  }
+  
+  .searchRow {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .searchInput {
+    width: 100%;
+  }
+  
+  .headerActions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .filtersGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .clearFullButton {
+    width: 100%;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .filtersGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
