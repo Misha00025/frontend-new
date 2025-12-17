@@ -140,7 +140,7 @@ const SearchBar: React.FC<SearchAndFilterBarProps> = ({
                   onChange={(e) => onAttributeValueChange(e.target.value)}
                   className={inputStyles.input}
                 >
-                  <option value="">Все {valueLabel.toLowerCase()}и</option>
+                  <option value="">Все значения</option>
                   {attributeValues.map(value => (
                     <option key={value} value={value}>{value}</option>
                   ))}
