@@ -1,194 +1,85 @@
-// components/SearchAndFilterBar/SearchAndFilterBar.tsx
+// components/SearchBar/SearchBar.tsx
 import React, { useState, useEffect } from 'react';
-import inputStyles from '../../../styles/components/Input.module.css';
-import buttonStyles from '../../../styles/components/Button.module.css';
 import styles from './SearchBar.module.css';
 
-interface SearchAndFilterBarProps {
+interface SearchBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  selectedAttribute: string;
-  onAttributeChange: (value: string) => void;
-  attributeValue: string;
-  onAttributeValueChange: (value: string) => void;
-  availableAttributes: string[];
-  attributeValues: string[];
-  onClearFilters: () => void;
-  resultsCount: number;
-  totalCount: number;
   placeholder?: string;
-  attributeLabel?: string;
-  valueLabel?: string;
-  showPriceFilter?: boolean;
-  priceRange?: { min: string; max: string };
-  onPriceRangeChange?: (field: 'min' | 'max', value: string) => void;
-  defaultCollapsed?: boolean;
+  onClear?: () => void;
+  showClearButton?: boolean;
+  autoFocus?: boolean;
 }
 
-const SearchBar: React.FC<SearchAndFilterBarProps> = ({
+const SearchBar: React.FC<SearchBarProps> = ({
   searchTerm,
   onSearchChange,
-  selectedAttribute,
-  onAttributeChange,
-  attributeValue,
-  onAttributeValueChange,
-  availableAttributes,
-  attributeValues,
-  onClearFilters,
-  resultsCount,
-  totalCount,
   placeholder = "Поиск...",
-  attributeLabel = "Атрибут",
-  valueLabel = "Значение",
-  showPriceFilter = false,
-  priceRange = { min: '', max: '' },
-  onPriceRangeChange,
-  defaultCollapsed = true,
+  onClear,
+  showClearButton = true,
+  autoFocus = false,
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
-  const [hasActiveFilters, setHasActiveFilters] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [hasText, setHasText] = useState(false);
 
-  // Определяем, есть ли активные фильтры
   useEffect(() => {
-    const active = 
-      !!searchTerm || 
-      !!selectedAttribute || 
-      !!attributeValue || 
-      (showPriceFilter && (!!priceRange.min || !!priceRange.max));
-    setHasActiveFilters(active);
-  }, [searchTerm, selectedAttribute, attributeValue, priceRange, showPriceFilter]);
+    setHasText(searchTerm.length > 0);
+  }, [searchTerm]);
 
-  const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
+  const handleClear = () => {
+    onSearchChange('');
+    if (onClear) {
+      onClear();
+    }
   };
 
-  const activeFiltersCount = [
-    searchTerm ? 1 : 0,
-    selectedAttribute ? 1 : 0,
-    attributeValue ? 1 : 0,
-    showPriceFilter && priceRange.min ? 1 : 0,
-    showPriceFilter && priceRange.max ? 1 : 0,
-  ].reduce((a, b) => a + b, 0);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape' && hasText) {
+      handleClear();
+    }
+  };
 
   return (
-    <div className={`${styles.container} ${isCollapsed ? styles.collapsed : styles.expanded}`}>
-      <div className={styles.header}>
-        <div className={styles.searchRow}>
-          <div className={styles.searchInput}>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className={inputStyles.input}
-              placeholder={placeholder}
-            />
-          </div>
-          
-          <div className={styles.headerActions}>
-            <div className={styles.resultsBadge}>
-              {resultsCount}/{totalCount}
-            </div>
-            
-            {hasActiveFilters && (
-              <div className={styles.filtersBadge}>
-                {activeFiltersCount}
-              </div>
-            )}
-            
-            <button
-              onClick={onClearFilters}
-              className={`${buttonStyles.button} ${styles.clearButton} ${!hasActiveFilters ? styles.hidden : ''}`}
-              disabled={!hasActiveFilters}
-              title="Очистить фильтры"
+    <div className={styles.container}>
+      <div className={`${styles.searchWrapper} ${isFocused ? styles.focused : ''} ${hasText ? styles.hasText : ''}`}>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          onKeyDown={handleKeyDown}
+          className={styles.searchInput}
+          placeholder={placeholder}
+          autoFocus={autoFocus}
+        />
+        
+        <div className={styles.underline}></div>
+        
+        {showClearButton && hasText && (
+          <button
+            onClick={handleClear}
+            className={styles.clearButton}
+            type="button"
+            aria-label="Очистить поиск"
+          >
+            <svg
+              className={styles.clearIcon}
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              stroke="currentColor"
+              strokeWidth="2"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              ×
-            </button>
-            
-            <button
-              onClick={toggleCollapse}
-              className={`${buttonStyles.button} ${styles.toggleButton}`}
-              title={isCollapsed ? "Показать фильтры" : "Скрыть фильтры"}
-            >
-              {isCollapsed ? "▼" : "▲"}
-            </button>
-          </div>
-        </div>
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        )}
       </div>
-      
-      {!isCollapsed && (
-        <div className={styles.filtersContent}>
-          <div className={styles.filtersGrid}>
-            <div className={styles.filterGroup}>
-              <label className={styles.filterLabel}>{attributeLabel}:</label>
-              <select
-                value={selectedAttribute}
-                onChange={(e) => onAttributeChange(e.target.value)}
-                className={inputStyles.input}
-              >
-                <option value="">Все {attributeLabel.toLowerCase()}ы</option>
-                {availableAttributes.map(attr => (
-                  <option key={attr} value={attr}>{attr}</option>
-                ))}
-              </select>
-            </div>
-            
-            {selectedAttribute && (
-              <div className={styles.filterGroup}>
-                <label className={styles.filterLabel}>{valueLabel}:</label>
-                <select
-                  value={attributeValue}
-                  onChange={(e) => onAttributeValueChange(e.target.value)}
-                  className={inputStyles.input}
-                >
-                  <option value="">Все значения</option>
-                  {attributeValues.map(value => (
-                    <option key={value} value={value}>{value}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-            
-            {showPriceFilter && onPriceRangeChange && (
-              <>
-                <div className={styles.filterGroup}>
-                  <label className={styles.filterLabel}>Цена от:</label>
-                  <input
-                    type="number"
-                    value={priceRange.min}
-                    onChange={(e) => onPriceRangeChange('min', e.target.value)}
-                    className={inputStyles.input}
-                    placeholder="0"
-                    min="0"
-                  />
-                </div>
-                
-                <div className={styles.filterGroup}>
-                  <label className={styles.filterLabel}>Цена до:</label>
-                  <input
-                    type="number"
-                    value={priceRange.max}
-                    onChange={(e) => onPriceRangeChange('max', e.target.value)}
-                    className={inputStyles.input}
-                    placeholder="∞"
-                    min="0"
-                  />
-                </div>
-              </>
-            )}
-          </div>
-          
-          <div className={styles.filterActions}>
-            {hasActiveFilters && (
-              <button
-                onClick={onClearFilters}
-                className={`${buttonStyles.button} ${styles.clearFullButton}`}
-              >
-                Очистить все фильтры
-              </button>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
