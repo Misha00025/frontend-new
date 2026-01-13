@@ -89,8 +89,6 @@ const GroupSkills: React.FC = () => {
     titles: {
       page: 'Книга способностей',
     },
-    // Указываем атрибут для группировки
-    groupByAttribute: 'Категория',
   };
   
   return (

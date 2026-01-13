@@ -21,7 +21,7 @@ export interface ResourcePageConfig<T> {
     page: string;
   };
   
-  // Атрибут для группировки (например, "Тип", "Категория")
+  // Атрибут для группировки по умолчанию
   groupByAttribute?: string;
 }
 
@@ -62,6 +62,20 @@ const ResourcePage = <T extends {
 }: ResourcePageProps<T>) => {
   const isMobile = usePlatform();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedGroupAttribute, setSelectedGroupAttribute] = useState<string>(
+    config.groupByAttribute || ''
+  );
+  
+  // Получаем все уникальные атрибуты из элементов
+  const availableAttributes = useMemo(() => {
+    const attrs = new Set<string>();
+    items.forEach(item => {
+      item.attributes?.forEach(attr => {
+        attrs.add(attr.name);
+      });
+    });
+    return Array.from(attrs).sort();
+  }, [items]);
   
   const filteredItems = useMemo(() => {
     if (!searchTerm.trim()) return items;
@@ -83,11 +97,14 @@ const ResourcePage = <T extends {
     });
   }, [items, searchTerm]);
   
-  // Группируем по атрибуту, если задан
+  // Определяем атрибут для группировки (выбранный пользователем или из конфига)
+  const attributeForGrouping = selectedGroupAttribute || config.groupByAttribute;
+  
+  // Группируем по выбранному атрибуту
   const groupedItems = useMemo((): Group<T>[] | null => {
-    if (!config.groupByAttribute) return null;
-    return groupByAttribute(filteredItems, config.groupByAttribute);
-  }, [filteredItems, config.groupByAttribute]);
+    if (!attributeForGrouping) return null;
+    return groupByAttribute(filteredItems, attributeForGrouping);
+  }, [filteredItems, attributeForGrouping]);
   
   const handleClearSearch = () => setSearchTerm('');
   
@@ -106,6 +123,24 @@ const ResourcePage = <T extends {
           placeholder="Поиск по названию, описанию или атрибуту..."
           onClear={handleClearSearch}
         />
+        
+        {/* Селектор для выбора атрибута группировки */}
+        <div className={styles.groupingSelector}>
+          <select
+            value={selectedGroupAttribute}
+            onChange={(e) => setSelectedGroupAttribute(e.target.value)}
+            className={styles.groupingSelect}
+          >
+            <option value="">
+              Без группировки
+            </option>
+            {availableAttributes.map(attr => (
+              <option key={attr} value={attr}>
+                {attr}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
       
       {canCreate && (
@@ -119,7 +154,7 @@ const ResourcePage = <T extends {
         </div>
       )}
       
-      {/* Если задан groupByAttribute, показываем группы, иначе плоский список */}
+      {/* Если выбран атрибут для группировки, показываем группы */}
       {groupedItems ? (
         <div className={styles.groupsContainer}>
           {groupedItems.map((group: Group<T>) => (
@@ -153,7 +188,7 @@ const ResourcePage = <T extends {
           )}
         </div>
       ) : (
-        // Плоский список (если не задан groupByAttribute)
+        // Плоский список (если не выбран атрибут группировки)
         <List 
           layout={isMobile ? "vertical" : "start-grid"} 
           gap="medium" 

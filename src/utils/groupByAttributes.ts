@@ -23,7 +23,7 @@ export interface Group<T> {
     items.forEach(item => {
       // Ищем атрибут с нужным именем
       const attribute = item.attributes?.find(attr => attr.name === attributeName);
-      const groupName = attribute?.value || `Без ${attributeName}`;
+      const groupName = attributeName + ": " + (attribute?.value || `Не задано`);
       
       // Добавляем элемент в соответствующую группу
       if (!groupsMap.has(groupName)) {
@@ -41,8 +41,8 @@ export interface Group<T> {
     
     // Сортируем группы по алфавиту, "Без X" в конце
     return groups.sort((a, b) => {
-      if (a.name.startsWith('Без ')) return 1;
-      if (b.name.startsWith('Без ')) return -1;
+      if (a.name.endsWith('Не задано')) return 1;
+      if (b.name.endsWith('Не задано')) return -1;
       return a.name.localeCompare(b.name);
     });
   }
