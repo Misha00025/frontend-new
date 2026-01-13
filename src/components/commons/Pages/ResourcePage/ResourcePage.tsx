@@ -7,7 +7,7 @@ import buttonStyles from '../../../../styles/components/Button.module.css';
 import commonStyles from '../../../../styles/common.module.css';
 import styles from './ResourcePage.module.css';
 import { usePlatform } from '../../../../hooks/usePlatform';
-import { Group, groupByAttribute } from '../../../../utils/groupByAttributes';
+import { Group, groupByAttributes } from '../../../../utils/groupByAttributes';
 
 export interface ResourcePageConfig<T> {
   ItemComponent: React.ComponentType<{
@@ -21,8 +21,8 @@ export interface ResourcePageConfig<T> {
     page: string;
   };
   
-  // Атрибут для группировки по умолчанию
-  groupByAttribute?: string;
+  // Список атрибутов для иерархической группировки
+  groupByAttributes?: string[];
 }
 
 interface ResourcePageProps<T extends { 
@@ -62,9 +62,6 @@ const ResourcePage = <T extends {
 }: ResourcePageProps<T>) => {
   const isMobile = usePlatform();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGroupAttribute, setSelectedGroupAttribute] = useState<string>(
-    config.groupByAttribute || ''
-  );
   
   // Получаем все уникальные атрибуты из элементов
   const availableAttributes = useMemo(() => {
@@ -97,14 +94,12 @@ const ResourcePage = <T extends {
     });
   }, [items, searchTerm]);
   
-  // Определяем атрибут для группировки (выбранный пользователем или из конфига)
-  const attributeForGrouping = selectedGroupAttribute || config.groupByAttribute;
-  
-  // Группируем по выбранному атрибуту
   const groupedItems = useMemo((): Group<T>[] | null => {
-    if (!attributeForGrouping) return null;
-    return groupByAttribute(filteredItems, attributeForGrouping);
-  }, [filteredItems, attributeForGrouping]);
+    if (!config.groupByAttributes || config.groupByAttributes.length === 0) {
+      return null;
+    }
+    return groupByAttributes(filteredItems, config.groupByAttributes);
+  }, [filteredItems, config.groupByAttributes]);
   
   const handleClearSearch = () => setSearchTerm('');
   
@@ -123,24 +118,6 @@ const ResourcePage = <T extends {
           placeholder="Поиск по названию, описанию или атрибуту..."
           onClear={handleClearSearch}
         />
-        
-        {/* Селектор для выбора атрибута группировки */}
-        <div className={styles.groupingSelector}>
-          <select
-            value={selectedGroupAttribute}
-            onChange={(e) => setSelectedGroupAttribute(e.target.value)}
-            className={styles.groupingSelect}
-          >
-            <option value="">
-              Без группировки
-            </option>
-            {availableAttributes.map(attr => (
-              <option key={attr} value={attr}>
-                {attr}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
       
       {canCreate && (
@@ -154,13 +131,14 @@ const ResourcePage = <T extends {
         </div>
       )}
       
-      {/* Если выбран атрибут для группировки, показываем группы */}
+      {/* Если заданы атрибуты для группировки, показываем группы */}
       {groupedItems ? (
         <div className={styles.groupsContainer}>
           {groupedItems.map((group: Group<T>) => (
             <CollapsibleGroup
               key={group.id}
               group={group}
+              level={0}
               isMobile={isMobile}
               ItemComponent={config.ItemComponent}
               onEdit={canEdit ? onEdit : undefined}
@@ -188,7 +166,7 @@ const ResourcePage = <T extends {
           )}
         </div>
       ) : (
-        // Плоский список (если не выбран атрибут группировки)
+        // Плоский список (если не заданы атрибуты группировки)
         <List 
           layout={isMobile ? "vertical" : "start-grid"} 
           gap="medium" 

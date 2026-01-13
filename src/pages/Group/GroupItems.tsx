@@ -89,7 +89,6 @@ const GroupItems: React.FC = () => {
     titles: {
       page: 'Каталог предметов',
     },
-    groupByAttribute: 'Тип',
   };
   
   return (
