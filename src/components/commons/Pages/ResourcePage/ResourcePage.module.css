@@ -1,0 +1,17 @@
+/* src/components/common/ResourcePage/ResourcePage.module.css */
+.headerControls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+  }
+  
+  .searchContainer {
+    flex: 1;
+  }
+  
+  .groupsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }

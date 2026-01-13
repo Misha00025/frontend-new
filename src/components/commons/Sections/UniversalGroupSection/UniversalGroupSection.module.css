@@ -1,0 +1,55 @@
+/* UniversalGroupSection.module.css */
+.container {
+    margin-bottom: 1rem;
+  }
+  
+  .rootGroup {
+    background-color: var(--bg-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 1rem;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0.5rem;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    border-radius: var(--border-radius-sm);
+  }
+  
+  .header:hover {
+    background-color: var(--bg-hover);
+  }
+  
+  .caret {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    transition: transform 0.2s ease;
+    width: 16px;
+    text-align: center;
+  }
+  
+  .groupName {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+  }
+  
+  .itemsCount {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-left: auto;
+    padding-right: 0.5rem;
+  }
+  
+  .content {
+    margin-top: 1rem;
+    padding-left: 1rem;
+  }
+  
+  .itemsContainer {
+    margin-bottom: 1.5rem;
+  }

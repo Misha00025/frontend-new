@@ -1,3 +1,4 @@
+// GroupSkills.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupSkill } from '../../types/groupSkills';
@@ -6,8 +7,8 @@ import SkillCard from '../../components/Cards/SkillCard/SkillCard';
 import SkillModal from '../../components/Modals/SkillModal/SkillModal';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import ResourcePage from '../../components/commons/Pages/ResourcePage/ResourcePage';
+import { createSkillsGrouping } from '../../utils/groupByAttributes';
 
-// Обертка для SkillCard
 const SkillCardWrapper: React.FC<{
   item: GroupSkill;
   onEdit?: (item: GroupSkill) => void;
@@ -89,6 +90,7 @@ const GroupSkills: React.FC = () => {
     titles: {
       page: 'Книга способностей',
     },
+    groupItems: createSkillsGrouping,
   };
   
   return (
@@ -112,10 +114,13 @@ const GroupSkills: React.FC = () => {
           onClose={() => {
             setIsModalOpen(false);
             setEditingSkill(null);
-          } }
+          }}
           onSave={handleSaveSkill}
           editingSkill={editingSkill}
-          title={editingSkill ? 'Редактирование навыка' : 'Создание навыка'} availableAttributes={[]} possibleValuesForFilteredAttributes={{}}        />
+          title={editingSkill ? 'Редактирование навыка' : 'Создание навыка'}
+          availableAttributes={[]}
+          possibleValuesForFilteredAttributes={{}}
+        />
       )}
     </>
   );
