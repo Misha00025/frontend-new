@@ -2,18 +2,12 @@
 import React, { useState, useMemo } from 'react';
 import List from '../../../../components/List/List';
 import SearchBar from '../../../../components/commons/Search/SearchBar';
+import CollapsibleGroup from '../../CollapsibleGroup/CollapsibleGroup';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import commonStyles from '../../../../styles/common.module.css';
 import styles from './ResourcePage.module.css';
 import { usePlatform } from '../../../../hooks/usePlatform';
-import UniversalGroupSection from '../../Sections/UniversalGroupSection/UniversalGroupSection';
-
-export interface Group<T> {
-  id: string;
-  name: string;
-  items: T[];
-  children: Group<T>[];
-}
+import { Group, groupByAttribute } from '../../../../utils/groupByAttributes';
 
 export interface ResourcePageConfig<T> {
   ItemComponent: React.ComponentType<{
@@ -27,21 +21,8 @@ export interface ResourcePageConfig<T> {
     page: string;
   };
   
-  groupItems?: (items: T[]) => Group<T>[];
-  
-  GroupComponent?: React.ComponentType<{
-    group: Group<T>;
-    level: number;
-    ItemComponent: React.ComponentType<{
-      item: T;
-      onEdit?: (item: T) => void;
-      onDelete?: (id: number) => void;
-      showActions?: boolean;
-    }>;
-    onEdit?: (item: T) => void;
-    onDelete?: (id: number) => void;
-    showActions?: boolean;
-  }>;
+  // Атрибут для группировки (например, "Тип", "Категория")
+  groupByAttribute?: string;
 }
 
 interface ResourcePageProps<T extends { 
@@ -81,7 +62,6 @@ const ResourcePage = <T extends {
 }: ResourcePageProps<T>) => {
   const isMobile = usePlatform();
   const [searchTerm, setSearchTerm] = useState('');
-  const [showGrouped, setShowGrouped] = useState(false);
   
   const filteredItems = useMemo(() => {
     if (!searchTerm.trim()) return items;
@@ -103,10 +83,11 @@ const ResourcePage = <T extends {
     });
   }, [items, searchTerm]);
   
-  const groupedItems = useMemo(() => {
-    if (!config.groupItems || !showGrouped) return null;
-    return config.groupItems(filteredItems);
-  }, [filteredItems, config.groupItems, showGrouped]);
+  // Группируем по атрибуту, если задан
+  const groupedItems = useMemo((): Group<T>[] | null => {
+    if (!config.groupByAttribute) return null;
+    return groupByAttribute(filteredItems, config.groupByAttribute);
+  }, [filteredItems, config.groupByAttribute]);
   
   const handleClearSearch = () => setSearchTerm('');
   
@@ -119,23 +100,12 @@ const ResourcePage = <T extends {
       {error && <div className={commonStyles.error}>{error}</div>}
       
       <div className={styles.headerControls}>
-        <div className={styles.searchContainer}>
-          <SearchBar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            placeholder="Поиск по названию, описанию или атрибуту..."
-            onClear={handleClearSearch}
-          />
-        </div>
-        
-        {config.groupItems && (
-          <button 
-            className={buttonStyles.button}
-            onClick={() => setShowGrouped(!showGrouped)}
-          >
-            {showGrouped ? 'Показать список' : 'Сгруппировать'}
-          </button>
-        )}
+        <SearchBar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          placeholder="Поиск по названию, описанию или атрибуту..."
+          onClear={handleClearSearch}
+        />
       </div>
       
       {canCreate && (
@@ -149,25 +119,41 @@ const ResourcePage = <T extends {
         </div>
       )}
       
-      {showGrouped && groupedItems ? (
+      {/* Если задан groupByAttribute, показываем группы, иначе плоский список */}
+      {groupedItems ? (
         <div className={styles.groupsContainer}>
-          {groupedItems.map(group => {
-            const GroupComponentToRender = config.GroupComponent || UniversalGroupSection;
-            
-            return (
-              <GroupComponentToRender
-                key={group.id}
-                group={group}
-                level={0}
-                ItemComponent={config.ItemComponent}
-                onEdit={canEdit ? onEdit : undefined}
-                onDelete={canDelete ? onDelete : undefined}
-                showActions={canEdit || canDelete}
-              />
-            );
-          })}
+          {groupedItems.map((group: Group<T>) => (
+            <CollapsibleGroup
+              key={group.id}
+              group={group}
+              isMobile={isMobile}
+              ItemComponent={config.ItemComponent}
+              onEdit={canEdit ? onEdit : undefined}
+              onDelete={canDelete ? onDelete : undefined}
+              showActions={canEdit || canDelete}
+            />
+          ))}
+          
+          {groupedItems.length === 0 && !loading && (
+            <div className={commonStyles.noResults}>
+              <p>
+                {searchTerm 
+                  ? `По запросу "${searchTerm}" ничего не найдено` 
+                  : 'Нет данных для отображения'}
+              </p>
+              {searchTerm && (
+                <button 
+                  className={buttonStyles.button}
+                  onClick={handleClearSearch}
+                >
+                  Очистить поиск
+                </button>
+              )}
+            </div>
+          )}
         </div>
       ) : (
+        // Плоский список (если не задан groupByAttribute)
         <List 
           layout={isMobile ? "vertical" : "start-grid"} 
           gap="medium" 

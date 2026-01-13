@@ -1,3 +1,4 @@
+// GroupItems.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupItem } from '../../types/groupItems';
@@ -32,7 +33,6 @@ const GroupItems: React.FC = () => {
   const [editingItem, setEditingItem] = useState<GroupItem | null>(null);
   const { canEditItems } = useActionPermissions();
   
-  // Загрузка данных
   useEffect(() => {
     if (groupId) {
       loadItems();
@@ -89,6 +89,8 @@ const GroupItems: React.FC = () => {
     titles: {
       page: 'Каталог предметов',
     },
+    // Указываем атрибут для группировки предметов
+    groupByAttribute: 'Тип',
   };
   
   return (

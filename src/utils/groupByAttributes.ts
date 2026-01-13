@@ -1,124 +1,48 @@
-// src/utils/groupByAttributes.ts
+// src/utils/groupByAttribute.ts
 export interface Group<T> {
     id: string;
     name: string;
     items: T[];
-    children: Group<T>[];
   }
   
-  export function groupBySingleAttribute<T extends { attributes?: Array<{ name: string; value: string }> }>(
+  /**
+   * Группирует элементы по значению указанного атрибута
+   * @param items Массив элементов
+   * @param attributeName Название атрибута для группировки
+   */
+  export function groupByAttribute<T extends { 
+    attributes?: Array<{ name: string; value: string }> 
+  }>(
     items: T[], 
     attributeName: string
   ): Group<T>[] {
+    // Создаем Map для группировки
     const groupsMap = new Map<string, T[]>();
     
+    // Проходим по всем элементам
     items.forEach(item => {
+      // Ищем атрибут с нужным именем
       const attribute = item.attributes?.find(attr => attr.name === attributeName);
-      const groupKey = attribute?.value || `Без ${attributeName}`;
+      const groupName = attribute?.value || `Без ${attributeName}`;
       
-      if (!groupsMap.has(groupKey)) {
-        groupsMap.set(groupKey, []);
+      // Добавляем элемент в соответствующую группу
+      if (!groupsMap.has(groupName)) {
+        groupsMap.set(groupName, []);
       }
-      groupsMap.get(groupKey)!.push(item);
+      groupsMap.get(groupName)!.push(item);
     });
     
-    return Array.from(groupsMap.entries()).map(([groupName, groupItems]) => ({
+    // Преобразуем Map в массив групп
+    const groups = Array.from(groupsMap.entries()).map(([groupName, groupItems]) => ({
       id: `${attributeName}-${groupName}`,
       name: groupName,
       items: groupItems,
-      children: []
     }));
-  }
-  
-  export function groupByMultipleAttributes<T extends { attributes?: Array<{ name: string; value: string }> }>(
-    items: T[], 
-    attributeNames: string[]
-  ): Group<T>[] {
-    if (attributeNames.length === 0 || items.length === 0) {
-      return [{
-        id: 'all',
-        name: 'Все элементы',
-        items,
-        children: []
-      }];
-    }
     
-    const [currentAttribute, ...restAttributes] = attributeNames;
-    const firstLevelGroups = groupBySingleAttribute(items, currentAttribute);
-    
-    if (restAttributes.length > 0) {
-      return firstLevelGroups.map(group => ({
-        ...group,
-        items: [],
-        children: groupByMultipleAttributes(group.items, restAttributes)
-      }));
-    }
-    
-    return firstLevelGroups;
-  }
-  
-  export function createSkillsGrouping(skills: any[]): Group<any>[] {
-    const combatSkills = skills.filter(s => 
-      s.attributes?.some((a: any) => a.value.includes('Бой') || a.value.includes('оружие'))
-    );
-    
-    const magicSkills = skills.filter(s => 
-      s.attributes?.some((a: any) => a.value.includes('Магия') || a.value.includes('заклинание'))
-    );
-    
-    const utilitySkills = skills.filter(s => 
-      !combatSkills.includes(s) && !magicSkills.includes(s)
-    );
-    
-    return [
-      {
-        id: 'combat',
-        name: 'Боевые навыки',
-        items: combatSkills,
-        children: [
-          {
-            id: 'melee',
-            name: 'Ближний бой',
-            items: combatSkills.filter(s => 
-              s.attributes?.some((a: any) => a.value.includes('меч') || a.value.includes('топор'))
-            ),
-            children: []
-          },
-          {
-            id: 'ranged',
-            name: 'Дальний бой',
-            items: combatSkills.filter(s => 
-              s.attributes?.some((a: any) => a.value.includes('лук') || a.value.includes('арбалет'))
-            ),
-            children: []
-          }
-        ]
-      },
-      {
-        id: 'magic',
-        name: 'Магические навыки',
-        items: magicSkills,
-        children: [
-          {
-            id: 'elemental',
-            name: 'Стихийная магия',
-            items: magicSkills.filter(s => 
-              s.attributes?.some((a: any) => 
-                a.value.includes('огонь') || 
-                a.value.includes('вода') || 
-                a.value.includes('земля') || 
-                a.value.includes('воздух')
-              )
-            ),
-            children: []
-          }
-        ]
-      },
-      {
-        id: 'utility',
-        name: 'Вспомогательные навыки',
-        items: utilitySkills,
-        children: []
-      }
-    ];
+    // Сортируем группы по алфавиту, "Без X" в конце
+    return groups.sort((a, b) => {
+      if (a.name.startsWith('Без ')) return 1;
+      if (b.name.startsWith('Без ')) return -1;
+      return a.name.localeCompare(b.name);
+    });
   }

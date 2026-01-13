@@ -7,7 +7,6 @@ import SkillCard from '../../components/Cards/SkillCard/SkillCard';
 import SkillModal from '../../components/Modals/SkillModal/SkillModal';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import ResourcePage from '../../components/commons/Pages/ResourcePage/ResourcePage';
-import { createSkillsGrouping } from '../../utils/groupByAttributes';
 
 const SkillCardWrapper: React.FC<{
   item: GroupSkill;
@@ -90,7 +89,8 @@ const GroupSkills: React.FC = () => {
     titles: {
       page: 'Книга способностей',
     },
-    groupItems: createSkillsGrouping,
+    // Указываем атрибут для группировки
+    groupByAttribute: 'Категория',
   };
   
   return (
