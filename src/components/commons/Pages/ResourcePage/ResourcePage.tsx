@@ -39,8 +39,8 @@ interface ResourcePageProps<T extends {
   canEdit: boolean;
   canDelete: boolean;
   onCreate: () => void;
-  onEdit: (item: T) => void;
-  onDelete: (id: number) => void;
+  onEdit?: (item: T) => void;
+  onDelete?: (id: number) => void;
 }
 
 const ResourcePage = <T extends { 
@@ -131,7 +131,6 @@ const ResourcePage = <T extends {
         </div>
       )}
       
-      {/* Если заданы атрибуты для группировки, показываем группы */}
       {groupedItems ? (
         <div className={styles.groupsContainer}>
           {groupedItems.map((group: Group<T>) => (
@@ -176,8 +175,8 @@ const ResourcePage = <T extends {
             <config.ItemComponent
               key={item.id}
               item={item}
-              onEdit={canEdit ? () => onEdit(item) : undefined}
-              onDelete={canDelete ? () => onDelete(item.id) : undefined}
+              onEdit={canEdit && onEdit ? () => onEdit(item) : undefined}
+              onDelete={canDelete && onDelete ? () => onDelete(item.id) : undefined}
               showActions={canEdit || canDelete}
             />
           ))}

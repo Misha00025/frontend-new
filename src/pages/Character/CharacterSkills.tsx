@@ -6,14 +6,27 @@ import { CreateGroupSkillRequest, GroupSkill, SkillAttributeDefinition, SkillGro
 import { characterSkillsAPI, groupSkillsAPI } from '../../services/api';
 import CharacterSkillModal from '../../components/Modals/SkillModal/CharacterSkillModal';
 import SkillCard from '../../components/Cards/SkillCard/SkillCard';
-import List from '../../components/List/List';
-import buttonStyles from '../../styles/components/Button.module.css';
 import commonStyles from '../../styles/common.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import { usePlatform } from '../../hooks/usePlatform';
-import GroupSection from '../../components/Cards/SkillCard/GroupSection';
-import { groupSkillsByAttributes } from '../../utils/groupSkillsByAttributes';
 import SkillModal from '../../components/Modals/SkillModal/SkillModal';
+import ResourcePage from '../../components/commons/Pages/ResourcePage/ResourcePage';
+
+const SkillCardWrapper: React.FC<{
+  item: CharacterSkill;
+  onEdit?: (item: CharacterSkill) => void;
+  onDelete?: (id: number) => void;
+  showActions?: boolean;
+}> = ({ item, onEdit, onDelete, showActions }) => {
+  return (
+    <SkillCard
+      skill={item}
+      onEdit={onEdit ? () => onEdit(item) : undefined}
+      onDelete={onDelete ? () => onDelete(item.id) : undefined}
+      showActions={showActions}
+    />
+  );
+};
 
 const CharacterSkills: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -139,46 +152,29 @@ const CharacterSkills: React.FC = () => {
     setIsModalOpen(false);
   };
 
+  const config = {
+    ItemComponent: SkillCardWrapper,
+    titles: {
+      page: 'Способности',
+    },
+  };
+
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
 
   return (
-    <div className={commonStyles.container}>
-      <h1>Способности персонажа</h1>
-
-      {error && <div className={commonStyles.error}>{error}</div>}
-
-      {canEditThisCharacter && (
-        <div className={commonStyles.actions}>
-          <button 
-            className={buttonStyles.button}
-            onClick={() => setIsModalOpen(true)}
-          >
-            Добавить способность
-          </button>
-        </div>
-      )}
-
-      <div className={commonStyles.list}>
-        <h2>Список способностей</h2>
-        {skills.length === 0 ? (
-          <p>Способностей пока нет</p>
-        ) : (
-          <List layout={"vertical"} gap="medium" gridSize='large'>
-            {groupSkillsByAttributes(skills, attributes).map((group, index) => (
-              <GroupSection
-                key={index}
-                group={group}
-                level={0}
-                isMobile={isMobile}
-                onEditSkill={canEditGroup ? handleEditSkill : undefined}
-                onDeleteSkill={canEditThisCharacter ? handleRemoveSkill : undefined}
-                showActions={canEditThisCharacter}
-                collapse={false}
-              />
-            ))}
-          </List>
-        )}
-      </div>
+    <>
+      <ResourcePage
+        config={config}
+        items={skills}
+        loading={loading}
+        error={error}
+        canCreate={canEditThisCharacter}
+        canEdit={canEditThisCharacter}
+        canDelete={canEditThisCharacter}
+        onCreate={() => setIsModalOpen(true)}
+        onEdit={canEditGroup ? handleEditSkill : undefined}
+        onDelete={canEditThisCharacter ? handleRemoveSkill : undefined}
+      />
 
       {canEditThisCharacter && (
         <CharacterSkillModal 
@@ -202,7 +198,7 @@ const CharacterSkills: React.FC = () => {
           title={editingSkill ? 'Редактирование навыка' : 'Создание навыка'}
         />
       )}
-    </div>
+    </>
   );
 };
 
