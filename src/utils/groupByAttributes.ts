@@ -81,16 +81,20 @@ export function groupByAttributes<T extends {
   if (a.name.endsWith('Не задано')) return 1;
   if (b.name.endsWith('Не задано')) return -1;
   
-  // Функция для проверки, является ли строка числом
-  const isNumeric = (str) => {
-    const normalizedStr = str.trim();
-    // Проверяем на целые и дробные числа (включая отрицательные)
-    return /^-?\d+(\.\d+)?$/.test(normalizedStr);
+  // Функция для проверки, является ли строка целым числом
+  const isIntegerString = (str: string): boolean => {
+    const trimmed = str.trim();
+    // Проверяем на целые числа (включая отрицательные)
+    // Не допускаем ведущие нули, кроме "0"
+    if (trimmed === '' || trimmed === '-') return false;
+    return /^-?(0|[1-9]\d*)$/.test(trimmed);
   };
   
-  // Если обе строки являются числами, сравниваем их как числа
-  if (isNumeric(a.name) && isNumeric(b.name)) {
-    return parseFloat(a.name) - parseFloat(b.name);
+  // Если обе строки являются целыми числами, сравниваем их как числа
+  if (isIntegerString(a.name) && isIntegerString(b.name)) {
+    const aNum = parseInt(a.name.trim(), 10);
+    const bNum = parseInt(b.name.trim(), 10);
+    return aNum - bNum;
   }
   
   // Иначе используем обычное строковое сравнение
