@@ -156,6 +156,7 @@ const CharacterSkills: React.FC = () => {
     ItemComponent: SkillCardWrapper,
     titles: {
       page: 'Способности',
+      create: 'Добавить'
     },
   };
 

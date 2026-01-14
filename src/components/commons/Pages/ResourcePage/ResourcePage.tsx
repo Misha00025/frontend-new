@@ -19,6 +19,7 @@ export interface ResourcePageConfig<T> {
   
   titles: {
     page: string;
+    create?: string;
   };
   
   // Список атрибутов для иерархической группировки
@@ -107,29 +108,34 @@ const ResourcePage = <T extends {
   
   return (
     <div className={commonStyles.container}>
-      <h1>{config.titles.page}</h1>
+      {/* Измененный заголовок с кнопкой создания */}
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>{config.titles.page}</h1>
+        {canCreate && (
+          <button 
+            className={`${buttonStyles.button} ${styles.createButton}`}
+            onClick={onCreate}
+            aria-label={config.titles.create !== undefined ? config.titles.create : "Создать"}
+            title={config.titles.create !== undefined ? config.titles.create : "Создать"}
+          >
+            <span className={styles.plusIcon}>+</span>
+            <span className={styles.createText}>{config.titles.create !== undefined ? config.titles.create : "Создать"}</span>
+          </button>
+        )}
+      </div>
       
       {error && <div className={commonStyles.error}>{error}</div>}
       
       <div className={styles.headerControls}>
-        <SearchBar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          placeholder="Поиск по названию, описанию или атрибуту..."
-          onClear={handleClearSearch}
-        />
-      </div>
-      
-      {canCreate && (
-        <div className={commonStyles.actions}>
-          <button 
-            className={buttonStyles.button}
-            onClick={onCreate}
-          >
-            Создать
-          </button>
+        <div className={styles.searchContainer}>
+          <SearchBar
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            placeholder="Поиск по названию, описанию или атрибуту..."
+            onClear={handleClearSearch}
+          />
         </div>
-      )}
+      </div>
       
       {groupedItems ? (
         <div className={styles.groupsContainer}>

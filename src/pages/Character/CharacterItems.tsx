@@ -13,6 +13,7 @@ import List from '../../components/List/List';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import { usePlatform } from '../../hooks/usePlatform';
 import ResourcePage from '../../components/commons/Pages/ResourcePage/ResourcePage';
+import { create } from 'domain';
 
 const ItemCardWrapper: React.FC<{
   item: CharacterItem;
@@ -110,6 +111,7 @@ const CharacterItems: React.FC = () => {
     ItemComponent: ItemCardWrapper,
     titles: {
       page: 'Инвентарь',
+      create: 'Добавить'
     },
   };
 
