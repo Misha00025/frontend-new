@@ -29,6 +29,7 @@ import {
 } from '../types/characterItems';
 import { useAuth } from '../contexts/AuthContext';
 import { CreateGroupSkillRequest, CreateSkillAttributeRequest, GroupSkill, GroupSkillsResponse, SkillAttributeDefinition, SkillAttributesResponse, UpdateGroupSkillRequest } from '../types/groupSkills';
+import { GroupSchema } from '../types/groupSchemas';
 
 
 const API_BASE = 'https://thedun.ru';
@@ -201,6 +202,46 @@ export const groupAPI = {
     }
 
     return response.json();
+  },
+
+  getSchema: async (groupId: number, schemaType: 'items' | 'skills'): Promise<GroupSchema> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/schemas/${schemaType}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${schemaType} schema`);
+    }
+    return response.json();
+  },
+
+  // Общий метод для обновления схемы
+  updateSchema: async (groupId: number, schemaType: 'items' | 'skills', groupBy: string[]): Promise<GroupSchema> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/schemas/${schemaType}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ groupBy }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to update ${schemaType} schema`);
+    }
+    return response.json();
+  },
+
+  // Методы-обёртки для обратной совместимости и удобства
+  getItemsSchema: async (groupId: number): Promise<GroupSchema> => {
+    return groupAPI.getSchema(groupId, 'items');
+  },
+
+  getSkillsSchema: async (groupId: number): Promise<GroupSchema> => {
+    return groupAPI.getSchema(groupId, 'skills');
+  },
+
+  updateItemsSchema: async (groupId: number, groupBy: string[]): Promise<GroupSchema> => {
+    return groupAPI.updateSchema(groupId, 'items', groupBy);
+  },
+
+  updateSkillsSchema: async (groupId: number, groupBy: string[]): Promise<GroupSchema> => {
+    return groupAPI.updateSchema(groupId, 'skills', groupBy);
   },
 };
 
