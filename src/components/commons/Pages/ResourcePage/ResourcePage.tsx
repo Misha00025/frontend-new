@@ -1,4 +1,4 @@
-// src/components/common/ResourcePage/ResourcePage.tsx
+// ResourcePage.tsx
 import React, { useState, useMemo } from 'react';
 import List from '../../../../components/List/List';
 import SearchBar from '../../../../components/commons/Search/SearchBar';
@@ -22,7 +22,6 @@ export interface ResourcePageConfig<T> {
     create?: string;
   };
   
-  // Список атрибутов для иерархической группировки
   groupByAttributes?: string[];
 }
 
@@ -39,7 +38,9 @@ interface ResourcePageProps<T extends {
   canCreate: boolean;
   canEdit: boolean;
   canDelete: boolean;
+  canConfigureSchema?: boolean;
   onCreate: () => void;
+  onConfigureSchema?: () => void;
   onEdit?: (item: T) => void;
   onDelete?: (id: number) => void;
 }
@@ -57,14 +58,15 @@ const ResourcePage = <T extends {
   canCreate,
   canEdit,
   canDelete,
+  canConfigureSchema = false,
   onCreate,
+  onConfigureSchema,
   onEdit,
   onDelete,
 }: ResourcePageProps<T>) => {
   const isMobile = usePlatform();
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Получаем все уникальные атрибуты из элементов
   const availableAttributes = useMemo(() => {
     const attrs = new Set<string>();
     items.forEach(item => {
@@ -108,20 +110,34 @@ const ResourcePage = <T extends {
   
   return (
     <div className={commonStyles.container}>
-      {/* Измененный заголовок с кнопкой создания */}
+      {/* Обновленный заголовок */}
       <div className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>{config.titles.page}</h1>
-        {canCreate && (
-          <button 
-            className={`${buttonStyles.button} ${styles.createButton}`}
-            onClick={onCreate}
-            aria-label={config.titles.create !== undefined ? config.titles.create : "Создать"}
-            title={config.titles.create !== undefined ? config.titles.create : "Создать"}
-          >
-            <span className={styles.plusIcon}>+</span>
-            <span className={styles.createText}>{config.titles.create !== undefined ? config.titles.create : "Создать"}</span>
-          </button>
-        )}
+        <div className={styles.headerButtons}>
+          {canConfigureSchema && onConfigureSchema && (
+            <button
+              className={`${buttonStyles.button} ${styles.schemaButton}`}
+              onClick={onConfigureSchema}
+              title="Настройка схемы группировки"
+              type="button"
+            >
+              <span className={styles.gearIcon}>⚙️</span>
+              <span className={styles.schemaText}>Схема</span>
+            </button>
+          )}
+          {canCreate && (
+            <button 
+              className={`${buttonStyles.button} ${styles.createButton}`}
+              onClick={onCreate}
+              aria-label={config.titles.create !== undefined ? config.titles.create : "Создать"}
+              title={config.titles.create !== undefined ? config.titles.create : "Создать"}
+              type="button"
+            >
+              <span className={styles.plusIcon}>+</span>
+              <span className={styles.createText}>{config.titles.create !== undefined ? config.titles.create : "Создать"}</span>
+            </button>
+          )}
+        </div>
       </div>
       
       {error && <div className={commonStyles.error}>{error}</div>}
@@ -163,6 +179,7 @@ const ResourcePage = <T extends {
                 <button 
                   className={buttonStyles.button}
                   onClick={handleClearSearch}
+                  type="button"
                 >
                   Очистить поиск
                 </button>
@@ -171,7 +188,6 @@ const ResourcePage = <T extends {
           )}
         </div>
       ) : (
-        // Плоский список (если не заданы атрибуты группировки)
         <List 
           layout={isMobile ? "vertical" : "start-grid"} 
           gap="medium" 
@@ -198,6 +214,7 @@ const ResourcePage = <T extends {
                 <button 
                   className={buttonStyles.button}
                   onClick={handleClearSearch}
+                  type="button"
                 >
                   Очистить поиск
                 </button>

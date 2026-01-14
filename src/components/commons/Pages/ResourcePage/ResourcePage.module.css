@@ -1,157 +1,94 @@
-/* src/components/common/ResourcePage/ResourcePage.module.css */
-.headerControls {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  align-items: center;
-}
-
-.searchContainer {
-  flex: 1;
-}
-
-.groupsContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-/* Стили для селектора группировки */
-.groupingSelector {
-  flex-shrink: 0;
-  width: 200px;
-}
-
-.groupingSelect {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-}
-
-.groupingSelect:hover {
-  border-color: var(--border-color-dark);
-}
-
-.groupingSelect:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.1);
-}
-
-/* Новые стили для заголовка с кнопкой */
+/* ResourcePage.module.css */
 .pageHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
   gap: 1rem;
 }
 
-.pageTitle {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.headerButtons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
 }
 
+.schemaButton,
 .createButton {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: var(--accent-color);
-  color: white;
-  border: none;
-  border-radius: var(--border-radius-sm);
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
-.createButton:hover {
-  background-color: var(--accent-color-dark);
+.gearIcon {
+  font-size: 1rem;
 }
 
 .plusIcon {
   font-size: 1.2rem;
-  font-weight: 400;
-  line-height: 1;
+  font-weight: bold;
 }
 
-.createText {
+.createText,
+.schemaText {
   display: inline;
 }
 
-/* Адаптивность */
+.pageTitle {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.headerControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.searchContainer {
+  flex: 1;
+  min-width: 300px;
+}
+
+.groupsContainer {
+  margin-top: 1rem;
+}
+
+/* Для мобильных устройств */
 @media (max-width: 768px) {
-  .headerControls {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  /* Исправление: поиск растягивается на всю ширину в мобильной версии */
-  .searchContainer {
-    width: 100%;
-  }
-  
-  .groupingSelector {
-    width: 100%;
-  }
-  
-  /* Адаптивные стили для заголовка и кнопки */
   .pageHeader {
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    flex-direction: column;
+    align-items: stretch;
   }
   
-  .pageTitle {
-    font-size: 1.5rem;
-    max-width: calc(100% - 60px);
+  .headerButtons {
+    justify-content: space-between;
+    width: 100%;
   }
   
-  .createButton {
-    padding: 0.5rem;
-    min-width: 40px;
-    justify-content: center;
+  .schemaText {
+    display: none;
   }
   
   .createText {
     display: none;
   }
   
-  .plusIcon {
-    font-size: 1.5rem;
-    font-weight: 300;
-  }
-}
-
-@media (max-width: 480px) {
-  .pageTitle {
-    font-size: 1.25rem;
-    max-width: calc(100% - 50px);
-  }
-  
+  .schemaButton,
   .createButton {
-    min-width: 36px;
-    height: 36px;
-    padding: 0.375rem;
+    padding: 0.5rem;
+    min-width: 44px;
+    justify-content: center;
+    flex: 1;
   }
   
-  .plusIcon {
-    font-size: 1.4rem;
+  .searchContainer {
+    min-width: 100%;
   }
 }

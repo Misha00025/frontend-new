@@ -7,6 +7,7 @@ import SkillCard from '../../components/Cards/SkillCard/SkillCard';
 import SkillModal from '../../components/Modals/SkillModal/SkillModal';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import ResourcePage from '../../components/commons/Pages/ResourcePage/ResourcePage';
+import SchemaModal from '../../components/Modals/ShcemaModal/SchemaModal';
 
 const SkillCardWrapper: React.FC<{
   item: GroupSkill;
@@ -32,7 +33,8 @@ const GroupSkills: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState<GroupSkill | null>(null);
   const { canEditGroup } = useActionPermissions();
-  const [schema, setSchema] = useState<string[]>([]); // Добавлено состояние для схемы
+  const [schema, setSchema] = useState<string[]>([]);
+  const [isSchemaModalOpen, setIsSchemaModalOpen] = useState(false);
   
   useEffect(() => {
     if (groupId) {
@@ -97,6 +99,28 @@ const GroupSkills: React.FC = () => {
     setEditingSkill(null);
     loadSkills();
   };
+
+  const handleConfigureSchema = () => {
+    setIsSchemaModalOpen(true);
+  };
+  
+  const handleSaveSchema = async (newSchema: string[]) => {
+    try {
+      await groupAPI.updateSkillsSchema(parseInt(groupId!), newSchema);
+      setSchema(newSchema);
+      setIsSchemaModalOpen(false);
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : 'Failed to save schema');
+    }
+  };
+
+  const availableAttributes = Array.from(
+    new Set(
+      skills.flatMap(skill => 
+        skill.attributes?.map(attr => attr.name) || []
+      )
+    )
+  ).sort();
   
   const config = {
     ItemComponent: SkillCardWrapper,
@@ -116,12 +140,15 @@ const GroupSkills: React.FC = () => {
         canCreate={canEditGroup}
         canEdit={canEditGroup}
         canDelete={canEditGroup}
+        canConfigureSchema={canEditGroup}
+        onConfigureSchema={handleConfigureSchema}
         onCreate={handleCreate}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
       
       {canEditGroup && (
+        <>
         <SkillModal 
           isOpen={isModalOpen}
           onClose={() => {
@@ -134,6 +161,16 @@ const GroupSkills: React.FC = () => {
           availableAttributes={[]}
           possibleValuesForFilteredAttributes={{}}
         />
+        
+        <SchemaModal
+          isOpen={isSchemaModalOpen}
+          onClose={() => setIsSchemaModalOpen(false)}
+          onSave={handleSaveSchema}
+          availableAttributes={availableAttributes}
+          currentSchema={schema}
+          title="Настройка схемы группировки навыков"
+        />
+      </>
       )}
     </>
   );

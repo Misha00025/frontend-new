@@ -7,6 +7,7 @@ import ItemCard from '../../components/Cards/ItemCard/ItemCard';
 import GroupItemModal from '../../components/Modals/ItemModal/GroupItemModal';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import ResourcePage from '../../components/commons/Pages/ResourcePage/ResourcePage';
+import SchemaModal from '../../components/Modals/ShcemaModal/SchemaModal';
 
 const ItemCardWrapper: React.FC<{
   item: GroupItem;
@@ -32,7 +33,8 @@ const GroupItems: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<GroupItem | null>(null);
   const [schema, setSchema] = useState<string[]>([]); // Добавлено состояние для схемы
-  const { canEditItems } = useActionPermissions();
+  const { canEditItems, canEditGroup } = useActionPermissions();
+  const [isSchemaModalOpen, setIsSchemaModalOpen] = useState(false);
   
   useEffect(() => {
     if (groupId) {
@@ -96,6 +98,28 @@ const GroupItems: React.FC = () => {
     setEditingItem(null);
     loadItems();
   };
+
+  const handleConfigureSchema = () => {
+    setIsSchemaModalOpen(true);
+  };
+  
+  const handleSaveSchema = async (newSchema: string[]) => {
+    try {
+      await groupAPI.updateItemsSchema(parseInt(groupId!), newSchema);
+      setSchema(newSchema);
+      setIsSchemaModalOpen(false);
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : 'Failed to save schema');
+    }
+  };
+
+  const availableAttributes = Array.from(
+    new Set(
+      items.flatMap(item => 
+        item.attributes?.map(attr => attr.name) || []
+      )
+    )
+  ).sort();
   
   const config = {
     ItemComponent: ItemCardWrapper,
@@ -115,6 +139,8 @@ const GroupItems: React.FC = () => {
         canCreate={canEditItems}
         canEdit={canEditItems}
         canDelete={canEditItems}
+        canConfigureSchema={canEditGroup}
+        onConfigureSchema={handleConfigureSchema}
         onCreate={handleCreate}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -130,6 +156,17 @@ const GroupItems: React.FC = () => {
           onSave={handleSaveItem}
           editingItem={editingItem}
           title={editingItem ? 'Редактирование предмета' : 'Создание предмета'}
+        />
+      )}
+
+      {canEditGroup && (
+        <SchemaModal
+          isOpen={isSchemaModalOpen}
+          onClose={() => setIsSchemaModalOpen(false)}
+          onSave={handleSaveSchema}
+          availableAttributes={availableAttributes}
+          currentSchema={schema}
+          title="Настройка схемы группировки предметов"
         />
       )}
     </>
