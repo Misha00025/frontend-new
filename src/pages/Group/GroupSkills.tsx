@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupSkill } from '../../types/groupSkills';
-import { groupSkillsAPI } from '../../services/api';
+import { groupAPI, groupSkillsAPI } from '../../services/api';
 import SkillCard from '../../components/Cards/SkillCard/SkillCard';
 import SkillModal from '../../components/Modals/SkillModal/SkillModal';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
@@ -32,13 +32,27 @@ const GroupSkills: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState<GroupSkill | null>(null);
   const { canEditGroup } = useActionPermissions();
+  const [schema, setSchema] = useState<string[]>([]); // Добавлено состояние для схемы
   
   useEffect(() => {
     if (groupId) {
+      loadSchema();
       loadSkills();
     }
   }, [groupId]);
   
+  
+  const loadSchema = async () => {
+    try {
+      const schemaData = await groupAPI.getSkillsSchema(parseInt(groupId!));
+      setSchema(schemaData.groupBy);
+    } catch (err) {
+      console.error('Failed to load schema:', err);
+      // При ошибке используем пустую схему
+      setSchema([]);
+    }
+  };
+
   const loadSkills = async () => {
     try {
       setLoading(true);
@@ -89,6 +103,7 @@ const GroupSkills: React.FC = () => {
     titles: {
       page: 'Книга способностей',
     },
+    groupByAttributes: schema,
   };
   
   return (

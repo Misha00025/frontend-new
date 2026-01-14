@@ -205,11 +205,21 @@ export const groupAPI = {
   },
 
   getSchema: async (groupId: number, schemaType: 'items' | 'skills'): Promise<GroupSchema> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/schemas/${schemaType}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${schemaType} schema`);
+    try {
+      const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/schemas/${schemaType}`);
+      if (!response.ok) {
+        // Если 404 - возвращаем пустую схему
+        if (response.status === 404) {
+          return { type: schemaType, groupBy: [] };
+        }
+        throw new Error(`Failed to fetch ${schemaType} schema`);
+      }
+      return response.json();
+    } catch (error) {
+      // При любой ошибке возвращаем пустую схему
+      console.error(`Error fetching ${schemaType} schema:`, error);
+      return { type: schemaType, groupBy: [] };
     }
-    return response.json();
   },
 
   // Общий метод для обновления схемы

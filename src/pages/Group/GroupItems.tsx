@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupItem } from '../../types/groupItems';
-import { groupItemsAPI } from '../../services/api';
+import { groupItemsAPI, groupAPI } from '../../services/api'; // Добавьте импорт groupAPI
 import ItemCard from '../../components/Cards/ItemCard/ItemCard';
 import GroupItemModal from '../../components/Modals/ItemModal/GroupItemModal';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
@@ -31,10 +31,12 @@ const GroupItems: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<GroupItem | null>(null);
+  const [schema, setSchema] = useState<string[]>([]); // Добавлено состояние для схемы
   const { canEditItems } = useActionPermissions();
   
   useEffect(() => {
     if (groupId) {
+      loadSchema();
       loadItems();
     }
   }, [groupId]);
@@ -48,6 +50,17 @@ const GroupItems: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to load items');
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const loadSchema = async () => {
+    try {
+      const schemaData = await groupAPI.getItemsSchema(parseInt(groupId!));
+      setSchema(schemaData.groupBy);
+    } catch (err) {
+      console.error('Failed to load schema:', err);
+      // При ошибке используем пустую схему
+      setSchema([]);
     }
   };
   
@@ -89,6 +102,7 @@ const GroupItems: React.FC = () => {
     titles: {
       page: 'Каталог предметов',
     },
+    groupByAttributes: schema, // Передаем схему в конфиг
   };
   
   return (

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterSkill } from '../../types/characterSkills';
 import { CreateGroupSkillRequest, GroupSkill, SkillAttributeDefinition, SkillGroup, UpdateGroupSkillRequest } from '../../types/groupSkills';
-import { characterSkillsAPI, groupSkillsAPI } from '../../services/api';
+import { characterSkillsAPI, groupAPI, groupSkillsAPI } from '../../services/api';
 import CharacterSkillModal from '../../components/Modals/SkillModal/CharacterSkillModal';
 import SkillCard from '../../components/Cards/SkillCard/SkillCard';
 import commonStyles from '../../styles/common.module.css';
@@ -40,9 +40,11 @@ const CharacterSkills: React.FC = () => {
   const { canEditThisCharacter, canEditGroup } = useActionPermissions();
   const [attributes, setAttributes] = useState<SkillAttributeDefinition[]>([]);
   const [editingSkill, setEditingSkill] = useState<GroupSkill | null>(null);
+  const [schema, setSchema] = useState<string[]>([]); // Добавлено состояние для схемы
 
   useEffect(() => {
     if (groupId && characterId) {
+      loadSchema();
       loadSkills();
       loadGroupSkills();
       loadAttributes();
@@ -57,6 +59,17 @@ const CharacterSkills: React.FC = () => {
       console.error('Failed to load attributes:', err);
     }
   };
+
+  const loadSchema = async () => {
+      try {
+        const schemaData = await groupAPI.getSkillsSchema(parseInt(groupId!));
+        setSchema(schemaData.groupBy);
+      } catch (err) {
+        console.error('Failed to load schema:', err);
+        // При ошибке используем пустую схему
+        setSchema([]);
+      }
+    };
 
   const loadSkills = async () => {
     try {
@@ -158,6 +171,7 @@ const CharacterSkills: React.FC = () => {
       page: 'Способности',
       create: 'Добавить'
     },
+    groupByAttributes: schema,
   };
 
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;

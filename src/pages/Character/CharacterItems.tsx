@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterItem, CreateCharacterItemRequest, UpdateCharacterItemRequest } from '../../types/characterItems';
 import { GroupItem } from '../../types/groupItems';
-import { characterItemsAPI } from '../../services/api';
+import { characterItemsAPI, groupAPI } from '../../services/api';
 import { groupItemsAPI } from '../../services/api';
 import CharacterItemModal from '../../components/Modals/ItemModal/CharacterItemModal';
 import buttonStyles from '../../styles/components/Button.module.css';
@@ -38,12 +38,14 @@ const CharacterItems: React.FC = () => {
   const [groupItems, setGroupItems] = useState<GroupItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [schema, setSchema] = useState<string[]>([]); // Добавлено состояние для схемы
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<CharacterItem | null>(null);
   const { canEditThisCharacter } = useActionPermissions();
 
   useEffect(() => {
     if (groupId && characterId) {
+      loadSchema();
       loadItems();
       loadGroupItems();
     }
@@ -60,6 +62,17 @@ const CharacterItems: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const loadSchema = async () => {
+      try {
+        const schemaData = await groupAPI.getItemsSchema(parseInt(groupId!));
+        setSchema(schemaData.groupBy);
+      } catch (err) {
+        console.error('Failed to load schema:', err);
+        // При ошибке используем пустую схему
+        setSchema([]);
+      }
+    };
 
   const loadGroupItems = async () => {
     try {
@@ -113,6 +126,7 @@ const CharacterItems: React.FC = () => {
       page: 'Инвентарь',
       create: 'Добавить'
     },
+    groupByAttributes: schema,
   };
 
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
