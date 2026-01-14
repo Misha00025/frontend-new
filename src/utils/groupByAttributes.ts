@@ -78,10 +78,24 @@ export function groupByAttributes<T extends {
     });
 
     return groups.sort((a, b) => {
-      if (a.name.endsWith('Не задано')) return 1;
-      if (b.name.endsWith('Не задано')) return -1;
-      return a.name.localeCompare(b.name);
-    });
+  if (a.name.endsWith('Не задано')) return 1;
+  if (b.name.endsWith('Не задано')) return -1;
+  
+  // Функция для проверки, является ли строка числом
+  const isNumeric = (str) => {
+    const normalizedStr = str.trim();
+    // Проверяем на целые и дробные числа (включая отрицательные)
+    return /^-?\d+(\.\d+)?$/.test(normalizedStr);
+  };
+  
+  // Если обе строки являются числами, сравниваем их как числа
+  if (isNumeric(a.name) && isNumeric(b.name)) {
+    return parseFloat(a.name) - parseFloat(b.name);
+  }
+  
+  // Иначе используем обычное строковое сравнение
+  return a.name.localeCompare(b.name);
+});
   };
   
   return createGroups(items, attributeNames);
