@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterItem, CreateCharacterItemRequest, UpdateCharacterItemRequest } from '../../types/characterItems';
 import { GroupItem } from '../../types/groupItems';
-import { characterItemsAPI } from '../../services/api';
+import { characterItemsAPI, groupAPI } from '../../services/api';
 import { groupItemsAPI } from '../../services/api';
 import CharacterItemModal from '../../components/Modals/ItemModal/CharacterItemModal';
 import buttonStyles from '../../styles/components/Button.module.css';
@@ -12,6 +12,24 @@ import ItemCard from '../../components/Cards/ItemCard/ItemCard';
 import List from '../../components/List/List';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import { usePlatform } from '../../hooks/usePlatform';
+import ResourcePage from '../../components/commons/Pages/ResourcePage/ResourcePage';
+import { create } from 'domain';
+
+const ItemCardWrapper: React.FC<{
+  item: CharacterItem;
+  onEdit?: (item: CharacterItem) => void;
+  onDelete?: (id: number) => void;
+  showActions?: boolean;
+}> = ({ item, onEdit, onDelete, showActions }) => {
+  return (
+    <ItemCard
+      item={item}
+      onEdit={onEdit ? () => onEdit(item) : undefined}
+      onDelete={onDelete ? () => onDelete(item.id) : undefined}
+      showActions={showActions}
+    />
+  );
+};
 
 const CharacterItems: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -20,12 +38,14 @@ const CharacterItems: React.FC = () => {
   const [groupItems, setGroupItems] = useState<GroupItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [schema, setSchema] = useState<string[]>([]); // Добавлено состояние для схемы
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<CharacterItem | null>(null);
   const { canEditThisCharacter } = useActionPermissions();
 
   useEffect(() => {
     if (groupId && characterId) {
+      loadSchema();
       loadItems();
       loadGroupItems();
     }
@@ -42,6 +62,17 @@ const CharacterItems: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const loadSchema = async () => {
+      try {
+        const schemaData = await groupAPI.getItemsSchema(parseInt(groupId!));
+        setSchema(schemaData.groupBy);
+      } catch (err) {
+        console.error('Failed to load schema:', err);
+        // При ошибке используем пустую схему
+        setSchema([]);
+      }
+    };
 
   const loadGroupItems = async () => {
     try {
@@ -89,52 +120,43 @@ const CharacterItems: React.FC = () => {
     setEditingItem(null);
   };
 
+  const config = {
+    ItemComponent: ItemCardWrapper,
+    titles: {
+      page: 'Инвентарь',
+      create: 'Добавить'
+    },
+    groupByAttributes: schema,
+  };
+
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
 
   return (
-    <div className={commonStyles.container}>
-      <h1>Предметы персонажа</h1>
-
-      {error && <div className={commonStyles.error}>{error}</div>}
-      {canEditThisCharacter && (
-        <div className={commonStyles.actions}>
-          <button 
-            className={buttonStyles.button}
-            onClick={() => setIsModalOpen(true)}
-          >
-            Добавить предмет
-          </button>
-        </div>
-      )}
-      <div className={commonStyles.list}>
-        <h2>Список предметов</h2>
-        {items.length === 0 ? (
-          <p>Предметов пока нет</p>
-        ) : (
-          <List layout="start-grid" gap="small" gridSize={isMobile ? "small" : "large"}>
-            {items.map(item => (
-              <ItemCard
-                key={item.id}
-                item={item}
-                onEdit={() => handleEditItem(item)}
-                onDelete={() => handleDeleteItem(item.id)}
-                showAmount={true}
-                showActions={canEditThisCharacter}
-              />
-            ))}
-          </List>
-        )}
-      </div>
-
-      <CharacterItemModal 
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={editingItem ? handleUpdateItem : handleCreateItem}
-        editingItem={editingItem}
-        title={editingItem ? 'Редактирование предмета' : 'Добавление предмета'}
-        groupItems={groupItems}
+    <>
+      <ResourcePage
+        config={config}
+        items={items}
+        loading={loading}
+        error={error}
+        canCreate={canEditThisCharacter}
+        canEdit={canEditThisCharacter}
+        canDelete={canEditThisCharacter}
+        onCreate={() => setIsModalOpen(true)}
+        onEdit={handleEditItem}
+        onDelete={handleDeleteItem}
       />
-    </div>
+      
+      {canEditThisCharacter && (
+        <CharacterItemModal 
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSave={editingItem ? handleUpdateItem : handleCreateItem}
+          editingItem={editingItem}
+          title={editingItem ? 'Редактирование предмета' : 'Добавление предмета'}
+          groupItems={groupItems}
+        />
+      )}
+    </>
   );
 };
 

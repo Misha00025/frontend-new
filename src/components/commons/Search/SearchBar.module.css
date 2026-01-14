@@ -1,173 +1,127 @@
-/* components/SearchAndFilterBar/SearchAndFilterBar.module.css */
+/* components/SearchBar/SearchBar.module.css */
 .container {
-  margin-bottom: 1rem;
-  background-color: var(--bg-secondary);
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--border-color);
-  transition: all 0.3s ease;
-  overflow: hidden;
+  width: 100%;
+  margin-bottom: 1.5rem;
 }
 
-.container.collapsed {
-  max-height: 60px;
-}
-
-.container.expanded {
-  max-height: 500px;
-}
-
-.header {
-  padding: 0.5rem 1rem;
-}
-
-.searchRow {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  justify-content: space-between;
+.searchWrapper {
+  position: relative;
+  width: 100%;
+  transition: all 0.2s ease;
 }
 
 .searchInput {
-  flex: 1;
-  min-width: 0; /* Для корректного сжатия */
+  width: 100%;
+  padding: 0.75rem 0;
+  padding-right: 2.5rem;
+  border: none;
+  background-color: transparent;
+  font-size: 1rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
 }
 
-.headerActions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
+.searchInput:focus {
+  outline: none;
 }
 
-.resultsBadge {
-  padding: 0.25rem 0.5rem;
-  background-color: var(--bg-primary);
-  border-radius: var(--border-radius-sm);
-  font-size: 0.8rem;
-  font-weight: 600;
+.searchInput::placeholder {
   color: var(--text-secondary);
-  min-width: 60px;
-  text-align: center;
+  opacity: 0.7;
 }
 
-.filtersBadge {
-  padding: 0.25rem 0.5rem;
+.underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.searchWrapper:hover .underline {
+  background-color: var(--border-color-dark);
+}
+
+.searchWrapper.focused .underline {
+  height: 2px;
   background-color: var(--accent-color);
-  border-radius: 50%;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: white;
-  min-width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transform: scaleY(1.2);
+}
+
+.searchWrapper.focused .searchInput {
+  color: var(--text-primary);
 }
 
 .clearButton {
-  padding: 0.25rem 0.5rem;
-  font-size: 1rem;
-  line-height: 1;
-  min-width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.clearButton.hidden {
-  visibility: hidden;
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.toggleButton {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.9rem;
-  line-height: 1;
-  min-width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.filtersContent {
-  padding: 1rem;
-  border-top: 1px solid var(--border-color);
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-.filtersGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.filterGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.filterLabel {
-  font-size: 0.85rem;
-  font-weight: 600;
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
   color: var(--text-secondary);
-  margin-left: 0.25rem;
-}
-
-.filterActions {
+  opacity: 0.7;
+  transition: all 0.2s ease;
   display: flex;
-  justify-content: flex-end;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--border-color-light);
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
-.clearFullButton {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
+.clearButton:hover {
+  opacity: 1;
+  color: var(--text-primary);
+  background-color: var(--bg-hover);
 }
 
-/* Анимация для кнопки очистки */
-.clearButton:not(.hidden):hover {
-  background-color: #ff4444;
-  color: white;
-  transform: scale(1.1);
+.clearIcon {
+  display: block;
+  pointer-events: none;
 }
 
-/* Адаптивные стили */
+/* Анимация для появления/скрытия кнопки очистки */
+.searchWrapper.hasText .clearButton {
+  opacity: 0.7;
+  transform: translateY(-50%) scale(1);
+}
+
+.searchWrapper:not(.hasText) .clearButton {
+  opacity: 0;
+  transform: translateY(-50%) scale(0.8);
+  pointer-events: none;
+}
+
+/* Эффект затемнения при наведении на всю область */
+.searchWrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  border-radius: var(--border-radius-sm);
+  transition: background-color 0.2s ease;
+  pointer-events: none;
+}
+
+.searchWrapper:hover::before {
+  background-color: var(--bg-hover);
+}
+
+/* Адаптивность */
 @media (max-width: 768px) {
-  .container.collapsed {
-    max-height: 70px;
-  }
-  
-  .searchRow {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
   .searchInput {
-    width: 100%;
+    font-size: 0.95rem;
+    padding: 0.625rem 0;
+    padding-right: 2.25rem;
   }
   
-  .headerActions {
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  .filtersGrid {
-    grid-template-columns: 1fr;
-  }
-  
-  .clearFullButton {
-    width: 100%;
-  }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-  .filtersGrid {
-    grid-template-columns: repeat(2, 1fr);
+  .clearButton {
+    right: 0.25rem;
   }
 }
