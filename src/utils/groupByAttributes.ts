@@ -78,28 +78,35 @@ export function groupByAttributes<T extends {
     });
 
     return groups.sort((a, b) => {
-  if (a.name.endsWith('Не задано')) return 1;
-  if (b.name.endsWith('Не задано')) return -1;
-  
-  // Функция для проверки, является ли строка целым числом
-  const isIntegerString = (str: string): boolean => {
-    const trimmed = str.trim();
-    // Проверяем на целые числа (включая отрицательные)
-    // Не допускаем ведущие нули, кроме "0"
-    if (trimmed === '' || trimmed === '-') return false;
-    return /^-?(0|[1-9]\d*)$/.test(trimmed);
-  };
-  
-  // Если обе строки являются целыми числами, сравниваем их как числа
-  if (isIntegerString(a.name) && isIntegerString(b.name)) {
-    const aNum = parseInt(a.name.trim(), 10);
-    const bNum = parseInt(b.name.trim(), 10);
-    return aNum - bNum;
-  }
-  
-  // Иначе используем обычное строковое сравнение
-  return a.name.localeCompare(b.name);
-});
+      if (a.name.endsWith('Не задано')) return 1;
+      if (b.name.endsWith('Не задано')) return -1;
+      
+      // Извлекаем значение из строки формата "Атрибут: значение"
+      const extractValue = (fullName: string): string => {
+        const parts = fullName.split(': ');
+        return parts.length > 1 ? parts[1] : fullName;
+      };
+      
+      const aValue = extractValue(a.name);
+      const bValue = extractValue(b.name);
+      
+      // Функция для проверки, является ли строка целым числом
+      const isIntegerString = (str: string): boolean => {
+        const trimmed = str.trim();
+        if (trimmed === '' || trimmed === '-') return false;
+        return /^-?(0|[1-9]\d*)$/.test(trimmed);
+      };
+      
+      // Если обе значения являются целыми числами, сравниваем их как числа
+      if (isIntegerString(aValue) && isIntegerString(bValue)) {
+        const aNum = parseInt(aValue.trim(), 10);
+        const bNum = parseInt(bValue.trim(), 10);
+        return aNum - bNum;
+      }
+      
+      // Иначе используем обычное строковое сравнение
+      return a.name.localeCompare(b.name);
+    });
   };
   
   return createGroups(items, attributeNames);
