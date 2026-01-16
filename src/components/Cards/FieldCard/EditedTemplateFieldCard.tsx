@@ -1,8 +1,9 @@
 import React from 'react';
-import { TemplateField, TemplateCategory } from '../../../types/characterTemplates';
+import { TemplateField } from '../../../types/characterTemplates';
 import IconButton from '../../commons/Buttons/IconButton/IconButton';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './EditedTemplateFieldCard.module.css';
+import { TemplateCategory } from '../../../types/groupSchemas';
 
 interface EditedTemplateFieldCardProps {
   fieldKey: string;
@@ -65,9 +66,9 @@ const EditedTemplateFieldCard: React.FC<EditedTemplateFieldCardProps> = ({
           <option value="">Переместить в...</option>
           <option value="other">Другое</option>
           {categories
-            .filter(c => !currentCategoryKey || c.key !== currentCategoryKey)
+            .filter(c => !currentCategoryKey || c.name !== currentCategoryKey)
             .map(c => (
-              <option key={c.key} value={c.key}>{c.name}</option>
+              <option key={c.name} value={c.name}>{c.name}</option>
             ))
           }
         </select>

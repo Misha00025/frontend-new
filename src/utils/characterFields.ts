@@ -1,6 +1,7 @@
 // utils/characterFields.ts
 import { Character, CharacterField } from '../types/characters';
-import { CharacterTemplate, TemplateCategory } from '../types/characterTemplates';
+import { CharacterTemplate } from '../types/characterTemplates';
+import { TemplateCategory, TemplateSchema } from '../types/groupSchemas';
 
 export interface CategoryData {
   key: string;
@@ -11,7 +12,6 @@ export interface CategoryData {
 
 export const convertToTemplateCategory = (categoryData: CategoryData): TemplateCategory => {
   return {
-    key: categoryData.key,
     name: categoryData.name,
     fields: categoryData.fields.map(([fieldKey]) => fieldKey),
     categories: categoryData.subcategories ? categoryData.subcategories.map(convertToTemplateCategory) : []
@@ -19,7 +19,7 @@ export const convertToTemplateCategory = (categoryData: CategoryData): TemplateC
 };
 
 export const getFieldsByCategory = (template: TemplateCategory, character: Character, parentKey?: string): CategoryData => {
-  const categoryKey = parentKey ? `${parentKey}.${template.key}` : template.key;
+  const categoryKey = parentKey ? `${parentKey}.${template.name}` : template.name;
   const fieldsInCategory: [string, CharacterField, boolean][] = [];
   
   template.fields.forEach(fieldKey => {
@@ -43,12 +43,12 @@ export const getFieldsByCategory = (template: TemplateCategory, character: Chara
   };
 };
 
-export const categorizeCharacterFields = (character: Character, template: CharacterTemplate | null): Record<string, CategoryData> => {
+export const categorizeCharacterFields = (character: Character, schema: TemplateSchema | null): Record<string, CategoryData> => {
   const categorizedFields: Record<string, CategoryData> = {};
   
-  if (template) {
-    template.schema.categories.forEach(category => {
-      categorizedFields[category.key] = getFieldsByCategory(category, character);
+  if (schema) {
+    schema.categories.forEach(category => {
+      categorizedFields[category.name] = getFieldsByCategory(category, character);
     });
   }
   

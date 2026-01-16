@@ -5,10 +5,12 @@ import { CharacterTemplate } from '../../../types/characterTemplates';
 import List from '../../List/List';
 import CategoryCard from '../../Cards/CategoryCard/CategoryCard';
 import { categorizeCharacterFields, convertToTemplateCategory } from '../../../utils/characterFields';
+import { TemplateSchema } from '../../../types/groupSchemas';
 
 interface CharacterCardsViewProps {
   character: Character;
   template: CharacterTemplate | null;
+  schema: TemplateSchema | null;
   canEdit: boolean;
   onEditField: (fieldKey: string, field: CharacterField) => void;
   onDeleteField: (fieldKey: string) => void;
@@ -18,24 +20,25 @@ interface CharacterCardsViewProps {
 const CharacterCardsView: React.FC<CharacterCardsViewProps> = ({
   character,
   template,
+  schema,
   canEdit,
   onEditField,
   onDeleteField,
   onChangeFieldCategory
 }) => {
-  const categorizedFields = categorizeCharacterFields(character, template);
+  const categorizedFields = categorizeCharacterFields(character, schema);
 
   return (
     <List layout='vertical' gap='small'>
-      {template && template.schema.categories.map(category => {
-        const categoryData = categorizedFields[category.key];
+      {schema && schema.categories.map(category => {
+        const categoryData = categorizedFields[category.name];
         if (!categoryData) return null;
         
         return (
           <CategoryCard
-            key={category.key}
+            key={category.name}
             title={category.name}
-            categoryKey={category.key}
+            categoryKey={category.name}
             fields={categoryData.fields}
             subcategories={categoryData.subcategories ? 
                 categoryData.subcategories.map(convertToTemplateCategory) : undefined}

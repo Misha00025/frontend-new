@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Character as CharacterData, UpdateCharacterRequest, CharacterField } from '../../types/characters';
-import { charactersAPI, characterTemplatesAPI } from '../../services/api';
+import { charactersAPI, characterTemplatesAPI, groupAPI } from '../../services/api';
 import CharacterFieldModal from '../../components/Modals/CharacterFieldModal/CharacterFieldModal';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from './Character.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
-import { CharacterTemplate, TemplateCategory } from '../../types/characterTemplates';
+import { CharacterTemplate } from '../../types/characterTemplates';
 import List from '../../components/List/List';
 import CharacterTableView from '../../components/Views/CharacterTableView/CharacterTableView';
 import CharacterCardsView from '../../components/Views/CharacterCardsView/CharacterCardsView';
 import IconButton from '../../components/commons/Buttons/IconButton/IconButton';
+import { TemplateCategory, TemplateSchema } from '../../types/groupSchemas';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
   const navigate = useNavigate();
   const [character, setCharacter] = useState<CharacterData | null>(null);
   const [template, setTemplate] = useState<CharacterTemplate | null>(null);
+  const [schema, setSchema] = useState<TemplateSchema | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isFieldModalOpen, setIsFieldModalOpen] = useState(false);
@@ -43,6 +45,9 @@ const Character: React.FC = () => {
             characterData.templateId
           );
           setTemplate(templateData);
+
+          const templateSchema = await groupAPI.getTemplateSchema(groupId ? Number(groupId) : 0)
+          setSchema(templateSchema)
         } catch (err) {
           console.error('Failed to load template:', err);
         }
@@ -202,9 +207,9 @@ const Character: React.FC = () => {
   if (!character) return <div className={commonStyles.container}>Персонаж не найден</div>;
 
   const categoryNames: Record<string, string> = {};
-  if (template) {
-    template.schema.categories.forEach(category => {
-      categoryNames[category.key] = category.name;
+  if (schema) {
+    schema.categories.forEach(category => {
+      categoryNames[category.name] = category.name;
     });
   }
   categoryNames.other = "Другое";
@@ -226,7 +231,7 @@ const Character: React.FC = () => {
     return Object.keys(character.fields)
   }
 
-  const allCategories = template ? getAllCategories(template.schema.categories) : [];
+  const allCategories = template ? getAllCategories(schema?.categories ?? []) : [];
 
   return (
     <div className={commonStyles.container}>
@@ -266,6 +271,7 @@ const Character: React.FC = () => {
           <CharacterCardsView
             character={character}
             template={template}
+            schema={schema}
             canEdit={canEditThisCharacter}
             onEditField={handleEditField}
             onDeleteField={handleDeleteField}
@@ -275,6 +281,7 @@ const Character: React.FC = () => {
           <CharacterTableView
             character={character}
             template={template}
+            schema={schema}
             canEdit={canEditThisCharacter}
             onUpdateFieldValue={handleUpdateFieldValue}
             onAddField={canEditThisCharacter ? handleAddField : undefined}

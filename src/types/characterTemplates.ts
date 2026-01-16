@@ -3,7 +3,6 @@ export interface TemplateField {
     value: number;
     maxValue?: number;
     description: string;
-    category?: string;
     formula?: string;
     modifierFormula?: string;
   }
@@ -14,24 +13,12 @@ export interface TemplateField {
     icon: string | null;
   }
   
-  export interface TemplateCategory {
-    key: string;
-    name: string;
-    fields: string[];
-    categories?: TemplateCategory[];
-  }
-
-  export interface TemplateSchema {
-    categories: TemplateCategory[];
-  }
-
   export interface CharacterTemplate {
     id: number;
     name: string;
     description: string;
     fields: Record<string, TemplateField>;
     group: TemplateGroup;
-    schema: TemplateSchema;
   }
   
   export interface CharacterTemplatesResponse {

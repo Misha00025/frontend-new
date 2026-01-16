@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { TemplateCategory } from '../../../types/characterTemplates';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CharacterTemplateModal.module.css';
+import { TemplateCategory } from '../../../types/groupSchemas';
 
 interface CategoryModalProps {
   isOpen: boolean;
@@ -20,22 +20,18 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
   title
 }) => {
   const [name, setName] = useState('');
-  const [key, setKey] = useState('');
 
   useEffect(() => {
     if (category) {
       setName(category.name);
-      setKey(category.key);
     } else {
       setName('');
-      setKey('');
     }
   }, [category, isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
-      key,
       name,
       fields: category?.fields || []
     });
@@ -55,17 +51,6 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={inputStyles.input}
-              required
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Ключ категории:</label>
-            <input
-              type="text"
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
               className={inputStyles.input}
               required
             />

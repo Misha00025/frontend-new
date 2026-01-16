@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterTemplate, CreateTemplateRequest, TemplateField, UpdateTemplateRequest } from '../../types/characterTemplates';
-import { characterTemplatesAPI } from '../../services/api';
+import { characterTemplatesAPI, groupAPI } from '../../services/api';
 import CharacterTemplateModal from '../../components/Modals/CharacterModal/CharacterTemplateModal';
 import commonStyles from '../../styles/common.module.css';
 import buttonStyles from '../../styles/components/Button.module.css';
@@ -10,11 +10,13 @@ import uiStyles from '../../styles/ui.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import IconButton from '../../components/commons/Buttons/IconButton/IconButton';
 import TemplatePreview from '../../components/Views/TemplatePreview/TemplatePreview';
+import { TemplateSchema } from '../../types/groupSchemas';
 
 const CharacterTemplates: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const [templates, setTemplates] = useState<CharacterTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<CharacterTemplate | null>(null);
+  const [schema, setSchema] = useState<TemplateSchema | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,6 +41,8 @@ const CharacterTemplates: React.FC = () => {
       setLoading(true);
       const templatesData = await characterTemplatesAPI.getTemplates(parseInt(groupId!));
       setTemplates(templatesData);
+      const templateSchema = await groupAPI.getTemplateSchema(groupId ? Number(groupId) : 0)
+      setSchema(templateSchema)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load templates');
     } finally {
@@ -95,7 +99,7 @@ const CharacterTemplates: React.FC = () => {
       {error && <div className={commonStyles.error}>{error}</div>}
       {/* Превью выбранного шаблона */}
       {selectedTemplate ? (
-        <TemplatePreview template={selectedTemplate} />
+        <TemplatePreview template={selectedTemplate} schema={schema || {categories: []}} />
       ) : (
         <div className={commonStyles.card}>
           <p>Шаблон ещё не создан</p>
