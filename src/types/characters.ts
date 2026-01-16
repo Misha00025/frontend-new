@@ -22,7 +22,6 @@ export interface CharacterShort {
     value: number;
     maxValue?: number;
     description: string;
-    category?: string;
     formula?: string;
     modifier?: number;
   }

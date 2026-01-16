@@ -18,10 +18,13 @@ export const convertToTemplateCategory = (categoryData: CategoryData): TemplateC
   };
 };
 
+// utils/characterFields.ts
+// Исправленная функция getFieldsByCategory
 export const getFieldsByCategory = (template: TemplateCategory, character: Character, parentKey?: string): CategoryData => {
   const categoryKey = parentKey ? `${parentKey}.${template.name}` : template.name;
   const fieldsInCategory: [string, CharacterField, boolean][] = [];
   
+  // Проверяем каждое поле в схеме категории
   template.fields.forEach(fieldKey => {
     if (character.fields[fieldKey]) {
       fieldsInCategory.push([fieldKey, character.fields[fieldKey], true]);
@@ -43,25 +46,29 @@ export const getFieldsByCategory = (template: TemplateCategory, character: Chara
   };
 };
 
+// Исправленная функция categorizeCharacterFields без поля category
 export const categorizeCharacterFields = (character: Character, schema: TemplateSchema | null): Record<string, CategoryData> => {
   const categorizedFields: Record<string, CategoryData> = {};
   
+  // Сначала создаем категории из схемы
   if (schema) {
     schema.categories.forEach(category => {
       categorizedFields[category.name] = getFieldsByCategory(category, character);
     });
   }
   
+  // Создаем категорию "Другое" для полей, не вошедших в схему
   categorizedFields.other = {
     key: 'other',
     name: 'Другое',
     fields: []
   };
   
+  // Распределяем все поля персонажа
   Object.entries(character.fields).forEach(([key, field]) => {
     let alreadyAdded = false;
     
-    // Функция для рекурсивного поиска поля в категориях
+    // Функция для рекурсивного поиска поля в категориях схемы
     const checkInCategory = (category: CategoryData): boolean => {
       // Проверяем поля в текущей категории
       if (category.fields.some(([fieldKey]) => fieldKey === key)) {
@@ -78,7 +85,7 @@ export const categorizeCharacterFields = (character: Character, schema: Template
       return false;
     };
     
-    // Проверяем все категории
+    // Проверяем все категории из схемы
     for (const category of Object.values(categorizedFields)) {
       if (checkInCategory(category)) {
         alreadyAdded = true;
@@ -86,46 +93,13 @@ export const categorizeCharacterFields = (character: Character, schema: Template
       }
     }
     
+    // Если поле не найдено в категориях схемы, добавляем в "Другое"
     if (!alreadyAdded) {
-      if (field.category) {
-        // Функция для рекурсивного поиска категории по короткому ключу
-        const findAndAddToCategory = (category: CategoryData, targetShortKey: string): boolean => {
-          // Проверяем, совпадает ли короткий ключ категории (последняя часть после точки)
-          const categoryShortKey = category.key.split('.').pop();
-          if (categoryShortKey === targetShortKey) {
-            category.fields.push([key, field, false]);
-            return true;
-          }
-          
-          // Рекурсивно проверяем подкатегории
-          if (category.subcategories) {
-            for (const subcategory of category.subcategories) {
-              if (findAndAddToCategory(subcategory, targetShortKey)) return true;
-            }
-          }
-          
-          return false;
-        };
-        
-        // Ищем категорию по короткому ключу во всем дереве
-        let categoryFound = false;
-        for (const category of Object.values(categorizedFields)) {
-          if (findAndAddToCategory(category, field.category)) {
-            categoryFound = true;
-            break;
-          }
-        }
-        
-        // Если категория не найдена, добавляем в "Другое"
-        if (!categoryFound) {
-          categorizedFields.other.fields.push([key, field, false]);
-        }
-      } else {
-        categorizedFields.other.fields.push([key, field, false]);
-      }
+      categorizedFields.other.fields.push([key, field, false]);
     }
   });
   
+  // Удаляем категорию "Другое", если она пустая
   if (categorizedFields.other.fields.length === 0) {
     delete categorizedFields.other;
   }

@@ -1,6 +1,6 @@
 // components/Views/CharacterTableView/CharacterTableView.tsx
 import React from 'react';
-import { Character, CharacterField } from '../../../types/characters';
+import { Character } from '../../../types/characters';
 import { CharacterTemplate } from '../../../types/characterTemplates';
 import { categorizeCharacterFields, CategoryData } from '../../../utils/characterFields';
 import CategoryTable from '../../Cards/CategoryCard/CategoryTable';
@@ -13,16 +13,13 @@ interface CharacterTableViewProps {
   schema: TemplateSchema | null;
   canEdit: boolean;
   onUpdateFieldValue: (fieldKey: string, newValue: string) => void;
-  onAddField?: (category?:string) => void;
 }
 
 const CharacterTableView: React.FC<CharacterTableViewProps> = ({
   character,
-  template,
   schema,
   canEdit,
-  onUpdateFieldValue,
-  onAddField = undefined
+  onUpdateFieldValue
 }) => {
   const categorizedFields = categorizeCharacterFields(character, schema);
 
@@ -34,7 +31,6 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
           category={category}
           canEdit={canEdit}
           onUpdateFieldValue={onUpdateFieldValue}
-          onAddField={onAddField}
         />
       ))}
     </div>
