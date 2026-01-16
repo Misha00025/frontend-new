@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CharacterTemplate, CreateTemplateRequest, UpdateTemplateRequest, TemplateField, TemplateCategory, TemplateSchema } from '../../../types/characterTemplates';
+import { CharacterTemplate, CreateTemplateRequest, UpdateTemplateRequest, TemplateField } from '../../../types/characterTemplates';
 import TemplateFieldModal from '../CharacterFieldModal/TemplateFieldModal';
 import CategoryModal from './CategoryModal';
 import buttonStyles from '../../../styles/components/Button.module.css';
@@ -8,12 +8,14 @@ import styles from './CharacterTemplateModal.module.css';
 import IconButton from '../../commons/Buttons/IconButton/IconButton';
 import EditedTemplateFieldCard from '../../Cards/FieldCard/EditedTemplateFieldCard';
 import TemplateCategoryCard from '../../Cards/CategoryCard/TemplateCategoryCard';
+import { TemplateCategory, TemplateSchema } from '../../../types/groupSchemas';
 
 interface CharacterTemplateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (templateData: CreateTemplateRequest | UpdateTemplateRequest) => Promise<void>;
   editingTemplate?: CharacterTemplate | null;
+  editingSchema?: TemplateSchema | null;
   title: string;
 }
 
@@ -22,6 +24,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
   onClose,
   onSave,
   editingTemplate,
+  editingSchema,
   title
 }) => {
   const [name, setName] = useState('');
@@ -42,7 +45,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
       setName(editingTemplate.name);
       setDescription(editingTemplate.description);
       setFields(editingTemplate.fields);
-      setSchema(editingTemplate.schema || { categories: [] });
+      setSchema(editingSchema || { categories: [] });
     } else {
       setName('');
       setDescription('');
@@ -114,8 +117,8 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
       // Обновляем вложенную категорию
       setSchema(prev => ({
         categories: prev.categories.map(c => 
-          c.key === parentCategory.key
-            ? { ...c, categories: c.categories?.map(sc => sc.key === updatedCategory.key ? updatedCategory : sc) }
+          c.name === parentCategory.name
+            ? { ...c, categories: c.categories?.map(sc => sc.name === updatedCategory.name ? updatedCategory : sc) }
             : c
         )
       }));
@@ -123,7 +126,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
       // Обновляем категорию верхнего уровня
       setSchema(prev => ({
         categories: prev.categories.map(c => 
-          c.key === updatedCategory.key ? updatedCategory : c
+          c.name === updatedCategory.name ? updatedCategory : c
         )
       }));
     }
@@ -196,15 +199,15 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
       // Удаляем вложенную категорию
       setSchema(prev => ({
         categories: prev.categories.map(c => 
-          c.key === parentCategory.key
-            ? { ...c, categories: c.categories?.filter(sc => sc.key !== categoryKey) }
+          c.name === parentCategory.name
+            ? { ...c, categories: c.categories?.filter(sc => sc.name !== categoryKey) }
             : c
         )
       }));
     } else {
       // Удаляем категорию верхнего уровня
       setSchema(prev => ({
-        categories: prev.categories.filter(category => category.key !== categoryKey)
+        categories: prev.categories.filter(category => category.name !== categoryKey)
       }));
     }
   };
@@ -216,7 +219,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
       // Перемещаем вложенную категорию
       setSchema(prev => ({
         categories: prev.categories.map(c => 
-          c.key === parentCategory.key && c.categories
+          c.name === parentCategory.name && c.categories
             ? { ...c, categories: moveItemInArray(c.categories, index, index - 1) }
             : c
         )
@@ -237,7 +240,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
       
       setSchema(prev => ({
         categories: prev.categories.map(c => 
-          c.key === parentCategory.key && c.categories
+          c.name === parentCategory.name && c.categories
             ? { ...c, categories: moveItemInArray(c.categories, index, index + 1) }
             : c
         )
@@ -265,8 +268,8 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
         // Редактируем вложенную категорию
         setSchema(prev => ({
           categories: prev.categories.map(c => 
-            c.key === editingCategoryParent.key
-              ? { ...c, categories: c.categories?.map(sc => sc.key === editingCategory.key ? category : sc) }
+            c.name === editingCategoryParent.name
+              ? { ...c, categories: c.categories?.map(sc => sc.name === editingCategory.name ? category : sc) }
               : c
           )
         }));
@@ -274,7 +277,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
         // Редактируем категорию верхнего уровня
         setSchema(prev => ({
           categories: prev.categories.map(c => 
-            c.key === editingCategory.key ? category : c
+            c.name === editingCategory.name ? category : c
           )
         }));
       }
@@ -284,7 +287,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
         // Добавляем вложенную категорию
         setSchema(prev => ({
           categories: prev.categories.map(c => 
-            c.key === editingCategoryParent.key
+            c.name === editingCategoryParent.name
               ? { ...c, categories: [...(c.categories || []), category] }
               : c
           )
@@ -311,7 +314,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
     if (categoryKey) {
       const addFieldToCategory = (categories: TemplateCategory[]): TemplateCategory[] => {
         return categories.map(category => {
-          if (category.key === categoryKey) {
+          if (category.name === categoryKey) {
             return {
               ...category,
               fields: [...category.fields, fieldKey]
@@ -395,7 +398,7 @@ const CharacterTemplateModal: React.FC<CharacterTemplateModalProps> = ({
 
               {schema.categories.map((category, index) => (
                 <TemplateCategoryCard
-                  key={category.key}
+                  key={category.name}
                   category={category}
                   index={index}
                   totalCategories={schema.categories.length}

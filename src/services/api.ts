@@ -29,7 +29,7 @@ import {
 } from '../types/characterItems';
 import { useAuth } from '../contexts/AuthContext';
 import { CreateGroupSkillRequest, CreateSkillAttributeRequest, GroupSkill, GroupSkillsResponse, SkillAttributeDefinition, SkillAttributesResponse, UpdateGroupSkillRequest } from '../types/groupSkills';
-import { GroupSchema } from '../types/groupSchemas';
+import { GroupSchema, TemplateSchema } from '../types/groupSchemas';
 
 
 const API_BASE = 'https://thedun.ru';
@@ -252,6 +252,38 @@ export const groupAPI = {
 
   updateSkillsSchema: async (groupId: number, groupBy: string[]): Promise<GroupSchema> => {
     return groupAPI.updateSchema(groupId, 'skills', groupBy);
+  },
+
+  getTemplateSchema: async (groupId: number): Promise<TemplateSchema> => {
+    try {
+      const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/schemas/template`);
+      if (!response.ok) {
+        // Если 404 - возвращаем пустую схему
+        if (response.status === 404) {
+          return {categories: []};
+        }
+        throw new Error(`Failed to fetch template schema`);
+      }
+      return response.json();
+    } catch (error) {
+      // При любой ошибке возвращаем пустую схему
+      console.error(`Error fetching template schema:`, error);
+      return {categories: []};
+    }
+  },
+
+  updateTemplateSchema: async (groupId: number): Promise<TemplateSchema> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/schemas/template`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ categories: [] }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to update template schema`);
+    }
+    return response.json();
   },
 };
 

@@ -9,12 +9,14 @@ import CharacterTableView from '../CharacterTableView/CharacterTableView';
 import styles from './TemplatePreview.module.css';
 import List from '../../List/List';
 import IconButton from '../../commons/Buttons/IconButton/IconButton';
+import { TemplateSchema } from '../../../types/groupSchemas';
 
 interface TemplatePreviewProps {
   template: CharacterTemplate;
+  schema: TemplateSchema
 }
 
-const TemplatePreview: React.FC<TemplatePreviewProps> = ({ template }) => {
+const TemplatePreview: React.FC<TemplatePreviewProps> = ({ template, schema }) => {
   const [viewMode, setViewMode] = useState<'card' | 'table'>('table');
   const character = templateToCharacter(template);
 
@@ -37,6 +39,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = ({ template }) => {
           <CharacterCardsView
             character={character}
             template={template}
+            schema={schema}
             canEdit={false}
             onEditField={() => {}}
             onDeleteField={() => {}}
@@ -46,6 +49,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = ({ template }) => {
           <CharacterTableView
             character={character}
             template={template}
+            schema={schema}
             canEdit={false}
             onUpdateFieldValue={() => {}}
           />

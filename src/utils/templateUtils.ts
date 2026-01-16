@@ -11,7 +11,6 @@ export const templateToCharacter = (template: CharacterTemplate): Character => {
       name: field.name,
       value: field.value || 0, // Используем значение по умолчанию из шаблона
       description: field.description,
-      category: field.category,
       formula: field.formula,
     };
   });

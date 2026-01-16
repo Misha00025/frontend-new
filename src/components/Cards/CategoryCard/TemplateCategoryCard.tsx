@@ -1,9 +1,10 @@
 import React from 'react';
-import { TemplateCategory, TemplateField } from '../../../types/characterTemplates';
+import { TemplateField } from '../../../types/characterTemplates';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import styles from './TemplateCategoryCard.module.css';
 import IconButton from '../../commons/Buttons/IconButton/IconButton';
 import EditedTemplateFieldCard from '../../Cards/FieldCard/EditedTemplateFieldCard';
+import { TemplateCategory } from '../../../types/groupSchemas';
 
 interface TemplateCategoryCardProps {
   category: TemplateCategory;
@@ -76,7 +77,7 @@ const TemplateCategoryCard: React.FC<TemplateCategoryCardProps> = ({
   };
 
   const handleRemoveCategory = () => {
-    onRemoveCategory(category.key, parentCategory);
+    onRemoveCategory(category.name, parentCategory);
   };
 
   const handleMoveUp = () => {
@@ -158,7 +159,7 @@ const TemplateCategoryCard: React.FC<TemplateCategoryCardProps> = ({
             categories={category.categories ? category.categories : []}
             selectedCategoryForField={selectedCategoryForField[fieldKey] || ''}
             onCategoryChange={onCategoryChange}
-            currentCategoryKey={category.key}
+            currentCategoryKey={category.name}
           />
         ))}
 
@@ -166,7 +167,7 @@ const TemplateCategoryCard: React.FC<TemplateCategoryCardProps> = ({
           <div className={styles.subCategories}>
             {category.categories.map((subCategory, subIndex) => (
               <TemplateCategoryCard
-                key={subCategory.key}
+                key={subCategory.name}
                 category={subCategory}
                 index={subIndex}
                 totalCategories={category.categories!.length}

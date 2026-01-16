@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { CharacterField } from '../../../types/characters';
-import { CharacterTemplate, TemplateCategory } from '../../../types/characterTemplates';
+import { CharacterTemplate } from '../../../types/characterTemplates';
 import List from '../../List/List';
 import FieldCard from '../FieldCard/FieldCard';
 import IconButton from '../../commons/Buttons/IconButton/IconButton';
 import styles from './CategoryCard.module.css';
+import { TemplateCategory } from '../../../types/groupSchemas';
 
 interface CategoryCardProps {
   title: string;
@@ -130,9 +131,9 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
           
           {subcategories && subcategories.map(subcategory => (
             <CategoryCard
-              key={subcategory.key}
+              key={subcategory.name}
               title={subcategory.name}
-              categoryKey={subcategory.key}
+              categoryKey={subcategory.name}
               fields={getSubcategoryFields(subcategory)}
               subcategories={subcategory.categories}
               allFields={allFields}

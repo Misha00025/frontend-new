@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { CharacterField } from '../../../types/characters';
-import { TemplateCategory } from '../../../types/characterTemplates';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import styles from './CharacterFieldModal.module.css';
+import { TemplateCategory } from '../../../types/groupSchemas';
 
 const generateFieldKey = (fieldName: string): string => {
   return fieldName
