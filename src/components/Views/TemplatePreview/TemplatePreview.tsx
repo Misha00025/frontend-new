@@ -10,7 +10,10 @@ interface TemplatePreviewProps {
   schema: TemplateSchema;
 }
 
-const TemplatePreview: React.FC<TemplatePreviewProps> = ({ template, schema }) => {
+const TemplatePreview: React.FC<TemplatePreviewProps> = ({ 
+  template, 
+  schema,
+}) => {
   const character = templateToCharacter(template);
 
   return (

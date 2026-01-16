@@ -9,6 +9,8 @@ import uiStyles from '../../styles/ui.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import TemplatePreview from '../../components/Views/TemplatePreview/TemplatePreview';
 import { TemplateSchema } from '../../types/groupSchemas';
+import IconButton from '../../components/commons/Buttons/IconButton/IconButton';
+import { TemplateEditProvider } from '../../contexts/TemplateEditContext';
 
 const CharacterTemplates: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -16,7 +18,7 @@ const CharacterTemplates: React.FC = () => {
   const [schema, setSchema] = useState<TemplateSchema | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const { canEditTemplates } = useActionPermissions();
 
   useEffect(() => {
@@ -29,7 +31,6 @@ const CharacterTemplates: React.FC = () => {
     try {
       setLoading(true);
       const templatesData = await characterTemplatesAPI.getTemplates(parseInt(groupId!));
-      // Берем первый (и единственный) шаблон, если он есть
       if (templatesData.length > 0) {
         setTemplate(templatesData[0]);
       } else {
@@ -44,30 +45,76 @@ const CharacterTemplates: React.FC = () => {
     }
   };
 
-  const handleCreateTemplate = async (templateData: any) => {
-    const newTemplate = await characterTemplatesAPI.createTemplate(parseInt(groupId!), templateData);
-    await loadTemplate();
+  const handleCreateTemplate = async () => {
+    try {
+      const newTemplate = await characterTemplatesAPI.createTemplate(parseInt(groupId!), {
+        name: 'Новый шаблон',
+        description: '',
+        fields: {}
+      });
+      setTemplate(newTemplate);
+      setEditMode(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create template');
+    }
+  };
+
+  const handleAddField = () => {
+    console.log('Добавить поле в шаблон');
+  };
+
+  const handleAddCategory = () => {
+    console.log('Добавить категорию в шаблон');
+  };
+
+  const handleDeleteField = (fieldKey: string) => {
+    console.log('Удалить поле:', fieldKey);
+  };
+
+  const handleDeleteCategory = (categoryKey: string) => {
+    console.log('Удалить категорию:', categoryKey);
   };
 
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
+
+  const templateEditContextValue = {
+    editMode,
+    onAddField: handleAddField,
+    onAddCategory: handleAddCategory,
+    onDeleteField: handleDeleteField,
+    onDeleteCategory: handleDeleteCategory,
+  };
 
   return (
     <div className={commonStyles.container}>
       <div className={uiStyles.actions} style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ margin: 0, marginRight: 'auto' }}>Шаблон персонажей</h1>
+        
+        {canEditTemplates && template && (
+          <IconButton 
+            title={editMode ? "Выйти из режима редактирования" : "Редактировать шаблон"}
+            icon={editMode ? "close" : "edit"}
+            onClick={() => setEditMode(!editMode)}
+          />
+        )}
       </div>
 
       {error && <div className={commonStyles.error}>{error}</div>}
 
       {template ? (
-        <TemplatePreview template={template} schema={schema || {categories: []}} />
+        <TemplateEditProvider value={templateEditContextValue}>
+          <TemplatePreview 
+            template={template} 
+            schema={schema || {categories: []}} 
+          />
+        </TemplateEditProvider>
       ) : (
         <div className={commonStyles.card}>
           <p>Шаблон ещё не создан</p>
           {canEditTemplates && (
             <button 
               className={buttonStyles.button}
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleCreateTemplate}
             >
               Создать шаблон
             </button>

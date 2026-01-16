@@ -19,9 +19,14 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
   character,
   schema,
   canEdit,
-  onUpdateFieldValue
+  onUpdateFieldValue,
 }) => {
   const categorizedFields = categorizeCharacterFields(character, schema);
+
+  // Если нет категорий, не отображаем таблицу
+  if (Object.keys(categorizedFields).length === 0) {
+    return null;
+  }
 
   return (
     <div className={styles.tableView}>
