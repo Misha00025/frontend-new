@@ -3,10 +3,12 @@ import React, { createContext, ReactNode } from 'react';
 
 export interface TemplateEditContextType {
   editMode: boolean;
-  onAddField: () => void;
-  onAddCategory: () => void;
-  onDeleteField: (fieldKey: string) => void;
-  onDeleteCategory: (categoryKey: string) => void;
+  onAddField?: () => void;
+  onEditField?: (fieldKey: string) => void;
+  onAddCategory?: () => void;
+  onEditCategory?: (categoryKey: string) => void;
+  onDeleteField?: (fieldKey: string) => void;
+  onDeleteCategory?: (categoryKey: string) => void;
 }
 
 export const TemplateEditContext = createContext<TemplateEditContextType | null>(null);

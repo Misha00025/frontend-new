@@ -1,0 +1,80 @@
+/* components/Views/FieldRow/FieldRow.module.css */
+.row {
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .row:last-child {
+    border-bottom: none;
+  }
+  
+  .nameCell {
+    padding: 0.5rem;
+    font-weight: 500;
+    width: 60%;
+    vertical-align: top;
+  }
+  
+  .nameContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .fieldName {
+    flex: 1;
+  }
+  
+  .valueCell {
+    padding: 0.5rem;
+    width: 40%;
+  }
+  
+  .value {
+    min-height: 1rem;
+  }
+  
+  .editableValue {
+    min-height: 1rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: var(--border-radius-sm);
+  }
+  
+  .editableValue:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  }
+  
+  .editInput {
+    width: 100%;
+    padding: 0.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+  
+  .progressContainer {
+    width: 100%;
+    background-color: var(--progress-bg, var(--bg-primary));
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+    position: relative;
+    height: 20px;
+  }
+  
+  .progressBar {
+    height: 100%;
+    transition: width 0.3s ease;
+    position: relative;
+  }
+  
+  .progressText {
+    position: absolute;
+    left: 8px;
+    color: var(--text-primary);
+  }
+  
+  [data-theme="dark"] .progressText {
+    text-shadow: 0 0 2px rgba(0, 0, 0, 1);
+  }

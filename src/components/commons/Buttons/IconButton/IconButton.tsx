@@ -2,7 +2,7 @@ import React from 'react';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import styles from './IconButton.module.css';
 
-export type IconType = 'edit' | 'delete' | 'add' | 'view' | 'close' | 'sort' | 'sort-up' | 'sort-down' | 'arrow-up' | 'arrow-down' | 'settings';
+export type IconType = 'edit' | 'delete' | 'add' | 'view' | 'close' | 'sort' | 'sort-up' | 'sort-down' | 'arrow-up' | 'arrow-down';
 
 interface IconButtonProps {
   icon: IconType;
