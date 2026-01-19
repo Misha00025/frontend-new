@@ -278,7 +278,7 @@ export const groupAPI = {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ categories: [] }),
+      body: JSON.stringify(schema),
     });
     if (!response.ok) {
       throw new Error(`Failed to update template schema`);

@@ -11,8 +11,8 @@ import TemplatePreview from '../../components/Views/TemplatePreview/TemplatePrev
 import { TemplateSchema, TemplateCategory } from '../../types/groupSchemas';
 import IconButton from '../../components/commons/Buttons/IconButton/IconButton';
 import { TemplateEditProvider } from '../../contexts/TemplateEditContext';
-import CategoryModal from '../../components/Modals/CharacterModal/CategoryModal';
 import TemplateFieldModal from '../../components/Modals/CharacterFieldModal/TemplateFieldModal';
+import CategoryModal from '../../components/Modals/CharacterModal/CategoryModal';
 
 const CharacterTemplates: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -31,7 +31,11 @@ const CharacterTemplates: React.FC = () => {
 
   // Состояния для модальных окон
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [currentEditingCategory, setCurrentEditingCategory] = useState<{category: TemplateCategory | null; parentKey?: string}>({ category: null });
+  const [currentEditingCategory, setCurrentEditingCategory] = useState<{
+    category: TemplateCategory | null; 
+    parentKey?: string;
+    isRoot?: boolean;
+  }>({ category: null });
   const [isFieldModalOpen, setIsFieldModalOpen] = useState(false);
   const [editingField, setEditingField] = useState<{ field: TemplateField | null; fieldKey: string }>({ field: null, fieldKey: '' });
 
@@ -142,15 +146,26 @@ const CharacterTemplates: React.FC = () => {
   };
 
   // Обработчики для категорий
-  const handleAddCategory = () => {
-    setCurrentEditingCategory({ category: null });
+  const handleAddCategory = (parentCategoryKey?: string) => {
+    setCurrentEditingCategory({ 
+      category: null, 
+      parentKey: parentCategoryKey,
+      isRoot: !parentCategoryKey
+    });
     setIsCategoryModalOpen(true);
+  };
+
+  const handleAddRootCategory = () => {
+    handleAddCategory(undefined); // undefined означает корневую категорию
   };
 
   const handleEditCategory = (categoryKey: string) => {
     if (!editingSchema) return;
     
-    const findCategoryInSchema = (categories: TemplateCategory[], key: string): {category: TemplateCategory | null; parentKey?: string} => {
+    const findCategoryInSchema = (categories: TemplateCategory[], key: string): {
+      category: TemplateCategory | null; 
+      parentKey?: string;
+    } => {
       for (const category of categories) {
         if (category.name === key) {
           return { category };
@@ -209,7 +224,7 @@ const CharacterTemplates: React.FC = () => {
             return {
               ...cat,
               categories: cat.categories 
-                ? updateCategoryInSchema(cat.categories, oldName, newCategory)
+                ? [...cat.categories.filter(c => c.name !== oldName), newCategory]
                 : [newCategory]
             };
           }
@@ -238,7 +253,7 @@ const CharacterTemplates: React.FC = () => {
             return cat;
           });
         } else {
-          // Добавление новой категории
+          // Добавление новой категории в корень
           return [...categories, newCategory];
         }
       }
@@ -394,6 +409,24 @@ const CharacterTemplates: React.FC = () => {
 
       {error && <div className={commonStyles.error}>{error}</div>}
 
+      {/* Кнопка добавления корневой категории */}
+      {editMode && (
+        <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <button 
+            className={buttonStyles.button}
+            onClick={handleAddRootCategory}
+          >
+            + Добавить корневую категорию
+          </button>
+          <button 
+            className={buttonStyles.button}
+            onClick={handleAddField}
+          >
+            + Добавить поле (без категории)
+          </button>
+        </div>
+      )}
+
       {originalTemplate ? (
         <TemplateEditProvider value={templateEditContextValue}>
           <TemplatePreview 
@@ -424,7 +457,8 @@ const CharacterTemplates: React.FC = () => {
         }}
         onSave={handleSaveCategory}
         category={currentEditingCategory.category}
-        title={currentEditingCategory.category ? 'Редактирование категории' : 'Создание категории'}
+        title={currentEditingCategory.category ? 'Редактирование категории' : 
+               currentEditingCategory.isRoot ? 'Создание корневой категории' : 'Создание подкатегории'}
       />
 
       <TemplateFieldModal
