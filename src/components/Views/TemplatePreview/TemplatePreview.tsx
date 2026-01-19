@@ -1,9 +1,12 @@
 // components/Preview/TemplatePreview.tsx
-import React from 'react';
+import React, { useContext } from 'react';
 import { CharacterTemplate } from '../../../types/characterTemplates';
 import { templateToCharacter } from '../../../utils/templateUtils';
 import CharacterTableView from '../CharacterTableView/CharacterTableView';
 import { TemplateSchema } from '../../../types/groupSchemas';
+import { TemplateEditContext } from '../../../contexts/TemplateEditContext';
+import { CategoryData } from '../../../utils/characterFields';
+import { MenuItem } from '../../control/DropdownMenu/DropdownMenu';
 
 interface TemplatePreviewProps {
   template: CharacterTemplate;
@@ -14,7 +17,47 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   template, 
   schema,
 }) => {
+  const templateEditContext = useContext(TemplateEditContext);
+  const editMode = templateEditContext?.editMode || false;
   const character = templateToCharacter(template);
+
+  // Функция для создания меню категорий в режиме редактирования шаблона
+  const getCategoryMenuItems = (category: CategoryData): MenuItem[] => {
+    if (!editMode || category.key === 'other') return [];
+    
+    const items: MenuItem[] = [];
+    
+    if (templateEditContext?.onAddCategory) {
+      items.push({
+        label: 'Добавить категорию',
+        onClick: () => templateEditContext.onAddCategory?.(),
+      });
+    }
+    
+    if (templateEditContext?.onAddField) {
+      items.push({
+        label: 'Добавить поле',
+        onClick: () => templateEditContext.onAddField?.(),
+      });
+    }
+    
+    if (templateEditContext?.onEditCategory) {
+      items.push({
+        label: 'Редактировать категорию',
+        onClick: () => templateEditContext.onEditCategory?.(category.key),
+      });
+    }
+    
+    if (templateEditContext?.onDeleteCategory) {
+      items.push({
+        label: 'Удалить категорию',
+        onClick: () => templateEditContext.onDeleteCategory?.(category.key),
+        variant: 'danger'
+      });
+    }
+    
+    return items;
+  };
 
   return (
     <div>
@@ -24,6 +67,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = ({
         schema={schema}
         canEdit={false}
         onUpdateFieldValue={() => {}}
+        getCategoryMenuItems={getCategoryMenuItems}
       />
     </div>
   );

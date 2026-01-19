@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Character as CharacterData } from '../../types/characters';
+import { Character as CharacterData, CharacterField } from '../../types/characters';
 import { charactersAPI, characterTemplatesAPI, groupAPI } from '../../services/api';
 import commonStyles from '../../styles/common.module.css';
 import uiStyles from './Character.module.css';
 import { CharacterTemplate } from '../../types/characterTemplates';
 import CharacterTableView from '../../components/Views/CharacterTableView/CharacterTableView';
 import { TemplateSchema } from '../../types/groupSchemas';
+import { CategoryData } from '../../utils/characterFields';
+import { MenuItem } from '../../components/control/DropdownMenu/DropdownMenu';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -49,6 +51,49 @@ const Character: React.FC = () => {
     }
   };
 
+  const handleUpdateFieldValue = async (fieldKey: string, newValue: string) => {
+    if (!character) return;
+  
+    try {
+      const field = character.fields[fieldKey];
+      const updatedField = {
+        ...field,
+        value: Number(newValue)
+      };
+  
+      const updateData: any = {
+        fields: {
+          [fieldKey]: updatedField
+        }
+      };
+  
+      const updatedCharacter = await charactersAPI.updateCharacter(
+        parseInt(groupId!), 
+        parseInt(characterId!), 
+        updateData
+      );
+      setCharacter(updatedCharacter);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update field value');
+    }
+  };
+
+  // Функция для создания меню категорий в персонаже
+  const getCategoryMenuItems = (category: CategoryData): MenuItem[] => {
+    // В персонаже можно только добавлять поля в категории
+    const items: MenuItem[] = [];
+    
+    // Пример: добавить поле в категорию
+    items.push({
+      label: 'Добавить поле в категорию',
+      onClick: () => {
+        console.log(`Добавить поле в категорию: ${category.name}`);
+      },
+    });
+    
+    return items;
+  };
+
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
   if (!character) return <div className={commonStyles.container}>Персонаж не найден</div>;
 
@@ -66,7 +111,8 @@ const Character: React.FC = () => {
           template={template}
           schema={schema}
           canEdit={false}
-          onUpdateFieldValue={() => {}}
+          onUpdateFieldValue={handleUpdateFieldValue}
+          getCategoryMenuItems={getCategoryMenuItems}
         />
       </div>
     </div>

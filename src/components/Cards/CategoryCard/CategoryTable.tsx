@@ -11,6 +11,7 @@ interface CategoryTableProps {
   canEdit: boolean;
   onUpdateFieldValue: (fieldKey: string, newValue: string) => void;
   level?: number;
+  categoryMenuItems?: MenuItem[];
 }
 
 const CategoryTable: React.FC<CategoryTableProps> = ({
@@ -18,46 +19,10 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   canEdit,
   onUpdateFieldValue,
   level = 0,
+  categoryMenuItems,
 }) => {
   const templateEditContext = useContext(TemplateEditContext);
   const editMode = templateEditContext?.editMode || false;
-
-  const getCategoryMenuItems = (): MenuItem[] => {
-    if (!editMode || category.key === 'other') return [];
-    
-    const items: MenuItem[] = [];
-    
-    if (templateEditContext?.onAddCategory) {
-      items.push({
-        label: 'Добавить категорию',
-        onClick: () => templateEditContext.onAddCategory?.(),
-      });
-    }
-    
-    if (templateEditContext?.onAddField) {
-      items.push({
-        label: 'Добавить поле',
-        onClick: () => templateEditContext.onAddField?.(),
-      });
-    }
-    
-    if (templateEditContext?.onEditCategory) {
-      items.push({
-        label: 'Редактировать категорию',
-        onClick: () => templateEditContext.onEditCategory?.(category.key),
-      });
-    }
-    
-    if (templateEditContext?.onDeleteCategory) {
-      items.push({
-        label: 'Удалить категорию',
-        onClick: () => templateEditContext.onDeleteCategory?.(category.key),
-        variant: 'danger'
-      });
-    }
-    
-    return items;
-  };
 
   const getFieldMenuItems = (fieldKey: string): MenuItem[] => {
     if (!editMode) return [];
@@ -83,7 +48,8 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   };
 
   const renderCategoryActions = () => {
-    const menuItems = getCategoryMenuItems();
+    // Используем переданное меню или пустой массив
+    const menuItems = categoryMenuItems || [];
     if (menuItems.length === 0) return null;
 
     return (
@@ -127,6 +93,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
           canEdit={canEdit}
           onUpdateFieldValue={onUpdateFieldValue}
           level={level + 1}
+          categoryMenuItems={categoryMenuItems}
         />
       ))}
     </div>

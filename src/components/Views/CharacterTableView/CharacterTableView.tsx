@@ -6,6 +6,7 @@ import { categorizeCharacterFields, CategoryData } from '../../../utils/characte
 import CategoryTable from '../../Cards/CategoryCard/CategoryTable';
 import styles from './CharacterTableView.module.css';
 import { TemplateSchema } from '../../../types/groupSchemas';
+import { MenuItem } from '../../control/DropdownMenu/DropdownMenu';
 
 interface CharacterTableViewProps {
   character: Character;
@@ -13,6 +14,7 @@ interface CharacterTableViewProps {
   schema: TemplateSchema | null;
   canEdit: boolean;
   onUpdateFieldValue: (fieldKey: string, newValue: string) => void;
+  getCategoryMenuItems?: (category: CategoryData) => MenuItem[];
 }
 
 const CharacterTableView: React.FC<CharacterTableViewProps> = ({
@@ -20,6 +22,7 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
   schema,
   canEdit,
   onUpdateFieldValue,
+  getCategoryMenuItems,
 }) => {
   const categorizedFields = categorizeCharacterFields(character, schema);
 
@@ -36,6 +39,7 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
           category={category}
           canEdit={canEdit}
           onUpdateFieldValue={onUpdateFieldValue}
+          categoryMenuItems={getCategoryMenuItems ? getCategoryMenuItems(category) : undefined}
         />
       ))}
     </div>
