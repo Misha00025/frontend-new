@@ -30,7 +30,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = ({
     if (templateEditContext?.onAddCategory) {
       items.push({
         label: 'Добавить категорию',
-        onClick: () => templateEditContext.onAddCategory?.(),
+        onClick: () => templateEditContext.onAddCategory?.(category.key),
       });
     }
     

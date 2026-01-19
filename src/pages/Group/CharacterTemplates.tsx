@@ -211,62 +211,72 @@ const CharacterTemplates: React.FC = () => {
   const handleSaveCategory = (category: TemplateCategory) => {
     if (!editingSchema) return;
     
-    const updateCategoryInSchema = (
+    console.log('Сохранение категории:', {
+      category,
+      currentEditingCategory,
+      parentKey: currentEditingCategory.parentKey,
+      isNew: !currentEditingCategory.category
+    });
+
+    const addOrUpdateCategory = (
       categories: TemplateCategory[], 
-      oldName: string, 
       newCategory: TemplateCategory,
-      parentName?: string
+      parentKey?: string
     ): TemplateCategory[] => {
-      if (parentName) {
-        // Ищем родительскую категорию
-        return categories.map(cat => {
-          if (cat.name === parentName) {
-            return {
-              ...cat,
-              categories: cat.categories 
-                ? [...cat.categories.filter(c => c.name !== oldName), newCategory]
-                : [newCategory]
-            };
-          }
-          if (cat.categories) {
-            return {
-              ...cat,
-              categories: updateCategoryInSchema(cat.categories, oldName, newCategory, parentName)
-            };
-          }
-          return cat;
-        });
-      } else {
-        // Работаем с корневыми категориями
-        if (currentEditingCategory.category) {
+      if (!parentKey) {
+        // Добавление/обновление корневой категории
+        const existingIndex = categories.findIndex(c => c.name === newCategory.name);
+        if (existingIndex >= 0) {
           // Обновление существующей категории
-          return categories.map(cat => {
-            if (cat.name === oldName) {
-              return newCategory;
-            }
-            if (cat.categories) {
-              return {
-                ...cat,
-                categories: updateCategoryInSchema(cat.categories, oldName, newCategory)
-              };
-            }
-            return cat;
-          });
+          const updated = [...categories];
+          updated[existingIndex] = newCategory;
+          return updated;
         } else {
-          // Добавление новой категории в корень
+          // Добавление новой категории
           return [...categories, newCategory];
         }
       }
+      
+      // Добавление/обновление подкатегории
+      return categories.map(cat => {
+        if (cat.name === parentKey) {
+          // Нашли родительскую категорию
+          const existingIndex = (cat.categories || []).findIndex(c => c.name === newCategory.name);
+          if (existingIndex >= 0) {
+            // Обновление существующей подкатегории
+            const updatedCategories = [...(cat.categories || [])];
+            updatedCategories[existingIndex] = newCategory;
+            return {
+              ...cat,
+              categories: updatedCategories
+            };
+          } else {
+            // Добавление новой подкатегории
+            return {
+              ...cat,
+              categories: [...(cat.categories || []), newCategory]
+            };
+          }
+        }
+        
+        // Рекурсивно ищем родительскую категорию в подкатегориях
+        if (cat.categories) {
+          return {
+            ...cat,
+            categories: addOrUpdateCategory(cat.categories, newCategory, parentKey)
+          };
+        }
+        
+        return cat;
+      });
     };
-
-    const oldName = currentEditingCategory.category?.name || '';
-    const updatedCategories = updateCategoryInSchema(
+    
+    const updatedCategories = addOrUpdateCategory(
       editingSchema.categories,
-      oldName,
       category,
       currentEditingCategory.parentKey
     );
-
+  
     setEditingSchema({
       ...editingSchema,
       categories: updatedCategories
@@ -290,10 +300,6 @@ const CharacterTemplates: React.FC = () => {
       setEditingField({ field, fieldKey });
       setIsFieldModalOpen(true);
     }
-  };
-
-  const handleChangeFieldType = (fieldKey: string) => {
-    console.log('Изменение типа поля:', fieldKey);
   };
 
   const handleDeleteField = (fieldKey: string) => {
@@ -431,7 +437,6 @@ const CharacterTemplates: React.FC = () => {
     onDeleteField: handleDeleteField,
     onDeleteCategory: handleDeleteCategory,
     onEditField: handleEditField,
-    onChangeFieldType: handleChangeFieldType,
     onEditCategory: handleEditCategory,
     onMoveFieldToCategory: handleMoveFieldToCategory,
   };
