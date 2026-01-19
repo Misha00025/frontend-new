@@ -34,20 +34,23 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Останавливаем всплытие
     setIsOtherDragOver(true);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
+    e.stopPropagation(); // Останавливаем всплытие
     setIsOtherDragOver(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Останавливаем всплытие
+    
     setIsOtherDragOver(false);
     
     const fieldKey = e.dataTransfer.getData('text/plain');
     if (fieldKey && categorizedFields.other) {
-      // Обработка будет в родительском компоненте через контекст
       console.log(`Перемещаем поле ${fieldKey} в "Другое"`);
     }
   };

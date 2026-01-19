@@ -361,72 +361,97 @@ const CharacterTemplates: React.FC = () => {
     // Определяем, является ли целевая категория "Другим"
     const isTargetOther = targetCategoryKey === 'other';
   
-    if (isTargetOther) {
-      // Если перемещаем в "Другое" - удаляем поле из всех категорий схемы
-      const removeFieldFromAllCategories = (categories: TemplateCategory[]): TemplateCategory[] => {
-        return categories.map(category => ({
-          ...category,
-          fields: category.fields.filter(f => f !== fieldKey),
-          categories: category.categories ? removeFieldFromAllCategories(category.categories) : []
-        }));
-      };
+    // Функция для удаления поля из всех категорий
+    const removeFieldFromAllCategories = (categories: TemplateCategory[]): TemplateCategory[] => {
+      return categories.map(category => ({
+        ...category,
+        fields: category.fields.filter(f => f !== fieldKey),
+        categories: category.categories ? removeFieldFromAllCategories(category.categories) : []
+      }));
+    };
   
-      setEditingSchema({
-        ...editingSchema,
-        categories: removeFieldFromAllCategories(editingSchema.categories)
-      });
-    } else {
-      // Находим целевую категорию в схеме
-      const findCategory = (categories: TemplateCategory[], targetKey: string): TemplateCategory | null => {
-        for (const category of categories) {
-          if (category.name === targetKey) {
-            return category;
-          }
-          if (category.categories) {
-            const found = findCategory(category.categories, targetKey);
-            if (found) return found;
-          }
-        }
-        return null;
-      };
-  
-      // Удаляем поле из всех категорий
-      const removeFieldFromAllCategories = (categories: TemplateCategory[]): TemplateCategory[] => {
-        return categories.map(category => ({
-          ...category,
-          fields: category.fields.filter(f => f !== fieldKey),
-          categories: category.categories ? removeFieldFromAllCategories(category.categories) : []
-        }));
-      };
-  
-      // Добавляем поле в целевую категорию
-      const addFieldToCategory = (categories: TemplateCategory[], targetKey: string): TemplateCategory[] => {
-        return categories.map(category => {
-          if (category.name === targetKey) {
+    // Функция для добавления поля в конкретную категорию по ключу
+    const addFieldToCategory = (categories: TemplateCategory[], targetKey: string): TemplateCategory[] => {
+      return categories.map(category => {
+        // Проверяем, совпадает ли ключ категории (для корневых категорий)
+        if (category.name === targetKey) {
+          // Проверяем, нет ли уже такого поля в категории
+          if (!category.fields.includes(fieldKey)) {
             return {
               ...category,
               fields: [...category.fields, fieldKey]
             };
           }
-          if (category.categories) {
+          return category;
+        }
+        
+        // Проверяем вложенные категории
+        if (category.categories) {
+          // Проверяем, является ли категория родительской для целевой
+          // Например, если targetKey = "parent.child", а category.name = "parent"
+          if (targetKey.startsWith(`${category.name}.`)) {
+            // Убираем префикс родительской категории
+            const remainingKey = targetKey.substring(category.name.length + 1);
             return {
               ...category,
-              categories: addFieldToCategory(category.categories, targetKey)
+              categories: addFieldToCategory(category.categories, remainingKey)
             };
           }
-          return category;
-        });
-      };
-  
-      // Сначала удаляем поле из всех категорий, затем добавляем в целевую
-      let updatedCategories = removeFieldFromAllCategories(editingSchema.categories);
-      updatedCategories = addFieldToCategory(updatedCategories, targetCategoryKey);
-  
-      setEditingSchema({
-        ...editingSchema,
-        categories: updatedCategories
+          
+          // Обычная рекурсия для подкатегорий
+          return {
+            ...category,
+            categories: addFieldToCategory(category.categories, targetKey)
+          };
+        }
+        
+        return category;
       });
+    };
+  
+    // Функция для поиска категории по ключу
+    const findCategoryByKey = (categories: TemplateCategory[], targetKey: string): boolean => {
+      for (const category of categories) {
+        if (category.name === targetKey) {
+          return true;
+        }
+        
+        if (category.categories) {
+          // Проверяем вложенные категории
+          const remainingKey = targetKey.startsWith(`${category.name}.`) 
+            ? targetKey.substring(category.name.length + 1)
+            : targetKey;
+          
+          if (findCategoryByKey(category.categories, remainingKey)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+  
+    // Проверяем, существует ли целевая категория
+    const categoryExists = findCategoryByKey(editingSchema.categories, targetCategoryKey);
+    
+    if (!categoryExists && !isTargetOther) {
+      console.error(`Категория ${targetCategoryKey} не найдена`);
+      return;
     }
+  
+    // Сначала удаляем поле из всех категорий
+    let updatedCategories = removeFieldFromAllCategories(editingSchema.categories);
+    
+    // Если цель не "Другое", добавляем поле в целевую категорию
+    if (!isTargetOther) {
+      updatedCategories = addFieldToCategory(updatedCategories, targetCategoryKey);
+    }
+  
+    setEditingSchema({
+      ...editingSchema,
+      categories: updatedCategories
+    });
+    
+    console.log('Поле успешно перемещено');
   };
   
   // Обновляем templateEditContextValue:

@@ -58,20 +58,25 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   const handleDragOver = (e: React.DragEvent) => {
     if (editMode && category.key !== 'other') {
       e.preventDefault();
+      e.stopPropagation(); // Останавливаем всплытие
       setIsDragOver(true);
     }
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
+    e.stopPropagation(); // Останавливаем всплытие
     setIsDragOver(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Останавливаем всплытие
+    
     setIsDragOver(false);
     
     const fieldKey = e.dataTransfer.getData('text/plain');
     if (fieldKey && templateEditContext?.onMoveFieldToCategory) {
+      console.log(`Перемещаем поле ${fieldKey} в категорию ${category.key}`);
       templateEditContext.onMoveFieldToCategory(fieldKey, category.key);
     }
   };
