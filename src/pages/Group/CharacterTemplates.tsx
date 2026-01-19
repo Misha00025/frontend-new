@@ -5,6 +5,7 @@ import { CharacterTemplate, TemplateField, UpdateTemplateRequest } from '../../t
 import { characterTemplatesAPI, groupAPI } from '../../services/api';
 import commonStyles from '../../styles/common.module.css';
 import buttonStyles from '../../styles/components/Button.module.css';
+import inputStyles from '../../styles/components/Input.module.css'; // Добавляем импорт стилей для input
 import uiStyles from '../../styles/ui.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import TemplatePreview from '../../components/Views/TemplatePreview/TemplatePreview';
@@ -475,7 +476,13 @@ const CharacterTemplates: React.FC = () => {
               type="text"
               value={editingTemplate?.name || ''}
               onChange={(e) => handleUpdateTemplateInfo({ name: e.target.value })}
-              style={{ flex: 1, padding: '0.5rem', fontSize: '1.5rem', fontWeight: 'bold' }}
+              className={inputStyles.input}
+              style={{ 
+                flex: 1, 
+                fontSize: '1.5rem', 
+                fontWeight: 'bold',
+                padding: '0.75rem'
+              }}
             />
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button 
@@ -513,7 +520,13 @@ const CharacterTemplates: React.FC = () => {
           <textarea
             value={editingTemplate.description}
             onChange={(e) => handleUpdateTemplateInfo({ description: e.target.value })}
-            style={{ width: '100%', minHeight: '80px', padding: '0.5rem' }}
+            className={`${inputStyles.input}`}
+            style={{ 
+              width: '100%', 
+              minHeight: '120px', 
+              resize: 'vertical',
+              fontFamily: 'inherit'
+            }}
             placeholder="Описание шаблона..."
           />
         </div>
