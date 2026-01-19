@@ -343,6 +343,87 @@ const CharacterTemplates: React.FC = () => {
 
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
 
+  const handleMoveFieldToCategory = (fieldKey: string, targetCategoryKey: string) => {
+    if (!editingTemplate || !editingSchema) return;
+  
+    console.log(`Перемещаем поле ${fieldKey} в категорию ${targetCategoryKey}`);
+  
+    // Находим поле
+    const field = editingTemplate.fields[fieldKey];
+    if (!field) return;
+  
+    // Определяем, является ли целевая категория "Другим"
+    const isTargetOther = targetCategoryKey === 'other';
+  
+    if (isTargetOther) {
+      // Если перемещаем в "Другое" - удаляем поле из всех категорий схемы
+      const removeFieldFromAllCategories = (categories: TemplateCategory[]): TemplateCategory[] => {
+        return categories.map(category => ({
+          ...category,
+          fields: category.fields.filter(f => f !== fieldKey),
+          categories: category.categories ? removeFieldFromAllCategories(category.categories) : []
+        }));
+      };
+  
+      setEditingSchema({
+        ...editingSchema,
+        categories: removeFieldFromAllCategories(editingSchema.categories)
+      });
+    } else {
+      // Находим целевую категорию в схеме
+      const findCategory = (categories: TemplateCategory[], targetKey: string): TemplateCategory | null => {
+        for (const category of categories) {
+          if (category.name === targetKey) {
+            return category;
+          }
+          if (category.categories) {
+            const found = findCategory(category.categories, targetKey);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+  
+      // Удаляем поле из всех категорий
+      const removeFieldFromAllCategories = (categories: TemplateCategory[]): TemplateCategory[] => {
+        return categories.map(category => ({
+          ...category,
+          fields: category.fields.filter(f => f !== fieldKey),
+          categories: category.categories ? removeFieldFromAllCategories(category.categories) : []
+        }));
+      };
+  
+      // Добавляем поле в целевую категорию
+      const addFieldToCategory = (categories: TemplateCategory[], targetKey: string): TemplateCategory[] => {
+        return categories.map(category => {
+          if (category.name === targetKey) {
+            return {
+              ...category,
+              fields: [...category.fields, fieldKey]
+            };
+          }
+          if (category.categories) {
+            return {
+              ...category,
+              categories: addFieldToCategory(category.categories, targetKey)
+            };
+          }
+          return category;
+        });
+      };
+  
+      // Сначала удаляем поле из всех категорий, затем добавляем в целевую
+      let updatedCategories = removeFieldFromAllCategories(editingSchema.categories);
+      updatedCategories = addFieldToCategory(updatedCategories, targetCategoryKey);
+  
+      setEditingSchema({
+        ...editingSchema,
+        categories: updatedCategories
+      });
+    }
+  };
+  
+  // Обновляем templateEditContextValue:
   const templateEditContextValue = {
     editMode,
     onAddField: handleAddField,
@@ -352,6 +433,7 @@ const CharacterTemplates: React.FC = () => {
     onEditField: handleEditField,
     onChangeFieldType: handleChangeFieldType,
     onEditCategory: handleEditCategory,
+    onMoveFieldToCategory: handleMoveFieldToCategory,
   };
 
   return (

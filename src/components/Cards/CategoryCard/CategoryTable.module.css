@@ -12,11 +12,19 @@
   background: var(--bg-primary);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+  min-height: 100px;
 }
 
 .categorySection.subcategory {
   margin-bottom: 0.25rem;
   border: 0px;
+}
+
+.categorySection.dragOver {
+  background-color: color-mix(in srgb, var(--accent-color) 15%, transparent);
+  border: 2px dashed var(--accent-color);
+  transform: scale(1.02);
 }
 
 .categoryTitle {
@@ -33,6 +41,11 @@
   align-items: center;
   position: relative;
   padding: 0 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.categorySection.dragOver .categoryTitle {
+  background-color: color-mix(in srgb, var(--accent-color) 80%, #ff9800);
 }
 
 .titleCenter {
@@ -52,6 +65,10 @@
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 0.5rem;
+}
+
+.dragging {
+  opacity: 0.5;
 }
 
 /* Мобильная версия */

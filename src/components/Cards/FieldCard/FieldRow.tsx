@@ -11,6 +11,8 @@ interface FieldRowProps {
   menuItems?: MenuItem[];
   onValueChange?: (newValue: string) => void;
   editable?: boolean;
+  draggable?: boolean;
+  onDragStart?: (e: React.DragEvent, fieldKey: string) => void;
 }
 
 const FieldRow: React.FC<FieldRowProps> = ({
@@ -19,7 +21,9 @@ const FieldRow: React.FC<FieldRowProps> = ({
   showMenu = false,
   menuItems = [],
   onValueChange,
-  editable = false
+  editable = false,
+  draggable = false,
+  onDragStart
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(field.value.toString());
@@ -32,6 +36,12 @@ const FieldRow: React.FC<FieldRowProps> = ({
       editInputRef.current.select();
     }
   }, [isEditing]);
+
+  const handleDragStart = (e: React.DragEvent) => {
+    if (draggable && onDragStart) {
+      onDragStart(e, fieldKey);
+    }
+  };
 
   const formatValue = (field: CharacterField) => {
     if (field.maxValue !== undefined) {
@@ -120,7 +130,12 @@ const FieldRow: React.FC<FieldRowProps> = ({
   };
 
   return (
-    <tr className={styles.row}>
+    <tr 
+      className={styles.row}
+      draggable={draggable}
+      onDragStart={handleDragStart}
+      style={{ cursor: draggable ? 'grab' : 'default' }}
+    >
       <td className={styles.nameCell}>
         <div className={styles.nameContent}>
           <span className={styles.fieldName}>{field.name}</span>

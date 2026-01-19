@@ -1,10 +1,10 @@
 // components/Views/CharacterTableView/CategoryTable.tsx
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { CategoryData } from '../../../utils/characterFields';
 import styles from './CategoryTable.module.css';
 import { TemplateEditContext } from '../../../contexts/TemplateEditContext';
-import FieldRow from '../FieldCard/FieldRow';
 import DropdownMenu, { MenuItem } from '../../control/DropdownMenu/DropdownMenu';
+import FieldRow from '../FieldCard/FieldRow';
 
 interface CategoryTableProps {
   category: CategoryData;
@@ -23,6 +23,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
 }) => {
   const templateEditContext = useContext(TemplateEditContext);
   const editMode = templateEditContext?.editMode || false;
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const getFieldMenuItems = (fieldKey: string): MenuItem[] => {
     if (!editMode) return [];
@@ -33,6 +34,13 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
       items.push({
         label: 'Редактировать поле',
         onClick: () => templateEditContext.onEditField?.(fieldKey),
+      });
+    }
+    
+    if (templateEditContext?.onChangeFieldType) {
+      items.push({
+        label: 'Изменить тип',
+        onClick: () => templateEditContext.onChangeFieldType?.(fieldKey),
       });
     }
     
@@ -47,8 +55,42 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
     return items;
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    if (editMode && category.key !== 'other') {
+      e.preventDefault();
+      setIsDragOver(true);
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const fieldKey = e.dataTransfer.getData('text/plain');
+    if (fieldKey && templateEditContext?.onMoveFieldToCategory) {
+      templateEditContext.onMoveFieldToCategory(fieldKey, category.key);
+    }
+  };
+
+  const handleDragStart = (e: React.DragEvent, fieldKey: string) => {
+    e.dataTransfer.setData('text/plain', fieldKey);
+    e.dataTransfer.effectAllowed = 'move';
+    
+    // Добавляем визуальную обратную связь
+    const element = e.currentTarget as HTMLElement;
+    element.classList.add(styles.dragging);
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    const element = e.currentTarget as HTMLElement;
+    element.classList.remove(styles.dragging);
+  };
+
   const renderCategoryActions = () => {
-    // Используем переданное меню или пустой массив
     const menuItems = categoryMenuItems || [];
     if (menuItems.length === 0) return null;
 
@@ -63,9 +105,18 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   };
 
   return (
-    <div className={`${styles.categorySection} ${level > 0 ? styles.subcategory : ''}`} style={{ margin: level > 0 ? `${level * 4}px` : '0' }}>
+    <div 
+      className={`${styles.categorySection} ${level > 0 ? styles.subcategory : ''} ${isDragOver ? styles.dragOver : ''}`}
+      style={{ margin: level > 0 ? `${level * 4}px` : '0' }}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <h3 className={styles.categoryTitle}>
-        <span className={styles.titleCenter}>{category.name}</span>
+        <span className={styles.titleCenter}>
+          {category.name}
+          {isDragOver && <span style={{ marginLeft: '0.5rem' }}>← Перетащите сюда</span>}
+        </span>
         {renderCategoryActions()}
       </h3>
       
@@ -81,6 +132,8 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
                 menuItems={getFieldMenuItems(fieldKey)}
                 onValueChange={(newValue) => onUpdateFieldValue(fieldKey, newValue)}
                 editable={false}
+                draggable={editMode}
+                onDragStart={handleDragStart}
               />
             ))}
           </tbody>
