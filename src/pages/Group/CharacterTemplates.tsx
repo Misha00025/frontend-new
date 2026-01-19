@@ -1,25 +1,43 @@
 // CharacterTemplates.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { CharacterTemplate } from '../../types/characterTemplates';
+import { CharacterTemplate, TemplateField, UpdateTemplateRequest } from '../../types/characterTemplates';
 import { characterTemplatesAPI, groupAPI } from '../../services/api';
 import commonStyles from '../../styles/common.module.css';
 import buttonStyles from '../../styles/components/Button.module.css';
 import uiStyles from '../../styles/ui.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import TemplatePreview from '../../components/Views/TemplatePreview/TemplatePreview';
-import { TemplateSchema } from '../../types/groupSchemas';
+import { TemplateSchema, TemplateCategory } from '../../types/groupSchemas';
 import IconButton from '../../components/commons/Buttons/IconButton/IconButton';
 import { TemplateEditProvider } from '../../contexts/TemplateEditContext';
+import CategoryModal from '../../components/Modals/CharacterModal/CategoryModal';
+import TemplateFieldModal from '../../components/Modals/CharacterFieldModal/TemplateFieldModal';
 
 const CharacterTemplates: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
-  const [template, setTemplate] = useState<CharacterTemplate | null>(null);
-  const [schema, setSchema] = useState<TemplateSchema | null>(null);
+  const [originalTemplate, setOriginalTemplate] = useState<CharacterTemplate | null>(null);
+  const [originalSchema, setOriginalSchema] = useState<TemplateSchema | null>(null);
+  
+  // Локальные копии для редактирования
+  const [editingTemplate, setEditingTemplate] = useState<CharacterTemplate | null>(null);
+  const [editingSchema, setEditingSchema] = useState<TemplateSchema | null>(null);
+  
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
   const { canEditTemplates } = useActionPermissions();
+
+  // Состояния для модальных окон
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [currentEditingCategory, setCurrentEditingCategory] = useState<{category: TemplateCategory | null; parentKey?: string}>({ category: null });
+  const [isFieldModalOpen, setIsFieldModalOpen] = useState(false);
+  const [editingField, setEditingField] = useState<{ field: TemplateField | null; fieldKey: string }>({ field: null, fieldKey: '' });
+
+  // Рефы для сохранения значений перед редактированием
+  const templateBeforeEdit = useRef<CharacterTemplate | null>(null);
+  const schemaBeforeEdit = useRef<TemplateSchema | null>(null);
 
   useEffect(() => {
     if (groupId) {
@@ -32,12 +50,15 @@ const CharacterTemplates: React.FC = () => {
       setLoading(true);
       const templatesData = await characterTemplatesAPI.getTemplates(parseInt(groupId!));
       if (templatesData.length > 0) {
-        setTemplate(templatesData[0]);
+        setOriginalTemplate(templatesData[0]);
+        setEditingTemplate(templatesData[0]);
       } else {
-        setTemplate(null);
+        setOriginalTemplate(null);
+        setEditingTemplate(null);
       }
       const templateSchema = await groupAPI.getTemplateSchema(groupId ? Number(groupId) : 0);
-      setSchema(templateSchema);
+      setOriginalSchema(templateSchema);
+      setEditingSchema(templateSchema);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load template');
     } finally {
@@ -52,27 +73,257 @@ const CharacterTemplates: React.FC = () => {
         description: '',
         fields: {}
       });
-      setTemplate(newTemplate);
+      setOriginalTemplate(newTemplate);
+      setEditingTemplate(newTemplate);
       setEditMode(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create template');
     }
   };
 
-  const handleAddField = () => {
-    console.log('Добавить поле в шаблон');
+  // Вход в режим редактирования
+  const handleEnterEditMode = () => {
+    if (!editingTemplate || !editingSchema) return;
+    
+    // Сохраняем текущие состояния для возможной отмены
+    templateBeforeEdit.current = JSON.parse(JSON.stringify(editingTemplate));
+    schemaBeforeEdit.current = JSON.parse(JSON.stringify(editingSchema));
+    setEditMode(true);
   };
 
+  // Выход из режима редактирования без сохранения
+  const handleCancelEdit = () => {
+    if (templateBeforeEdit.current) {
+      setEditingTemplate(templateBeforeEdit.current);
+    }
+    if (schemaBeforeEdit.current) {
+      setEditingSchema(schemaBeforeEdit.current);
+    }
+    setEditMode(false);
+  };
+
+  // Сохранение всех изменений
+  const handleSaveAllChanges = async () => {
+    if (!editingTemplate || !editingSchema) return;
+
+    try {
+      setSaving(true);
+      setError(null);
+
+      // 1. Сохраняем шаблон (все поля)
+      const templateUpdateData: UpdateTemplateRequest = {
+        name: editingTemplate.name,
+        description: editingTemplate.description,
+        fields: editingTemplate.fields
+      };
+
+      await characterTemplatesAPI.updateTemplate(
+        parseInt(groupId!), 
+        editingTemplate.id, 
+        templateUpdateData
+      );
+
+      // 2. Сохраняем схему
+      await groupAPI.updateTemplateSchema(
+        Number(groupId), 
+        editingSchema
+      );
+
+      // Обновляем оригинальные данные
+      setOriginalTemplate(editingTemplate);
+      setOriginalSchema(editingSchema);
+      setEditMode(false);
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save changes');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Обработчики для категорий
   const handleAddCategory = () => {
-    console.log('Добавить категорию в шаблон');
+    setCurrentEditingCategory({ category: null });
+    setIsCategoryModalOpen(true);
   };
 
-  const handleDeleteField = (fieldKey: string) => {
-    console.log('Удалить поле:', fieldKey);
+  const handleEditCategory = (categoryKey: string) => {
+    if (!editingSchema) return;
+    
+    const findCategoryInSchema = (categories: TemplateCategory[], key: string): {category: TemplateCategory | null; parentKey?: string} => {
+      for (const category of categories) {
+        if (category.name === key) {
+          return { category };
+        }
+        if (category.categories) {
+          const found = findCategoryInSchema(category.categories, key);
+          if (found.category) {
+            return { category: found.category, parentKey: category.name };
+          }
+        }
+      }
+      return { category: null };
+    };
+
+    const result = findCategoryInSchema(editingSchema.categories, categoryKey);
+    if (result.category) {
+      setCurrentEditingCategory(result);
+      setIsCategoryModalOpen(true);
+    }
   };
 
   const handleDeleteCategory = (categoryKey: string) => {
-    console.log('Удалить категорию:', categoryKey);
+    if (!editingSchema || !window.confirm(`Удалить категорию "${categoryKey}"? Все поля в этой категории будут перемещены в "Другое".`)) {
+      return;
+    }
+
+    const removeCategoryFromSchema = (categories: TemplateCategory[], categoryName: string): TemplateCategory[] => {
+      return categories
+        .filter(category => category.name !== categoryName)
+        .map(category => ({
+          ...category,
+          categories: category.categories ? removeCategoryFromSchema(category.categories, categoryName) : []
+        }));
+    };
+
+    const updatedCategories = removeCategoryFromSchema(editingSchema.categories, categoryKey);
+    setEditingSchema({
+      ...editingSchema,
+      categories: updatedCategories
+    });
+  };
+
+  const handleSaveCategory = (category: TemplateCategory) => {
+    if (!editingSchema) return;
+    
+    const updateCategoryInSchema = (
+      categories: TemplateCategory[], 
+      oldName: string, 
+      newCategory: TemplateCategory,
+      parentName?: string
+    ): TemplateCategory[] => {
+      if (parentName) {
+        // Ищем родительскую категорию
+        return categories.map(cat => {
+          if (cat.name === parentName) {
+            return {
+              ...cat,
+              categories: cat.categories 
+                ? updateCategoryInSchema(cat.categories, oldName, newCategory)
+                : [newCategory]
+            };
+          }
+          if (cat.categories) {
+            return {
+              ...cat,
+              categories: updateCategoryInSchema(cat.categories, oldName, newCategory, parentName)
+            };
+          }
+          return cat;
+        });
+      } else {
+        // Работаем с корневыми категориями
+        if (currentEditingCategory.category) {
+          // Обновление существующей категории
+          return categories.map(cat => {
+            if (cat.name === oldName) {
+              return newCategory;
+            }
+            if (cat.categories) {
+              return {
+                ...cat,
+                categories: updateCategoryInSchema(cat.categories, oldName, newCategory)
+              };
+            }
+            return cat;
+          });
+        } else {
+          // Добавление новой категории
+          return [...categories, newCategory];
+        }
+      }
+    };
+
+    const oldName = currentEditingCategory.category?.name || '';
+    const updatedCategories = updateCategoryInSchema(
+      editingSchema.categories,
+      oldName,
+      category,
+      currentEditingCategory.parentKey
+    );
+
+    setEditingSchema({
+      ...editingSchema,
+      categories: updatedCategories
+    });
+    
+    setIsCategoryModalOpen(false);
+    setCurrentEditingCategory({ category: null });
+  };
+
+  // Обработчики для полей
+  const handleAddField = () => {
+    setEditingField({ field: null, fieldKey: '' });
+    setIsFieldModalOpen(true);
+  };
+
+  const handleEditField = (fieldKey: string) => {
+    if (!editingTemplate) return;
+    
+    const field = editingTemplate.fields[fieldKey];
+    if (field) {
+      setEditingField({ field, fieldKey });
+      setIsFieldModalOpen(true);
+    }
+  };
+
+  const handleChangeFieldType = (fieldKey: string) => {
+    console.log('Изменение типа поля:', fieldKey);
+  };
+
+  const handleDeleteField = (fieldKey: string) => {
+    if (!editingTemplate || !window.confirm(`Удалить поле "${editingTemplate.fields[fieldKey]?.name}"?`)) {
+      return;
+    }
+
+    const updatedFields = { ...editingTemplate.fields };
+    delete updatedFields[fieldKey];
+    
+    setEditingTemplate({
+      ...editingTemplate,
+      fields: updatedFields
+    });
+  };
+
+  const handleSaveField = (field: TemplateField, fieldKey: string) => {
+    if (!editingTemplate) return;
+    
+    let updatedFields = { ...editingTemplate.fields };
+    
+    if (editingField.field && editingField.fieldKey !== fieldKey) {
+      // Если изменился ключ поля, удаляем старый и добавляем новый
+      delete updatedFields[editingField.fieldKey];
+    }
+    
+    updatedFields[fieldKey] = field;
+    
+    setEditingTemplate({
+      ...editingTemplate,
+      fields: updatedFields
+    });
+    
+    setIsFieldModalOpen(false);
+    setEditingField({ field: null, fieldKey: '' });
+  };
+
+  // Обновление названия и описания шаблона
+  const handleUpdateTemplateInfo = (updates: { name?: string; description?: string }) => {
+    if (!editingTemplate) return;
+    
+    setEditingTemplate({
+      ...editingTemplate,
+      ...updates
+    });
   };
 
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
@@ -83,29 +334,71 @@ const CharacterTemplates: React.FC = () => {
     onAddCategory: handleAddCategory,
     onDeleteField: handleDeleteField,
     onDeleteCategory: handleDeleteCategory,
+    onEditField: handleEditField,
+    onChangeFieldType: handleChangeFieldType,
+    onEditCategory: handleEditCategory,
   };
 
   return (
     <div className={commonStyles.container}>
       <div className={uiStyles.actions} style={{ marginBottom: '1.5rem' }}>
-        <h1 style={{ margin: 0, marginRight: 'auto' }}>Шаблон персонажей</h1>
-        
-        {canEditTemplates && template && (
-          <IconButton 
-            title={editMode ? "Выйти из режима редактирования" : "Редактировать шаблон"}
-            icon={editMode ? "close" : "edit"}
-            onClick={() => setEditMode(!editMode)}
-          />
+        {editMode ? (
+          <div style={{ display: 'flex', gap: '1rem', width: '100%', alignItems: 'center' }}>
+            <input
+              type="text"
+              value={editingTemplate?.name || ''}
+              onChange={(e) => handleUpdateTemplateInfo({ name: e.target.value })}
+              style={{ flex: 1, padding: '0.5rem', fontSize: '1.5rem', fontWeight: 'bold' }}
+            />
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button 
+                className={buttonStyles.button}
+                onClick={handleSaveAllChanges}
+                disabled={saving}
+              >
+                {saving ? 'Сохранение...' : 'Сохранить'}
+              </button>
+              <IconButton 
+                title="Отменить редактирование"
+                icon="close"
+                onClick={handleCancelEdit}
+              />
+            </div>
+          </div>
+        ) : (
+          <>
+            <h1 style={{ margin: 0, marginRight: 'auto' }}>
+              {originalTemplate?.name || 'Шаблон персонажей'}
+            </h1>
+            {canEditTemplates && originalTemplate && (
+              <IconButton 
+                title="Редактировать шаблон"
+                icon="edit"
+                onClick={handleEnterEditMode}
+              />
+            )}
+          </>
         )}
       </div>
 
+      {editMode && editingTemplate && (
+        <div style={{ marginBottom: '1rem' }}>
+          <textarea
+            value={editingTemplate.description}
+            onChange={(e) => handleUpdateTemplateInfo({ description: e.target.value })}
+            style={{ width: '100%', minHeight: '80px', padding: '0.5rem' }}
+            placeholder="Описание шаблона..."
+          />
+        </div>
+      )}
+
       {error && <div className={commonStyles.error}>{error}</div>}
 
-      {template ? (
+      {originalTemplate ? (
         <TemplateEditProvider value={templateEditContextValue}>
           <TemplatePreview 
-            template={template} 
-            schema={schema || {categories: []}} 
+            template={editMode && editingTemplate ? editingTemplate : originalTemplate} 
+            schema={editMode && editingSchema ? editingSchema : (originalSchema || {categories: []})} 
           />
         </TemplateEditProvider>
       ) : (
@@ -121,6 +414,30 @@ const CharacterTemplates: React.FC = () => {
           )}
         </div>
       )}
+
+      {/* Модальные окна */}
+      <CategoryModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => {
+          setIsCategoryModalOpen(false);
+          setCurrentEditingCategory({ category: null });
+        }}
+        onSave={handleSaveCategory}
+        category={currentEditingCategory.category}
+        title={currentEditingCategory.category ? 'Редактирование категории' : 'Создание категории'}
+      />
+
+      <TemplateFieldModal
+        isOpen={isFieldModalOpen}
+        onClose={() => {
+          setIsFieldModalOpen(false);
+          setEditingField({ field: null, fieldKey: '' });
+        }}
+        onSave={handleSaveField}
+        field={editingField.field}
+        fieldKey={editingField.fieldKey}
+        title={editingField.field ? 'Редактирование поля' : 'Создание поля'}
+      />
     </div>
   );
 };

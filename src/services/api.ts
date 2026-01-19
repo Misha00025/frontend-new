@@ -272,7 +272,7 @@ export const groupAPI = {
     }
   },
 
-  updateTemplateSchema: async (groupId: number): Promise<TemplateSchema> => {
+  updateTemplateSchema: async (groupId: number, schema: TemplateSchema): Promise<TemplateSchema> => {
     const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/schemas/template`, {
       method: 'PUT',
       headers: {
@@ -364,7 +364,7 @@ export const characterTemplatesAPI = {
   },
 
   updateTemplate: async (groupId: number, templateId: number, templateData: UpdateTemplateRequest): Promise<CharacterTemplate> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates/${templateId}`, {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
