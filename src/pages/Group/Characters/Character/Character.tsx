@@ -9,6 +9,7 @@ import CharacterTableView from '../CharacterTableView/CharacterTableView';
 import { TemplateSchema } from '../../../../types/groupSchemas';
 import { CategoryData } from '../../../../utils/characterFields';
 import { MenuItem } from '../../../../components/commons/DropdownMenu/DropdownMenu';
+import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -17,6 +18,7 @@ const Character: React.FC = () => {
   const [schema, setSchema] = useState<TemplateSchema | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const {canEditCharacterFields} = useActionPermissions()
 
   useEffect(() => {
     if (groupId && characterId) {
@@ -110,7 +112,8 @@ const Character: React.FC = () => {
           character={character}
           template={template}
           schema={schema}
-          canEdit={false}
+          canEdit={canEditCharacterFields}
+          canEditCategories={false}
           onUpdateFieldValue={handleUpdateFieldValue}
           getCategoryMenuItems={getCategoryMenuItems}
           hideZero={true}

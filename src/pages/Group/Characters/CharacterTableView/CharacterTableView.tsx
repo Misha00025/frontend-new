@@ -15,6 +15,7 @@ interface CharacterTableViewProps {
   canEdit: boolean;
   onUpdateFieldValue: (fieldKey: string, newValue: string) => void;
   getCategoryMenuItems?: (category: CategoryData) => MenuItem[];
+  canEditCategories?: boolean;
   hideZero?: boolean;
 
 }
@@ -25,7 +26,8 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
   canEdit,
   onUpdateFieldValue,
   getCategoryMenuItems,
-  hideZero
+  canEditCategories,
+  hideZero,
 }) => {
   const [isOtherDragOver, setIsOtherDragOver] = useState(false);
   const categorizedFields = categorizeCharacterFields(character, schema);
@@ -33,6 +35,10 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
   // Если нет категорий, не отображаем таблицу
   if (Object.keys(categorizedFields).length === 0) {
     return null;
+  }
+
+  if (canEditCategories === undefined){
+    canEditCategories = canEdit
   }
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -67,12 +73,12 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
           canEdit={canEdit}
           onUpdateFieldValue={onUpdateFieldValue}
           categoryMenuItems={getCategoryMenuItems ? getCategoryMenuItems(category) : undefined}
-          hideZero
+          hideZero={hideZero}
         />
       ))}
       
       {/* Специальная зона для "Другого", если её нет в categorizedFields */}
-      {!categorizedFields.other && canEdit && (
+      {!categorizedFields.other && canEdit && canEditCategories && (
         <div 
           className={`${styles.otherDropZone} ${isOtherDragOver ? styles.dragOver : ''}`}
           onDragOver={handleDragOver}

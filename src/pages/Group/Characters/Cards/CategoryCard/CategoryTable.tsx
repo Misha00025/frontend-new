@@ -21,7 +21,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   onUpdateFieldValue,
   level = 0,
   categoryMenuItems,
-  hideZero,
+  hideZero = false,
 }) => {
   const templateEditContext = useContext(TemplateEditContext);
   const editMode = templateEditContext?.editMode || false;
@@ -131,7 +131,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
         <table className={styles.table}>
           <tbody>
             {category.fields.map(([fieldKey, field]) => (
-              !(hideZero && field.value === 0 && !(field.maxValue)) && 
+              !(hideZero && (field.value === 0 && field.maxValue === undefined)) && 
               <FieldRow
                 key={fieldKey}
                 field={field}
@@ -139,7 +139,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
                 showMenu={editMode}
                 menuItems={getFieldMenuItems(fieldKey)}
                 onValueChange={(newValue) => onUpdateFieldValue(fieldKey, newValue)}
-                editable={false}
+                editable={canEdit}
                 draggable={editMode}
                 onDragStart={handleDragStart}
               />
@@ -155,6 +155,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
           onUpdateFieldValue={onUpdateFieldValue}
           level={level + 1}
           categoryMenuItems={categoryMenuItems}
+          hideZero={hideZero}
         />
       ))}
     </div>
