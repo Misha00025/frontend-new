@@ -8,7 +8,7 @@ import { CharacterTemplate } from '../../../../types/characterTemplates';
 import CharacterTableView from '../CharacterTableView/CharacterTableView';
 import { TemplateSchema } from '../../../../types/groupSchemas';
 import { CategoryData } from '../../../../utils/characterFields';
-import { MenuItem } from '../../../../components/control/DropdownMenu/DropdownMenu';
+import { MenuItem } from '../../../../components/commons/DropdownMenu/DropdownMenu';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();

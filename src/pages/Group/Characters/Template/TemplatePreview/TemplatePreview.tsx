@@ -6,7 +6,7 @@ import CharacterTableView from '../../CharacterTableView/CharacterTableView';
 import { TemplateSchema } from '../../../../../types/groupSchemas';
 import { TemplateEditContext } from '../../../../../contexts/TemplateEditContext';
 import { CategoryData } from '../../../../../utils/characterFields';
-import { MenuItem } from '../../../../../components/control/DropdownMenu/DropdownMenu';
+import { MenuItem } from '../../../../../components/commons/DropdownMenu/DropdownMenu';
 
 interface TemplatePreviewProps {
   template: CharacterTemplate;

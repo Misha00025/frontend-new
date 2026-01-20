@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CharacterField } from '../../../../../types/characters';
 import styles from './FieldRow.module.css';
-import DropdownMenu, { MenuItem } from '../../../../../components/control/DropdownMenu/DropdownMenu';
+import DropdownMenu, { MenuItem } from '../../../../../components/commons/DropdownMenu/DropdownMenu';
 
 interface FieldRowProps {
   field: CharacterField;

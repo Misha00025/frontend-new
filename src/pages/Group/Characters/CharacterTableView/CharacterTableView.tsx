@@ -6,7 +6,7 @@ import { categorizeCharacterFields, CategoryData } from '../../../../utils/chara
 import CategoryTable from '../Cards/CategoryCard/CategoryTable';
 import styles from './CharacterTableView.module.css';
 import { TemplateSchema } from '../../../../types/groupSchemas';
-import { MenuItem } from '../../../../components/control/DropdownMenu/DropdownMenu';
+import { MenuItem } from '../../../../components/commons/DropdownMenu/DropdownMenu';
 
 interface CharacterTableViewProps {
   character: Character;
