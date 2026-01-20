@@ -6,24 +6,23 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { GroupProvider } from './contexts/GroupContext';
 import { useProfile } from './hooks/useProfile';
 import Sidebar from './components/commons/Sidebar/Sidebar';
-import Login from './pages/Login';
-import CompleteRegistration from './pages/CompleteRegistration';
+import CompleteRegistration from './pages/Authorisation/CompleteRegistration';
 import Dashboard from './pages/Dashboard';
 import Groups from './pages/Groups';
 import GroupDashboard from './pages/Group/GroupDashboard';
 import GroupUsers from './pages/Group/GroupUsers';
-import CharacterTemplates from './pages/Group/CharacterTemplates';
-import Characters from './pages/Group/Characters';
-import Character from './pages/Character/Character';
-import CharacterUsers from './pages/Character/CharacterUsers';
-import CharacterItems from './pages/Character/CharacterItems';
+import CharacterTemplates from './pages/Group/Characters/Template/CharacterTemplates';
+import Characters from './pages/Group/Characters/Characters';
+import Character from './pages/Group/Characters/Character/Character';
+import CharacterItems from './pages/Group/Characters/Character/CharacterItems';
 import GroupItems from './pages/Group/GroupItems';
 import Profile from './pages/Profile';
 import './styles/globals.css';
 import { PermissionsProvider } from './contexts/PermissionsContext';
 import WorkInProgress from './pages/WorkInProgress';
 import GroupSkills from './pages/Group/GroupSkills';
-import CharacterSkills from './pages/Character/CharacterSkills';
+import CharacterSkills from './pages/Group/Characters/Character/CharacterSkills';
+import Login from './pages/Authorisation/Login';
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
@@ -71,7 +70,6 @@ const AppContent: React.FC = () => {
         <Route path="/group/:groupId/characters" element={<Characters />} />
         <Route path="/group/:groupId/skills" element={<GroupSkills />} />
         <Route path="/group/:groupId/character/:characterId" element={<Character />} />
-        <Route path="/group/:groupId/character/:characterId/users" element={<CharacterUsers />} />
         <Route path="/group/:groupId/character/:characterId/items" element={<CharacterItems />} />
         <Route path="/group/:groupId/character/:characterId/skills" element={<CharacterSkills />} />
         <Route path="/group/:groupId/items" element={<GroupItems />} />

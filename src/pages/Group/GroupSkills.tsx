@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupSkill } from '../../types/groupSkills';
 import { groupAPI, groupSkillsAPI } from '../../services/api';
-import SkillCard from '../../components/Cards/SkillCard/SkillCard';
-import SkillModal from '../../components/Modals/SkillModal/SkillModal';
+import SkillCard from './Cards/SkillCard/SkillCard';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import ResourcePage from '../../components/commons/Pages/ResourcePage/ResourcePage';
-import SchemaModal from '../../components/Modals/ShcemaModal/SchemaModal';
+import SchemaModal from './Modals/ShcemaModal/SchemaModal';
+import SkillModal from './Modals/SkillModal/SkillModal';
 
 const SkillCardWrapper: React.FC<{
   item: GroupSkill;

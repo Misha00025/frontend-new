@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupItem } from '../../types/groupItems';
 import { groupItemsAPI, groupAPI } from '../../services/api'; // Добавьте импорт groupAPI
-import ItemCard from '../../components/Cards/ItemCard/ItemCard';
-import GroupItemModal from '../../components/Modals/ItemModal/GroupItemModal';
+import GroupItemModal from './Modals/ItemModal/GroupItemModal';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import ResourcePage from '../../components/commons/Pages/ResourcePage/ResourcePage';
-import SchemaModal from '../../components/Modals/ShcemaModal/SchemaModal';
+import SchemaModal from './Modals/ShcemaModal/SchemaModal';
+import ItemCard from './Cards/ItemCard/ItemCard';
 
 const ItemCardWrapper: React.FC<{
   item: GroupItem;
