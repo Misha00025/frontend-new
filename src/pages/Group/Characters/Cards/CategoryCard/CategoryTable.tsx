@@ -12,6 +12,7 @@ interface CategoryTableProps {
   onUpdateFieldValue: (fieldKey: string, newValue: string) => void;
   level?: number;
   categoryMenuItems?: MenuItem[];
+  hideZero?: boolean;
 }
 
 const CategoryTable: React.FC<CategoryTableProps> = ({
@@ -20,6 +21,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   onUpdateFieldValue,
   level = 0,
   categoryMenuItems,
+  hideZero,
 }) => {
   const templateEditContext = useContext(TemplateEditContext);
   const editMode = templateEditContext?.editMode || false;
@@ -129,6 +131,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
         <table className={styles.table}>
           <tbody>
             {category.fields.map(([fieldKey, field]) => (
+              !(hideZero && field.value === 0 && !(field.maxValue)) && 
               <FieldRow
                 key={fieldKey}
                 field={field}

@@ -113,6 +113,7 @@ const Character: React.FC = () => {
           canEdit={false}
           onUpdateFieldValue={handleUpdateFieldValue}
           getCategoryMenuItems={getCategoryMenuItems}
+          hideZero={true}
         />
       </div>
     </div>

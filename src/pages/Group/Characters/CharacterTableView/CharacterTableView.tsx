@@ -15,6 +15,8 @@ interface CharacterTableViewProps {
   canEdit: boolean;
   onUpdateFieldValue: (fieldKey: string, newValue: string) => void;
   getCategoryMenuItems?: (category: CategoryData) => MenuItem[];
+  hideZero?: boolean;
+
 }
 
 const CharacterTableView: React.FC<CharacterTableViewProps> = ({
@@ -23,6 +25,7 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
   canEdit,
   onUpdateFieldValue,
   getCategoryMenuItems,
+  hideZero
 }) => {
   const [isOtherDragOver, setIsOtherDragOver] = useState(false);
   const categorizedFields = categorizeCharacterFields(character, schema);
@@ -64,6 +67,7 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
           canEdit={canEdit}
           onUpdateFieldValue={onUpdateFieldValue}
           categoryMenuItems={getCategoryMenuItems ? getCategoryMenuItems(category) : undefined}
+          hideZero
         />
       ))}
       
