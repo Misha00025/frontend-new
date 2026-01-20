@@ -26,6 +26,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   const templateEditContext = useContext(TemplateEditContext);
   const editMode = templateEditContext?.editMode || false;
   const [isDragOver, setIsDragOver] = useState(false);
+  const draggableFields = templateEditContext?.onMoveFieldToCategory !== undefined && editMode
 
   const getFieldMenuItems = (fieldKey: string): MenuItem[] => {
     if (!editMode) return [];
@@ -140,7 +141,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
                 menuItems={getFieldMenuItems(fieldKey)}
                 onValueChange={(newValue) => onUpdateFieldValue(fieldKey, newValue)}
                 editable={canEdit}
-                draggable={editMode}
+                draggable={draggableFields}
                 onDragStart={handleDragStart}
               />
             ))}

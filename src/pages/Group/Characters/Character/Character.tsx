@@ -10,6 +10,7 @@ import { TemplateSchema } from '../../../../types/groupSchemas';
 import { CategoryData } from '../../../../utils/characterFields';
 import { MenuItem } from '../../../../components/commons/DropdownMenu/DropdownMenu';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
+import { TemplateEditContext, TemplateEditContextType } from '../../../../contexts/TemplateEditContext';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -99,6 +100,12 @@ const Character: React.FC = () => {
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
   if (!character) return <div className={commonStyles.container}>Персонаж не найден</div>;
 
+  const conf: TemplateEditContextType = {
+    editMode: true,
+    onEditField: (e) => undefined,
+    onDeleteField: (e) => undefined
+  }
+
   return (
     <div className={commonStyles.container}>
       <h1 style={{ marginBottom: '2px' }}>{character.name}</h1> 
@@ -108,16 +115,18 @@ const Character: React.FC = () => {
       
       <div className={uiStyles.fields} style={{ marginTop: '0px' }}>
         <h2>Поля персонажа</h2>
-        <CharacterTableView
-          character={character}
-          template={template}
-          schema={schema}
-          canEdit={canEditCharacterFields}
-          canEditCategories={false}
-          onUpdateFieldValue={handleUpdateFieldValue}
-          getCategoryMenuItems={getCategoryMenuItems}
-          hideZero={true}
-        />
+        <TemplateEditContext value={conf}>
+          <CharacterTableView
+            character={character}
+            template={template}
+            schema={schema}
+            canEdit={canEditCharacterFields}
+            canEditCategories={false}
+            onUpdateFieldValue={handleUpdateFieldValue}
+            getCategoryMenuItems={getCategoryMenuItems}
+            hideZero={true}
+          />
+        </TemplateEditContext>
       </div>
     </div>
   );
