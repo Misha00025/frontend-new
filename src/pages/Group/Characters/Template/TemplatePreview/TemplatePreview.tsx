@@ -37,7 +37,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = ({
     if (templateEditContext?.onAddField) {
       items.push({
         label: 'Добавить поле',
-        onClick: () => templateEditContext.onAddField?.(),
+        onClick: () => templateEditContext.onAddField?.(category.key),
       });
     }
     

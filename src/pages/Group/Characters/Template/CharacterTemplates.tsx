@@ -39,6 +39,7 @@ const CharacterTemplates: React.FC = () => {
   }>({ category: null });
   const [isFieldModalOpen, setIsFieldModalOpen] = useState(false);
   const [editingField, setEditingField] = useState<{ field: TemplateField | null; fieldKey: string }>({ field: null, fieldKey: '' });
+  const [currentCategoryKey, setCurrentCategoryKey]= useState<string|null>(null)
 
   // Рефы для сохранения значений перед редактированием
   const templateBeforeEdit = useRef<CharacterTemplate | null>(null);
@@ -48,7 +49,8 @@ const CharacterTemplates: React.FC = () => {
     if (groupId) {
       loadTemplate();
     }
-  }, [groupId]);
+    setCurrentCategoryKey(null);
+  }, [groupId, editMode]);
 
   const loadTemplate = async () => {
     try {
@@ -90,20 +92,12 @@ const CharacterTemplates: React.FC = () => {
   const handleEnterEditMode = () => {
     if (!editingTemplate || !editingSchema) return;
     
-    // Сохраняем текущие состояния для возможной отмены
-    templateBeforeEdit.current = JSON.parse(JSON.stringify(editingTemplate));
-    schemaBeforeEdit.current = JSON.parse(JSON.stringify(editingSchema));
     setEditMode(true);
   };
 
   // Выход из режима редактирования без сохранения
   const handleCancelEdit = () => {
-    if (templateBeforeEdit.current) {
-      setEditingTemplate(templateBeforeEdit.current);
-    }
-    if (schemaBeforeEdit.current) {
-      setEditingSchema(schemaBeforeEdit.current);
-    }
+    
     setEditMode(false);
   };
 
@@ -288,8 +282,9 @@ const CharacterTemplates: React.FC = () => {
   };
 
   // Обработчики для полей
-  const handleAddField = () => {
+  const handleAddField = (categoryKey?:string) => {
     setEditingField({ field: null, fieldKey: '' });
+    setCurrentCategoryKey(categoryKey !== undefined ? categoryKey : null)
     setIsFieldModalOpen(true);
   };
 
@@ -326,16 +321,19 @@ const CharacterTemplates: React.FC = () => {
       // Если изменился ключ поля, удаляем старый и добавляем новый
       delete updatedFields[editingField.fieldKey];
     }
-    
     updatedFields[fieldKey] = field;
-    
     setEditingTemplate({
       ...editingTemplate,
       fields: updatedFields
     });
-    
+    console.log("Шаблон изменён")
     setIsFieldModalOpen(false);
     setEditingField({ field: null, fieldKey: '' });
+
+    if (currentCategoryKey !== null){
+      handleMoveFieldToCategory(fieldKey, currentCategoryKey);
+    }
+    setCurrentCategoryKey(null);
   };
 
   // Обновление названия и описания шаблона
@@ -357,7 +355,10 @@ const CharacterTemplates: React.FC = () => {
   
     // Находим поле
     const field = editingTemplate.fields[fieldKey];
-    if (!field) return;
+    if (!field && !currentCategoryKey) {
+      console.log(`Поле ${fieldKey} не найдено`);
+      return;
+    }
   
     // Определяем, является ли целевая категория "Другим"
     const isTargetOther = targetCategoryKey === 'other';
@@ -386,20 +387,14 @@ const CharacterTemplates: React.FC = () => {
           return category;
         }
         
-        // Проверяем вложенные категории
         if (category.categories) {
-          // Проверяем, является ли категория родительской для целевой
-          // Например, если targetKey = "parent.child", а category.name = "parent"
           if (targetKey.startsWith(`${category.name}.`)) {
-            // Убираем префикс родительской категории
             const remainingKey = targetKey.substring(category.name.length + 1);
             return {
               ...category,
               categories: addFieldToCategory(category.categories, remainingKey)
             };
           }
-          
-          // Обычная рекурсия для подкатегорий
           return {
             ...category,
             categories: addFieldToCategory(category.categories, targetKey)
@@ -431,7 +426,6 @@ const CharacterTemplates: React.FC = () => {
       return false;
     };
   
-    // Проверяем, существует ли целевая категория
     const categoryExists = findCategoryByKey(editingSchema.categories, targetCategoryKey);
     
     if (!categoryExists && !isTargetOther) {
@@ -439,11 +433,10 @@ const CharacterTemplates: React.FC = () => {
       return;
     }
   
-    // Сначала удаляем поле из всех категорий
     let updatedCategories = removeFieldFromAllCategories(editingSchema.categories);
     
-    // Если цель не "Другое", добавляем поле в целевую категорию
     if (!isTargetOther) {
+      console.log(`Помещаем поле ${fieldKey} в категорию ${targetCategoryKey}`);
       updatedCategories = addFieldToCategory(updatedCategories, targetCategoryKey);
     }
   
@@ -545,7 +538,7 @@ const CharacterTemplates: React.FC = () => {
           </button>
           <button 
             className={buttonStyles.button}
-            onClick={handleAddField}
+            onClick={() => handleAddField()}
           >
             + Добавить поле (без категории)
           </button>
