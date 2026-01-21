@@ -72,6 +72,7 @@ const CharacterTableView: React.FC<CharacterTableViewProps> = ({
           category={category}
           canEdit={canEdit}
           onUpdateFieldValue={onUpdateFieldValue}
+          getSubcategoryMenuItems={getCategoryMenuItems}
           categoryMenuItems={getCategoryMenuItems ? getCategoryMenuItems(category) : undefined}
           hideZero={hideZero}
         />

@@ -10,6 +10,7 @@ interface CategoryTableProps {
   category: CategoryData;
   canEdit: boolean;
   onUpdateFieldValue: (fieldKey: string, newValue: string) => void;
+  getSubcategoryMenuItems?: (category: CategoryData) => MenuItem[];
   level?: number;
   categoryMenuItems?: MenuItem[];
   hideZero?: boolean;
@@ -19,6 +20,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
   category,
   canEdit,
   onUpdateFieldValue,
+  getSubcategoryMenuItems,
   level = 0,
   categoryMenuItems,
   hideZero = false,
@@ -154,8 +156,9 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
           category={subcategory}
           canEdit={canEdit}
           onUpdateFieldValue={onUpdateFieldValue}
+          getSubcategoryMenuItems={getSubcategoryMenuItems}
           level={level + 1}
-          categoryMenuItems={categoryMenuItems}
+          categoryMenuItems={getSubcategoryMenuItems ? getSubcategoryMenuItems(subcategory) : []}
           hideZero={hideZero}
         />
       ))}

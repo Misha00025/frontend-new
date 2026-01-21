@@ -4,13 +4,14 @@ import { Character as CharacterData, CharacterField } from '../../../../types/ch
 import { charactersAPI, characterTemplatesAPI, groupAPI } from '../../../../services/api';
 import commonStyles from '../../../../styles/common.module.css';
 import uiStyles from './Character.module.css';
-import { CharacterTemplate } from '../../../../types/characterTemplates';
+import { CharacterTemplate, TemplateField } from '../../../../types/characterTemplates';
 import CharacterTableView from '../CharacterTableView/CharacterTableView';
 import { TemplateSchema } from '../../../../types/groupSchemas';
 import { CategoryData } from '../../../../utils/characterFields';
 import { MenuItem } from '../../../../components/commons/DropdownMenu/DropdownMenu';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import { TemplateEditContext, TemplateEditContextType } from '../../../../contexts/TemplateEditContext';
+import AddFieldModal from '../Modals/AddFieldModal/AddFieldModal';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -18,6 +19,8 @@ const Character: React.FC = () => {
   const [template, setTemplate] = useState<CharacterTemplate | null>(null);
   const [schema, setSchema] = useState<TemplateSchema | null>(null);
   const [loading, setLoading] = useState(false);
+  const [fieldAdding, setFieldAdding] = useState(false);
+  const [availableCategoryFields, setAvailableCategoryFields] = useState<{key: string, field:TemplateField}[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const {canEditCharacterFields} = useActionPermissions();
 
@@ -81,15 +84,23 @@ const Character: React.FC = () => {
     }
   };
 
+  const startAddCategoryItems = (category: CategoryData) => {
+    if (!template) return;
+    const fields = category.fields.filter(([key, val]) => val.value === 0 && !val.maxValue).map((value) => {return {key: value[0], field:template.fields[value[0]]}})
+    setAvailableCategoryFields(fields)
+    setFieldAdding(true)
+  }
+
   const getCategoryMenuItems = (category: CategoryData): MenuItem[] => {
     const items: MenuItem[] = [];
     if (canEditCharacterFields){
-      items.push({
-        label: 'Добавить поле в категорию',
-        onClick: () => {
-          console.log(`Добавить поле в категорию: ${category.name}`);
-        },
-      });
+      const fields = category.fields.filter(([key, val]) => val.value === 0 && !val.maxValue)
+      if (fields.length > 0){
+        items.push({
+          label: 'Добавить поле в категорию',
+          onClick: () => { startAddCategoryItems(category) },
+        });
+      }
     }
     return items;
   };
@@ -99,8 +110,8 @@ const Character: React.FC = () => {
 
   const conf: TemplateEditContextType = {
     editMode: canEditCharacterFields,
-    onEditField: (e) => undefined,
-    onDeleteField: (e) => undefined
+    // onEditField: (e) => undefined,
+    // onDeleteField: (e) => undefined
   }
 
   return (
@@ -125,7 +136,15 @@ const Character: React.FC = () => {
           />
         </TemplateEditContext>
       </div>
+      <AddFieldModal
+        isOpen={fieldAdding}
+        onClose={() => setFieldAdding(false)}
+        onSave={(key) => handleUpdateFieldValue(key, '1')}
+        availableFields={availableCategoryFields || []}
+      />
     </div>
+
+    
   );
 };
 
