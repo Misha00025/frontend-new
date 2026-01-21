@@ -19,7 +19,7 @@ const Character: React.FC = () => {
   const [schema, setSchema] = useState<TemplateSchema | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const {canEditCharacterFields} = useActionPermissions()
+  const {canEditCharacterFields} = useActionPermissions();
 
   useEffect(() => {
     if (groupId && characterId) {
@@ -81,19 +81,16 @@ const Character: React.FC = () => {
     }
   };
 
-  // Функция для создания меню категорий в персонаже
   const getCategoryMenuItems = (category: CategoryData): MenuItem[] => {
-    // В персонаже можно только добавлять поля в категории
     const items: MenuItem[] = [];
-    
-    // Пример: добавить поле в категорию
-    items.push({
-      label: 'Добавить поле в категорию',
-      onClick: () => {
-        console.log(`Добавить поле в категорию: ${category.name}`);
-      },
-    });
-    
+    if (canEditCharacterFields){
+      items.push({
+        label: 'Добавить поле в категорию',
+        onClick: () => {
+          console.log(`Добавить поле в категорию: ${category.name}`);
+        },
+      });
+    }
     return items;
   };
 
@@ -101,7 +98,7 @@ const Character: React.FC = () => {
   if (!character) return <div className={commonStyles.container}>Персонаж не найден</div>;
 
   const conf: TemplateEditContextType = {
-    editMode: true,
+    editMode: canEditCharacterFields,
     onEditField: (e) => undefined,
     onDeleteField: (e) => undefined
   }

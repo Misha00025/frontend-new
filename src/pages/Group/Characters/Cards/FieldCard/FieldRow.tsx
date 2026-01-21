@@ -102,16 +102,12 @@ const FieldRow: React.FC<FieldRowProps> = ({
       );
     }
 
-    if (field.maxValue !== undefined) {
-      return renderProgressBar(field);
-    }
-
     return (
       <div 
         className={editable ? styles.editableValue : styles.value}
         onClick={() => editable && setIsEditing(true)}
       >
-        {formatValue(field) || '—'}
+        {field.maxValue !== undefined ? renderProgressBar(field) : formatValue(field) || '—'}
       </div>
     );
   };
