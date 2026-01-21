@@ -11,6 +11,7 @@ interface TemplateFieldModalProps {
   field: TemplateField | null;
   fieldKey: string;
   title: string;
+  fullEditMode?: boolean;
 }
 
 const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
@@ -19,7 +20,8 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
   onSave,
   field,
   fieldKey,
-  title
+  title,
+  fullEditMode = true
 }) => {
   const [name, setName] = useState('');
   const [value, setValue] = useState<number | ''>(0);
@@ -122,41 +124,44 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
         {error && <div className={styles.error}>{error}</div>}
         
         <form onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
-            <label>Название поля:</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => { setName(e.target.value); setKey(generateFieldKey(e.target.value)) }}
-              onBlur={handleGenerateKey}
-              className={inputStyles.input}
-              required
-            />
-          </div>
 
-          <div className={styles.formGroup}>
-            <label>Ключ поля:</label>
-            <div className={styles.keyInputGroup}>
-              <input
-                type="text"
-                value={key}
-                onChange={(e) => setKey(e.target.value)}
-                className={inputStyles.input}
-                required
-              />
-              <button 
-                type="button" 
-                onClick={handleGenerateKey}
-                className={buttonStyles.button}
-              >
-                Сгенерировать
-              </button>
-            </div>
-            <small className={styles.helpText}>
-              Ключ будет использоваться в системе (только латинские буквы, цифры и _)
-            </small>
-          </div>
-
+          {(fullEditMode &&
+            <>
+              <div className={styles.formGroup}>
+                <label>Название поля:</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => { setName(e.target.value); setKey(generateFieldKey(e.target.value)) }}
+                  onBlur={handleGenerateKey}
+                  className={inputStyles.input}
+                  required
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Ключ поля:</label>
+                <div className={styles.keyInputGroup}>
+                  <input
+                    type="text"
+                    value={key}
+                    onChange={(e) => setKey(e.target.value)}
+                    className={inputStyles.input}
+                    required
+                  />
+                  <button 
+                    type="button" 
+                    onClick={handleGenerateKey}
+                    className={buttonStyles.button}
+                  >
+                    Сгенерировать
+                  </button>
+                </div>
+                <small className={styles.helpText}>
+                  Ключ будет использоваться в системе (только латинские буквы, цифры и _)
+                </small>
+              </div>
+            </>
+          )}
           <div className={styles.formGroup}>
             <label>Формула:</label>
             <input
@@ -167,7 +172,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
             />
           </div>
 
-          <div className={styles.formGroup}>
+          {fullEditMode && <div className={styles.formGroup}>
             <label>Значение по умолчанию:</label>
             <input
               type="number"
@@ -177,31 +182,35 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
               className={inputStyles.input}
               required
             />
-          </div>
-
-          {!isModifier && <div className={styles.formGroup}>
-            <label>
-              <input
-                type="checkbox"
-                checked={isProperty}
-                className={inputStyles.input}
-                onChange={(e) => setIsProperty(e.target.checked)}
-              />
-              Поле с максимальным значением
-            </label>
           </div>}
 
-          {!isProperty && <div className={styles.formGroup}>
-            <label>
-              <input
-                type="checkbox"
-                checked={isModifier}
-                className={inputStyles.input}
-                onChange={(e) => setIsModifier(e.target.checked)}
-              />
-              Поле с модификатором
-            </label>
-          </div>}
+          {fullEditMode &&
+            <>
+              {!isModifier && <div className={styles.formGroup}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={isProperty}
+                    className={inputStyles.input}
+                    onChange={(e) => setIsProperty(e.target.checked)}
+                  />
+                  Поле с максимальным значением
+                </label>
+              </div>}
+
+              {!isProperty && <div className={styles.formGroup}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={isModifier}
+                    className={inputStyles.input}
+                    onChange={(e) => setIsModifier(e.target.checked)}
+                  />
+                  Поле с модификатором
+                </label>
+              </div>}
+            </>
+          }
 
           { isProperty && (
             <div className={styles.formGroup}>
@@ -228,7 +237,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
               />
             </div>
           )}
-          <div className={styles.formGroup}>
+          {fullEditMode && <div className={styles.formGroup}>
             <label>Описание поля:</label>
             <textarea
               value={description}
@@ -236,7 +245,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
               className={inputStyles.input}
               rows={3}
             />
-          </div>
+          </div>}
 
           <div className={styles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>

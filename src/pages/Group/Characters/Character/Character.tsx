@@ -11,6 +11,7 @@ import { CategoryData } from '../../../../utils/characterFields';
 import { MenuItem } from '../../../../components/commons/DropdownMenu/DropdownMenu';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import { TemplateEditContext, TemplateEditContextType } from '../../../../contexts/TemplateEditContext';
+import TemplateFieldModal from '../Modals/CharacterFieldModal/TemplateFieldModal';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -18,10 +19,10 @@ const Character: React.FC = () => {
   const [template, setTemplate] = useState<CharacterTemplate | null>(null);
   const [schema, setSchema] = useState<TemplateSchema | null>(null);
   const [loading, setLoading] = useState(false);
-  const [fieldAdding, setFieldAdding] = useState(false);
-  const [availableCategoryFields, setAvailableCategoryFields] = useState<{key: string, field:TemplateField}[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const {canEditCharacterFields} = useActionPermissions();
+  const [isFieldModalOpen, setIsFieldModalOpen] = useState(false);
+  const [editingField, setEditingField] = useState<{ field: TemplateField | null; fieldKey: string }>({ field: null, fieldKey: '' });
 
   useEffect(() => {
     if (groupId && characterId) {
@@ -83,6 +84,17 @@ const Character: React.FC = () => {
     }
   };
 
+  const handleDeleteField = async (fieldKey: string) => {
+    const fields = { [fieldKey] : null }
+    try{
+      const updatedCharacter = await charactersAPI.updateCharacter(Number(groupId), Number(characterId), {fields: fields});
+      setCharacter(updatedCharacter)
+    }
+    catch(err){
+      setError(err instanceof Error ? err.message : 'Failed to delete field');
+    }
+  }
+
   const getCategoryMenuItems = (category: CategoryData): MenuItem[] => {
     const items: MenuItem[] = [];
     if (canEditCharacterFields){
@@ -99,13 +111,27 @@ const Character: React.FC = () => {
     return items;
   };
 
+  const handleSaveField = async (field: TemplateField, fieldKey: string) => {
+    const fields = { [fieldKey] : field }
+    try{
+      const updatedCharacter = await charactersAPI.updateCharacter(Number(groupId), Number(characterId), {fields: fields});
+      setCharacter(updatedCharacter)
+    }
+    catch(err){
+      setError(err instanceof Error ? err.message : 'Failed to delete field');
+    }
+    
+    setIsFieldModalOpen(false);
+    setEditingField({ field: null, fieldKey: '' });
+  };
+
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
   if (!character) return <div className={commonStyles.container}>Персонаж не найден</div>;
 
   const conf: TemplateEditContextType = {
     editMode: canEditCharacterFields,
-    // onEditField: (e) => undefined,
-    // onDeleteField: (e) => undefined
+    onEditField: (key) => { setEditingField({fieldKey: key, field: character.fields[key]}); setIsFieldModalOpen(true) },
+    onDeleteField: handleDeleteField
   }
 
   return (
@@ -130,9 +156,21 @@ const Character: React.FC = () => {
           />
         </TemplateEditContext>
       </div>
+      <TemplateFieldModal
+        isOpen={isFieldModalOpen && editingField.field !== null}
+        onClose={() => {
+          setIsFieldModalOpen(false);
+          setEditingField({ field: null, fieldKey: '' });
+        }}
+        onSave={handleSaveField}
+        field={editingField.field}
+        fieldKey={editingField.fieldKey}
+        title={`Редактирование поля ${editingField.field?.name}`}
+        fullEditMode={false}
+      />
     </div>
 
-    
+
   );
 };
 
