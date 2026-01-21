@@ -11,7 +11,6 @@ import { CategoryData } from '../../../../utils/characterFields';
 import { MenuItem } from '../../../../components/commons/DropdownMenu/DropdownMenu';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import { TemplateEditContext, TemplateEditContextType } from '../../../../contexts/TemplateEditContext';
-import AddFieldModal from '../Modals/AddFieldModal/AddFieldModal';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -84,22 +83,17 @@ const Character: React.FC = () => {
     }
   };
 
-  const startAddCategoryItems = (category: CategoryData) => {
-    if (!template) return;
-    const fields = category.fields.filter(([key, val]) => val.value === 0 && !val.maxValue).map((value) => {return {key: value[0], field:template.fields[value[0]]}})
-    setAvailableCategoryFields(fields)
-    setFieldAdding(true)
-  }
-
   const getCategoryMenuItems = (category: CategoryData): MenuItem[] => {
     const items: MenuItem[] = [];
     if (canEditCharacterFields){
-      const fields = category.fields.filter(([key, val]) => val.value === 0 && !val.maxValue)
+      const fields = category.fields.filter(([key, val]) => val.value === 0 && !val.maxValue && template?.fields[key] !== undefined)
       if (fields.length > 0){
-        items.push({
-          label: 'Добавить поле в категорию',
-          onClick: () => { startAddCategoryItems(category) },
-        });
+        fields.map(([key, value]) => 
+          items.push({
+            label: `Добавить \'${value.name}\'`,
+            onClick: () => { handleUpdateFieldValue(key, '1') },
+          })
+        );
       }
     }
     return items;
@@ -136,12 +130,6 @@ const Character: React.FC = () => {
           />
         </TemplateEditContext>
       </div>
-      <AddFieldModal
-        isOpen={fieldAdding}
-        onClose={() => setFieldAdding(false)}
-        onSave={(key) => handleUpdateFieldValue(key, '1')}
-        availableFields={availableCategoryFields || []}
-      />
     </div>
 
     
