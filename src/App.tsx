@@ -5,7 +5,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { GroupProvider } from './contexts/GroupContext';
 import { useProfile } from './hooks/useProfile';
-import GlobalSidebar from './components/commons/GlobalSidebar/GlobalSidebar';
 import CompleteRegistration from './pages/Authorisation/CompleteRegistration';
 import Dashboard from './pages/Dashboard';
 import Groups from './pages/Groups';
@@ -29,14 +28,7 @@ import GroupSkills from './pages/Group/GroupSkills';
 import Login from './pages/Authorisation/Login';
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <div>
-      <GlobalSidebar />
-      <div style={{ paddingTop: '60px' }}>
-        {children}
-      </div>
-    </div>
-  );
+  return <>{children}</>;
 };
 
 const AppContent: React.FC = () => {

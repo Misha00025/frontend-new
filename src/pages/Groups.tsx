@@ -5,6 +5,7 @@ import { groupAPI } from '../services/api';
 import { useGroup } from '../contexts/GroupContext';
 import CreateGroupModal from '../components/Modals/CreateGroupModal/CreateGroupModal';
 import GroupCard from '../components/Cards/GroupCard';
+import GlobalSidebar from '../components/commons/GlobalSidebar/GlobalSidebar';
 import List from '../components/List/List';
 import buttonStyles from '../styles/components/Button.module.css';
 import commonStyles from '../styles/common.module.css';
@@ -45,11 +46,13 @@ const Groups: React.FC = () => {
     navigate(`/group/${newGroup.id}`);
   };
 
-  if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
-  if (error) return <div className={commonStyles.container}>Ошибка: {error}</div>;
+  if (loading) return <div style={{ paddingTop: '60px' }}><GlobalSidebar /><div className={commonStyles.container}>Загрузка...</div></div>;
+  if (error) return <div style={{ paddingTop: '60px' }}><GlobalSidebar /><div className={commonStyles.container}>Ошибка: {error}</div></div>;
 
   return (
-    <div className={commonStyles.container}>
+    <div style={{ paddingTop: '60px' }}>
+      <GlobalSidebar />
+      <div className={commonStyles.container}>
       <h1>Мои группы</h1>
 
       <div className={commonStyles.actions}>
@@ -76,6 +79,7 @@ const Groups: React.FC = () => {
         onClose={() => setIsCreateModalOpen(false)}
         onGroupCreated={handleGroupCreated}
       />
+    </div>
     </div>
   );
 };
