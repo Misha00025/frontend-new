@@ -12,7 +12,11 @@ const navItems: NavItem[] = [
   { id: 'profile', label: 'Профиль', icon: '👤', path: '/profile' },
 ];
 
-const SidebarDrawer: React.FC = () => {
+interface SidebarDrawerProps {
+  inline?: boolean;
+}
+
+const SidebarDrawer: React.FC<SidebarDrawerProps> = ({ inline = false }) => {
   const { isOpen, open, close } = useSidebar();
   const { logout } = useAuth();
   const location = useLocation();
@@ -29,7 +33,7 @@ const SidebarDrawer: React.FC = () => {
 
   return (
     <>
-      <button className={styles.hamburger} onClick={open}>
+      <button className={inline ? styles.hamburgerInline : styles.hamburger} onClick={open}>
         ☰
       </button>
 

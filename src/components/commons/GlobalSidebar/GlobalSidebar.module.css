@@ -3,10 +3,21 @@
   top: 12px;
   left: 12px;
   z-index: 110;
-  background: var(--sidebar-bg, #1e1e2e);
-  color: var(--sidebar-text, #cdd6f4);
-  border: none;
-  font-size: 24px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #000);
+  border: 1px solid var(--border-color, #e0e0e0);
+  font-size: 20px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.hamburgerInline {
+  position: static;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #000);
+  border: 1px solid var(--border-color, #e0e0e0);
+  font-size: 20px;
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
@@ -25,9 +36,10 @@
   top: 0;
   height: 100vh;
   width: 300px;
-  background: var(--sidebar-bg, #1e1e2e);
-  color: var(--sidebar-text, #cdd6f4);
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #000);
   z-index: 210;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.15);
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease;
@@ -46,7 +58,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
 }
 
 .drawerTitle {
@@ -85,11 +97,11 @@
 }
 
 .navItem:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-hover, rgba(0,0,0,0.05));
 }
 
 .navItem.active {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--bg-active, rgba(0,0,0,0.08));
 }
 
 .icon {
@@ -107,7 +119,7 @@
   flex-direction: column;
   gap: 8px;
   padding: 12px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--border-color, #e0e0e0);
 }
 
 .footerBtn {
@@ -127,5 +139,5 @@
 }
 
 .footerBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-hover, rgba(0,0,0,0.05));
 }

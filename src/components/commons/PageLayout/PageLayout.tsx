@@ -1,6 +1,7 @@
 import React from 'react';
 import Breadcrumbs, { BreadcrumbItem } from './Breadcrumbs';
 import TabBar, { TabItem } from './TabBar';
+import GlobalSidebar from '../GlobalSidebar/GlobalSidebar';
 import styles from './PageLayout.module.css';
 
 export interface PageLayoutProps {
@@ -22,7 +23,10 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 }) => {
   return (
     <>
-      <Breadcrumbs items={breadcrumbs} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <GlobalSidebar mode="inline" />
+        <Breadcrumbs items={breadcrumbs} />
+      </div>
       {header && <div className={styles.pageHeader}>{header}</div>}
       <TabBar
         tabs={tabs}
