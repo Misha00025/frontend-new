@@ -87,6 +87,7 @@ const AppContent: React.FC = () => {
           <Route path="notes" element={<CharacterNotes />} />
         </Route>
         <Route path="/profile" element={<Profile />} />
+        <Route path="/login" element={<Navigate to="/dashboard" replace />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </AppLayout>
