@@ -263,9 +263,9 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
             {selectedGroupItem && (
               <div className={styles.selectedItem}>
                 <h3>Выбранный предмет:</h3>
-                <div className={styles.itemCard}>
-                  <h4 className={styles.itemName}>{selectedGroupItem.name}</h4>
-                  <p className={styles.itemDescription}>{selectedGroupItem.description}</p>
+                <div className={selectStyles.listItem}>
+                  <h4 className={selectStyles.itemName}>{selectedGroupItem.name}</h4>
+                  <p className={selectStyles.itemDescription}>{selectedGroupItem.description}</p>
                   <p className={styles.itemPrice}>Цена: {selectedGroupItem.price}</p>
                   {selectedGroupItem.attributes && selectedGroupItem.attributes.length > 0 && (
                     <div className={selectStyles.attributes}>
@@ -286,7 +286,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
               </div>
             )}
 
-            <div className={styles.itemsList}>
+            <div className={selectStyles.sectionList}>
               <h3>Доступные предметы ({filteredItems.length})</h3>
               
               {filteredItems.length === 0 ? (

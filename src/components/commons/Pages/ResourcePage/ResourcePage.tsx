@@ -5,6 +5,7 @@ import SearchBar from '../../../../components/commons/Search/SearchBar';
 import CollapsibleGroup from '../../CollapsibleGroup/CollapsibleGroup';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import commonStyles from '../../../../styles/common.module.css';
+import modalStyles from '../../../../styles/modal.module.css';
 import styles from './ResourcePage.module.css';
 import { usePlatform } from '../../../../hooks/usePlatform';
 import { Group, groupByAttributes } from '../../../../utils/groupByAttributes';
@@ -140,7 +141,7 @@ const ResourcePage = <T extends {
         </div>
       </div>
       
-      {error && <div className={commonStyles.error}>{error}</div>}
+      {error && <div className={modalStyles.error}>{error}</div>}
       
       <div className={styles.headerControls}>
         <div className={styles.searchContainer}>

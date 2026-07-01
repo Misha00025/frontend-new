@@ -8,6 +8,7 @@ import { characterTemplatesAPI } from '../../../services/api';
 import CharacterModal from './Modals/CharacterModal/CharacterModal';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import commonStyles from '../../../styles/common.module.css';
+import modalStyles from '../../../styles/modal.module.css';
 import List from '../../../components/List/List';
 import CharacterCard from '../Cards/CharacterCard/CharacterCard';
 import { useActionPermissions } from '../../../hooks/useActionPermissions';
@@ -70,7 +71,7 @@ const Characters: React.FC = () => {
     <div className={commonStyles.container}>
       <h1>Персонажи группы</h1>
 
-      {error && <div className={commonStyles.error}>{error}</div>}
+      {error && <div className={modalStyles.error}>{error}</div>}
       {canEditGroup && (
         <div className={commonStyles.actions}>
           <button 

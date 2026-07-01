@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
-import styles from './CharacterSkillModal.module.css';
 import selectStyles from '../../../../styles/select-list.module.css';
 import { GroupSkill } from '../../../../types/groupSkills';
 import { CharacterSkill } from '../../../../types/characterSkills';
@@ -129,7 +128,7 @@ const CharacterSkillModal: React.FC<CharacterSkillModalProps> = ({
           </div>
         </div>
 
-        <div className={styles.skillsList}>
+        <div className={selectStyles.sectionList}>
           <h3>Доступные способности ({filteredSkills.length})</h3>
           
           {filteredSkills.length === 0 ? (

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import buttonStyles from '../../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../../styles/components/Input.module.css';
 import modalStyles from '../../../../../styles/modal.module.css';
-import styles from './CharacterTemplateModal.module.css';
 import { TemplateCategory } from '../../../../../types/groupSchemas';
 
 interface CategoryModalProps {
