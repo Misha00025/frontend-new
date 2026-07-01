@@ -1,27 +1,4 @@
 /* components/Modals/SkillAttributesModal.module.css */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal {
-  background-color: var(--bg-primary);
-  padding: 2rem;
-  border-radius: var(--border-radius-md);
-  width: 95%;
-  max-width: 900px;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
 .attributesTable {
   margin-bottom: 2rem;
 }
@@ -113,28 +90,8 @@
   align-items: end;
 }
 
-.buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-}
-
-.error {
-  color: red;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  background-color: #ffeeee;
-  border-radius: var(--border-radius-sm);
-}
-
 /* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
-  .modal {
-    padding: 1rem;
-    width: 98%;
-    max-height: 90vh;
-  }
-  
   .tableHeader,
   .tableRow {
     grid-template-columns: 60px 1fr 1fr;

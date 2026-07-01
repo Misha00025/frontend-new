@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TemplateField } from '../../../../../types/characterTemplates';
 import buttonStyles from '../../../../../styles/components/Button.module.css';
+import modalStyles from '../../../../../styles/modal.module.css';
 import styles from './AddFieldModal.module.css';
 import IconButton from '../../../../../components/commons/Buttons/IconButton/IconButton';
 
@@ -31,11 +32,11 @@ const AddFieldModal: React.FC<AddFieldModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>Добавить поле в категорию</h2>
 
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
 
         {availableFields.length === 0 ? (
           <div className={styles.emptyState}>
@@ -64,7 +65,7 @@ const AddFieldModal: React.FC<AddFieldModalProps> = ({
           </div>
         )}
 
-        <div className={styles.buttons}>
+        <div className={modalStyles.buttons}>
           <button
             type="button"
             onClick={onClose}

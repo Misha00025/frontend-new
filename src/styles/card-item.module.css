@@ -1,11 +1,11 @@
-.skillCard {
+.card {
   background-color: var(--bg-secondary);
   border-radius: var(--border-radius-md);
   margin-bottom: 1rem;
   overflow: hidden;
   border: 1px solid var(--border-color);
 }
-  
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -24,7 +24,7 @@
   min-width: 0;
 }
 
-.skillName {
+.name {
   margin: 0 0 0.5rem 0;
   white-space: nowrap;
   overflow: hidden;

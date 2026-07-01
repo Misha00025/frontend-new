@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { GroupItem } from '../../../../types/groupItems';
 import { CharacterItem } from '../../../../types/characterItems';
 import styles from './ItemCard.module.css';
+import cardStyles from '../../../../styles/card-item.module.css';
 import ReactMarkdown from 'react-markdown';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
 
@@ -57,23 +58,23 @@ const ItemCard: React.FC<ItemCardProps> = ({
   const extendedAttributes = getExtendedAttributes();
 
   return (
-    <div className={item.isSecret && !isCharacterItem ? styles.itemCardHide : styles.itemCard}>
-      <div className={styles.header} onClick={() => setIsExpanded(!isExpanded)}>
+    <div className={item.isSecret && !isCharacterItem ? styles.itemCardHide : cardStyles.card}>
+      <div className={cardStyles.header} onClick={() => setIsExpanded(!isExpanded)}>
         {item.image_link && (
           <img src={item.image_link} alt={item.name} className={styles.itemImage} />
         )}
-        <div className={styles.titleSection}>
-          <h3 className={styles.itemName} title={item.name}>{item.name}</h3>
-          <div className={styles.attributesPreview}>
+        <div className={cardStyles.titleSection}>
+          <h3 className={cardStyles.name} title={item.name}>{item.name}</h3>
+          <div className={cardStyles.attributesPreview}>
             {extendedAttributes.map(attr => (
-              <span key={attr.key} className={styles.attributeTag}>
+              <span key={attr.key} className={cardStyles.attributeTag}>
                 {attr.name}: {attr.value}
               </span>
             ))}
           </div>
         </div>
         <button 
-          className={styles.expandButton}
+          className={cardStyles.expandButton}
           onClick={(e) => {
             e.stopPropagation();
             setIsExpanded(!isExpanded);
@@ -83,12 +84,12 @@ const ItemCard: React.FC<ItemCardProps> = ({
         </button>
       </div>
       {isExpanded && (
-        <div className={styles.expandedContent}>
-          <div className={styles.description}>
+        <div className={cardStyles.expandedContent}>
+          <div className={cardStyles.description}>
             <ReactMarkdown>{item.description}</ReactMarkdown>
           </div>
           {showActions && (
-            <div className={styles.actions}>
+            <div className={cardStyles.actions}>
               {onEdit && (
                 <IconButton 
                   icon="edit" 

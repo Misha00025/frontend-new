@@ -62,13 +62,6 @@
     white-space: nowrap;
   }
 
-  .card {
-    background-color: var(--bg-secondary);
-    padding: 1.5rem;
-    border-radius: var(--border-radius-md);
-    margin-bottom: 1.5rem;
-  }
-
   .fields {
     margin-top: 2rem;
   }
@@ -126,8 +119,15 @@
     border-radius: var(--border-radius-sm);
   }
 
-  .actions {
+  .actionsTop {
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .radioGroup {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
   }

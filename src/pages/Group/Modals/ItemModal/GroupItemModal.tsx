@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GroupItem, CreateGroupItemRequest, UpdateGroupItemRequest } from '../../../../types/groupItems';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
-import styles from './GroupItemModal.module.css';
+import modalStyles from '../../../../styles/modal.module.css';
 import { SkillAttribute } from '../../../../types/groupSkills';
 import { generateKey } from '../../../../utils/generateKey';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
@@ -132,8 +132,8 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
     const showCustomInput = true;
 
       return (
-        <div className={styles.attributeValueContainer}>
-            <div className={styles.customInputContainer}>
+        <div className={modalStyles.attributeValueContainer}>
+            <div className={modalStyles.customInputContainer}>
               <input
                 type="text"
                 value={customValues[attr.key] || currentValue}
@@ -176,14 +176,14 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>{title}</h2>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
         
         <form onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Название:</label>
             <input
               type="text"
@@ -194,7 +194,7 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
             />
           </div>
 
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Описание:</label>
             <textarea
               value={description}
@@ -205,7 +205,7 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
             />
           </div>
 
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Цена:</label>
             <input
               type="number"
@@ -217,7 +217,7 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
             />
           </div>
 
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Ссылка на изображение (в разработке):</label>
             <input
               type="text"
@@ -227,15 +227,15 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
             />
           </div>
 
-          <div className={styles.attributesSection}>
+          <div className={modalStyles.attributesSection}>
             <h3>Атрибуты предмета</h3>
             
             {attributes.map((attr, index) => {
               return (
-                <div key={index} className={styles.attributeItem}>
-                  <div className={styles.attributeContent}>
-                    <div className={styles.attributeHeader}>
-                      <span className={styles.attributeName}>{attr.name}</span>
+                <div key={index} className={modalStyles.attributeItem}>
+                  <div className={modalStyles.attributeContent}>
+                    <div className={modalStyles.attributeHeader}>
+                      <span className={modalStyles.attributeName}>{attr.name}</span>
                     </div>
                     {renderAttributeValueInput(attr, index)}
                   </div>
@@ -250,7 +250,7 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
             })}
           </div>
 
-          <div className={styles.addAttribute}>
+          <div className={modalStyles.addAttribute}>
               <h4>Добавить атрибут</h4>
               <input
                 type="text"
@@ -261,14 +261,14 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
               />
               {renderAttributeValueInput(newAttribute as SkillAttribute, -1, true)}
 
-              <div className={styles.attributeActions}>
+              <div className={modalStyles.attributeActions}>
                   <button type="button" onClick={handleCreateNewAttribute} className={buttonStyles.button}>
                     Создать новый атрибут
                   </button>
               </div>
             </div>
 
-          <div className={styles.buttons}>
+          <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
             </button>

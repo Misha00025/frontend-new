@@ -3,7 +3,7 @@ import { CharacterTemplate } from '../../../../../types/characterTemplates';
 import { CreateCharacterRequest } from '../../../../../types/characters';
 import buttonStyles from '../../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../../styles/components/Input.module.css';
-import styles from './CharacterModal.module.css';
+import modalStyles from '../../../../../styles/modal.module.css';
 
 interface CharacterModalProps {
   isOpen: boolean;
@@ -59,14 +59,14 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>{title}</h2>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
         
         <form onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Название персонажа:</label>
             <input
               type="text"
@@ -77,7 +77,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
             />
           </div>
 
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Описание персонажа:</label>
             <textarea
               value={description}
@@ -88,7 +88,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
             />
           </div>
 
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Шаблон персонажа:</label>
             <select
               value={templateId}
@@ -105,7 +105,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
             </select>
           </div>
 
-          <div className={styles.buttons}>
+          <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
             </button>

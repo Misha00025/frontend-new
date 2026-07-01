@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
+import modalStyles from '../../../../styles/modal.module.css';
 import styles from './SkillModal.module.css';
 import MDEditor from '@uiw/react-md-editor';
 import { useTheme } from '../../../../contexts/ThemeContext';
@@ -283,14 +284,14 @@ const SkillModal: React.FC<SkillModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>{title}</h2>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
         
         <form onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Название:</label>
             <input
               type="text"
@@ -301,7 +302,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
             />
           </div>
 
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Описание:</label>
             <div ref={editorRef} className={styles.editorContainer} data-color-mode={theme}>
               <MDEditor
@@ -419,7 +420,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
               </div>
             </div>
           </div>
-          <div className={styles.buttons}>
+          <div className={`${modalStyles.buttons} ${styles.buttons}`}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
             </button>

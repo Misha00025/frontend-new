@@ -30,6 +30,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
+  color: var(--text-primary);
 }
 
 .formActions {
@@ -166,17 +167,6 @@
   background-color: var(--bg-secondary);
   border-radius: var(--border-radius-sm);
   border-left: 3px solid var(--accent-color);
-}
-
-.formGroup {
-  margin: 1rem 0;
-}
-
-.formGroup label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-  color: var(--text-primary);
 }
 
 .footer {

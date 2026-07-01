@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import buttonStyles from '../../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../../styles/components/Input.module.css';
+import modalStyles from '../../../../../styles/modal.module.css';
 import styles from './CharacterTemplateModal.module.css';
 import { TemplateCategory } from '../../../../../types/groupSchemas';
 
@@ -40,12 +41,12 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>{title}</h2>
         
         <form onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Название категории:</label>
             <input
               type="text"
@@ -56,7 +57,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
             />
           </div>
 
-          <div className={styles.buttons}>
+          <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
             </button>
