@@ -30,3 +30,14 @@
   color: var(--text-secondary);
   margin-top: 0.25rem;
 }
+
+.emptyState {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.fieldInfo {
+  flex: 1;
+}

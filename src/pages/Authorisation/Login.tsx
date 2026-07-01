@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import buttonStyles from '../../styles/components/Button.module.css';
 import inputStyles from '../../styles/components/Input.module.css';
 import commonStyles from '../../styles/common.module.css';
+import modalStyles from '../../styles/modal.module.css';
 import { useAuth } from '../../contexts/AuthContext';
 import ThemeToggle from '../../components/commons/Buttons/ThemeToggle/ThemeToggle';
 
@@ -53,7 +54,7 @@ const Login: React.FC = () => {
           {isRegistering ? 'Регистрация' : 'Вход в систему'}
         </h2>
         
-        {error && <div className={commonStyles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
 
         <input
           className={inputStyles.input}

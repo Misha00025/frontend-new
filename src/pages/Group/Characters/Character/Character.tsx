@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Character as CharacterData, CharacterField } from '../../../../types/characters';
 import { charactersAPI, characterTemplatesAPI, groupAPI } from '../../../../services/api';
 import commonStyles from '../../../../styles/common.module.css';
+import modalStyles from '../../../../styles/modal.module.css';
 import uiStyles from './Character.module.css';
 import { CharacterTemplate, TemplateField } from '../../../../types/characterTemplates';
 import CharacterTableView from '../CharacterTableView/CharacterTableView';
@@ -139,7 +140,7 @@ const Character: React.FC = () => {
       <h1 style={{ marginBottom: '2px' }}>{character.name}</h1> 
       <p>{character.description}</p>
 
-      {error && <div className={commonStyles.error}>{error}</div>}
+      {error && <div className={modalStyles.error}>{error}</div>}
       
       <div className={uiStyles.fields} style={{ marginTop: '0px' }}>
         <h2>Поля персонажа</h2>

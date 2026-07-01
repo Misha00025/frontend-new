@@ -6,6 +6,7 @@ import { userAPI } from '../../services/api';
 import buttonStyles from '../../styles/components/Button.module.css';
 import inputStyles from '../../styles/components/Input.module.css';
 import commonStyles from '../../styles/common.module.css';
+import modalStyles from '../../styles/modal.module.css';
 import { useProfile } from '../../hooks/useProfile';
 
 const CompleteRegistration: React.FC = () => {
@@ -54,7 +55,7 @@ const CompleteRegistration: React.FC = () => {
       <h1>Завершение регистрации</h1>
       <p>Пожалуйста, создайте ваш профиль</p>
 
-      {error && <div className={commonStyles.error}>{error}</div>}
+      {error && <div className={modalStyles.error}>{error}</div>}
 
       <form onSubmit={handleSubmit} className={commonStyles.form}>
         <div className={commonStyles.formGroup}>

@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { CharacterTemplate, TemplateField, UpdateTemplateRequest } from '../../../../types/characterTemplates';
 import { characterTemplatesAPI, groupAPI } from '../../../../services/api';
 import commonStyles from '../../../../styles/common.module.css';
+import modalStyles from '../../../../styles/modal.module.css';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css'; // Добавляем импорт стилей для input
 import uiStyles from '../../../../styles/ui.module.css';
@@ -525,7 +526,7 @@ const CharacterTemplates: React.FC = () => {
         </div>
       )}
 
-      {error && <div className={commonStyles.error}>{error}</div>}
+      {error && <div className={modalStyles.error}>{error}</div>}
 
       {/* Кнопка добавления корневой категории */}
       {editMode && (
