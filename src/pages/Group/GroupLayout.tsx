@@ -4,6 +4,7 @@ import { Group } from '../../types/group';
 import { groupAPI } from '../../services/api';
 import { useGroup } from '../../contexts/GroupContext';
 import { usePlatform } from '../../hooks/usePlatform';
+import { usePermissions } from '../../contexts/PermissionsContext';
 import PageLayout from '../../components/commons/PageLayout/PageLayout';
 import PageHeader from '../../components/commons/PageLayout/PageHeader';
 import { TabItem } from '../../components/commons/PageLayout/TabBar';
@@ -11,6 +12,7 @@ import { TabItem } from '../../components/commons/PageLayout/TabBar';
 const GroupLayout: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const { selectedGroup, setSelectedGroup } = useGroup();
+  const { isGroupAdmin } = usePermissions();
   const isMobile = usePlatform();
   const [group, setGroup] = useState<Group | null>(null);
 
@@ -27,10 +29,10 @@ const GroupLayout: React.FC = () => {
   }, [groupId]);
 
   const groupTabs: TabItem[] = [
-    { id: 'dashboard', label: 'Главная', path: '' },
     { id: 'characters', label: 'Персонажи', path: 'characters' },
     { id: 'items', label: 'Предметы', path: 'items' },
     { id: 'skills', label: 'Книга способностей', path: 'skills' },
+    ...(isGroupAdmin ? [{ id: 'settings', label: 'Настройки', path: 'settings' }] : []),
   ];
 
   if (!group) return <div>Загрузка...</div>;

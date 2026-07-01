@@ -168,7 +168,7 @@ const CharacterSkills: React.FC = () => {
   const config = {
     ItemComponent: SkillCardWrapper,
     titles: {
-      page: 'Способности',
+      page: undefined,
       create: 'Добавить'
     },
     groupByAttributes: schema,

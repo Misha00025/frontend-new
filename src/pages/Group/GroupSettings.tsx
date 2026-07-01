@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Group } from '../../types/group';
 import { useGroup } from '../../contexts/GroupContext';
+import { usePermissions } from '../../contexts/PermissionsContext';
 import styles from '../../styles/common.module.css';
 import buttonStyles from '../../styles/components/Button.module.css';
 import GroupEditModal from '../../components/Modals/CreateGroupModal/EditGroupModal';
-import { usePermissions } from '../../contexts/PermissionsContext';
 import List from '../../components/List/List';
 import { usePlatform } from '../../hooks/usePlatform';
 
-const GroupDashboard: React.FC = () => {
+const GroupSettings: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const { selectedGroup, setSelectedGroup } = useGroup();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -24,6 +24,7 @@ const GroupDashboard: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      <h2>Управление</h2>
       <div className={isMobile ? styles.footer : ''}>
         <List>
           {isGroupAdmin && (
@@ -61,4 +62,4 @@ const GroupDashboard: React.FC = () => {
   );
 };
 
-export default GroupDashboard;
+export default GroupSettings;

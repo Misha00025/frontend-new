@@ -69,8 +69,6 @@ const Characters: React.FC = () => {
 
   return (
     <div className={commonStyles.container}>
-      <h1>Персонажи группы</h1>
-
       {error && <div className={modalStyles.error}>{error}</div>}
       {canEditGroup && (
         <div className={commonStyles.actions}>
