@@ -23,6 +23,7 @@ const ItemCardWrapper: React.FC<{
       onEdit={onEdit ? () => onEdit(item) : undefined}
       onDelete={onDelete ? () => onDelete(item.id) : undefined}
       showActions={showActions}
+      showAmount={true}
     />
   );
 };
