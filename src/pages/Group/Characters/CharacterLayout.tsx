@@ -7,6 +7,7 @@ import { Group } from '../../../types/group';
 import PageLayout from '../../../components/commons/PageLayout/PageLayout';
 import PageHeader from '../../../components/commons/PageLayout/PageHeader';
 import { TabItem } from '../../../components/commons/PageLayout/TabBar';
+import { useVisited } from '../../../contexts/VisitedContext';
 
 const CharacterLayout: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -16,6 +17,7 @@ const CharacterLayout: React.FC = () => {
   const [group, setGroup] = useState<Group | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { visitCharacter } = useVisited();
 
   useEffect(() => {
     if (!groupId || !characterId) return;
@@ -29,6 +31,7 @@ const CharacterLayout: React.FC = () => {
         ]);
         setCharacter(charData);
         setGroup(groupData);
+        visitCharacter(Number(groupId), Number(characterId));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load character');
       } finally {

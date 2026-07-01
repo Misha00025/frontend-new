@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocat
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { GroupProvider } from './contexts/GroupContext';
+import { VisitedProvider } from './contexts/VisitedContext';
 import { useProfile } from './hooks/useProfile';
 import CompleteRegistration from './pages/Authorisation/CompleteRegistration';
 import Dashboard from './pages/Dashboard';
@@ -97,6 +98,7 @@ const App: React.FC = () => {
     <ThemeProvider>
       <AuthProvider>
         <GroupProvider>
+          <VisitedProvider>
           <Router>
             <PermissionsProvider>
               <SidebarProvider>
@@ -104,6 +106,7 @@ const App: React.FC = () => {
               </SidebarProvider>
             </PermissionsProvider>
           </Router>
+          </VisitedProvider>
         </GroupProvider>
       </AuthProvider>
     </ThemeProvider>

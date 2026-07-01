@@ -3,6 +3,7 @@ import { useParams, Outlet } from 'react-router-dom';
 import { Group } from '../../types/group';
 import { groupAPI } from '../../services/api';
 import { useGroup } from '../../contexts/GroupContext';
+import { useVisited } from '../../contexts/VisitedContext';
 import { usePlatform } from '../../hooks/usePlatform';
 import { usePermissions } from '../../contexts/PermissionsContext';
 import PageLayout from '../../components/commons/PageLayout/PageLayout';
@@ -13,6 +14,7 @@ const GroupLayout: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const { selectedGroup, setSelectedGroup } = useGroup();
   const { isGroupAdmin } = usePermissions();
+  const { visitGroup } = useVisited();
   const isMobile = usePlatform();
   const [group, setGroup] = useState<Group | null>(null);
 
@@ -22,9 +24,11 @@ const GroupLayout: React.FC = () => {
       groupAPI.getGroup(parseInt(groupId)).then(data => {
         setGroup(data);
         setSelectedGroup(data);
+        visitGroup(data.id);
       });
     } else {
       setGroup(selectedGroup);
+      visitGroup(selectedGroup.id);
     }
   }, [groupId]);
 
