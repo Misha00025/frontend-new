@@ -285,6 +285,28 @@ export const groupAPI = {
     }
     return response.json();
   },
+
+  exportGroup: async (groupId: number): Promise<Record<string, unknown>> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/export`);
+    if (!response.ok) {
+      throw new Error('Failed to export group data');
+    }
+    return response.json();
+  },
+
+  importGroup: async (groupId: number, data: Record<string, unknown>): Promise<Record<string, unknown>> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/import`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to import group data');
+    }
+    return response.json();
+  },
 };
 
 
