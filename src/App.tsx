@@ -10,7 +10,7 @@ import CompleteRegistration from './pages/Authorisation/CompleteRegistration';
 import Dashboard from './pages/Dashboard';
 import Groups from './pages/Groups';
 import GroupLayout from './pages/Group/GroupLayout';
-import GroupDashboard from './pages/Group/GroupDashboard';
+import GroupSettings from './pages/Group/GroupSettings';
 import GroupUsers from './pages/Group/GroupUsers';
 import CharacterTemplates from './pages/Group/Characters/Template/CharacterTemplates';
 import Characters from './pages/Group/Characters/Characters';
@@ -79,10 +79,11 @@ const AppContent: React.FC = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/groups" element={<Groups />} />
         <Route path="/group/:groupId" element={<GroupLayout />}>
-          <Route index element={<GroupDashboard />} />
+          <Route index element={<Navigate to="characters" replace />} />
+          <Route path="characters" element={<Characters />} />
+          <Route path="settings" element={<GroupSettings />} />
           <Route path="users" element={<GroupUsers />} />
           <Route path="templates" element={<CharacterTemplates />} />
-          <Route path="characters" element={<Characters />} />
           <Route path="skills" element={<GroupSkills />} />
           <Route path="items" element={<GroupItems />} />
         </Route>

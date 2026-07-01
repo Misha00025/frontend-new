@@ -137,13 +137,9 @@ const Character: React.FC = () => {
 
   return (
     <div className={commonStyles.container}>
-      <h1 style={{ marginBottom: '2px' }}>{character.name}</h1> 
-      <p>{character.description}</p>
-
       {error && <div className={modalStyles.error}>{error}</div>}
       
       <div className={uiStyles.fields} style={{ marginTop: '0px' }}>
-        <h2>Поля персонажа</h2>
         <TemplateEditContext value={conf}>
           <CharacterTableView
             character={character}

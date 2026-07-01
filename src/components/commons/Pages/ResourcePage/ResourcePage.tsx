@@ -19,7 +19,7 @@ export interface ResourcePageConfig<T> {
   }>;
   
   titles: {
-    page: string;
+    page?: string;
     create?: string;
   };
   
@@ -113,7 +113,9 @@ const ResourcePage = <T extends {
     <div className={commonStyles.container}>
       {/* Обновленный заголовок */}
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>{config.titles.page}</h1>
+        {config.titles.page && (
+          <h1 className={styles.pageTitle}>{config.titles.page}</h1>
+        )}
         <div className={styles.headerButtons}>
           {canConfigureSchema && onConfigureSchema && (
             <button

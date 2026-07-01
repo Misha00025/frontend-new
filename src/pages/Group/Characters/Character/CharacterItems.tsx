@@ -119,7 +119,7 @@ const CharacterItems: React.FC = () => {
   const config = {
     ItemComponent: ItemCardWrapper,
     titles: {
-      page: 'Инвентарь',
+      page: undefined,
       create: 'Добавить'
     },
     groupByAttributes: schema,

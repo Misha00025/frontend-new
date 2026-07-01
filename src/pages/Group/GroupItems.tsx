@@ -124,7 +124,7 @@ const GroupItems: React.FC = () => {
   const config = {
     ItemComponent: ItemCardWrapper,
     titles: {
-      page: 'Каталог предметов',
+      page: undefined,
     },
     groupByAttributes: schema, // Передаем схему в конфиг
   };
