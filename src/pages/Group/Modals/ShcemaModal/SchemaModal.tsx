@@ -1,6 +1,7 @@
 // components/Modals/SchemaModal/SchemaModal.tsx
 import React, { useState, useEffect } from 'react';
 import buttonStyles from '../../../../styles/components/Button.module.css';
+import modalStyles from '../../../../styles/modal.module.css';
 import styles from './SchemaModal.module.css';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
 
@@ -91,11 +92,11 @@ const SchemaModal: React.FC<SchemaModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={`${modalStyles.modal} ${styles.modal}`}>
         <h2>{title}</h2>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
         
         <form onSubmit={handleSubmit}>
           <div className={styles.schemaSection}>
@@ -190,7 +191,7 @@ const SchemaModal: React.FC<SchemaModalProps> = ({
             </div>
           </div>
 
-          <div className={styles.buttons}>
+          <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
             </button>

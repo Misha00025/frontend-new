@@ -125,7 +125,7 @@ const GroupSkills: React.FC = () => {
   const config = {
     ItemComponent: SkillCardWrapper,
     titles: {
-      page: 'Книга способностей',
+      page: undefined,
     },
     groupByAttributes: schema,
   };

@@ -4,7 +4,7 @@ import { Group } from '../../../types/group';
 import { groupAPI, uploadAPI } from '../../../services/api';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
-import styles from './CreateGroupModal.module.css'; // Используем те же стили
+import modalStyles from '../../../styles/modal.module.css';
 
 interface EditGroupModalProps {
   group: Group;
@@ -104,20 +104,20 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>Редактировать группу</h2>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
         
         <form onSubmit={handleSubmit}>
           {/* Секция иконки группы */}
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Иконка группы:</label>
-            <div className={styles.iconSection}>
+            <div className={modalStyles.iconSection}>
               {icon ? (
-                <div className={styles.iconPreview}>
-                  <img src={icon} alt="Иконка группы" className={styles.iconImage} />
+                <div className={modalStyles.iconPreview}>
+                  <img src={icon} alt="Иконка группы" className={modalStyles.iconImage} />
                   <button 
                     type="button" 
                     onClick={removeIcon}
@@ -128,7 +128,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
                   </button>
                 </div>
               ) : (
-                <div className={styles.iconPlaceholder}>
+                <div className={modalStyles.iconPlaceholder}>
                   Нет иконки
                 </div>
               )}
@@ -138,13 +138,13 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
                 accept="image/*"
                 onChange={handleFileChange}
                 disabled={uploadingImage}
-                className={styles.fileInput}
+                className={modalStyles.fileInput}
               />
-              {uploadingImage && <div className={styles.uploadStatus}>Загрузка изображения...</div>}
+              {uploadingImage && <div className={modalStyles.uploadStatus}>Загрузка изображения...</div>}
             </div>
           </div>
 
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Название группы:</label>
             <input
               type="text"
@@ -155,7 +155,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
             />
           </div>
           
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Описание:</label>
             <textarea
               value={description}
@@ -165,12 +165,12 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
             />
           </div>
 
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>ID группы:</label>
-            <div className={styles.readOnlyField}>{group.id}</div>
+            <div className={modalStyles.readOnlyField}>{group.id}</div>
           </div>
           
-          <div className={styles.buttons}>
+          <div className={modalStyles.buttons}>
             <button 
               type="button" 
               onClick={handleCancel} 

@@ -3,7 +3,10 @@ import { CharacterItem, CreateCharacterItemRequest, UpdateCharacterItemRequest }
 import { GroupItem } from '../../../../types/groupItems';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
+import modalStyles from '../../../../styles/modal.module.css';
 import styles from './CharacterItemModal.module.css';
+import uiStyles from '../../../../styles/ui.module.css';
+import selectStyles from '../../../../styles/select-list.module.css';
 
 interface CharacterItemModalProps {
   isOpen: boolean;
@@ -189,16 +192,16 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>{title}</h2>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
         
         {!editingItem && (
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Способ добавления:</label>
-            <div className={styles.radioGroup}>
+            <div className={uiStyles.radioGroup}>
               <label>
                 <input
                   type="radio"
@@ -230,8 +233,8 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
 
         {creationMode === 'existing' && !editingItem && (
           <>
-            <div className={styles.filters}>
-              <div className={styles.searchGroup}>
+            <div className={selectStyles.filters}>
+              <div className={selectStyles.searchGroup}>
                 <label>Поиск:</label>
                 <input
                   type="text"
@@ -242,7 +245,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
                 />
               </div>
               
-              <div className={styles.filterGroup}>
+              <div className={selectStyles.filterGroup}>
                 <label>Фильтр по атрибуту:</label>
                 <select
                   value={selectedAttribute}
@@ -260,18 +263,18 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
             {selectedGroupItem && (
               <div className={styles.selectedItem}>
                 <h3>Выбранный предмет:</h3>
-                <div className={styles.itemCard}>
-                  <h4 className={styles.itemName}>{selectedGroupItem.name}</h4>
-                  <p className={styles.itemDescription}>{selectedGroupItem.description}</p>
+                <div className={selectStyles.listItem}>
+                  <h4 className={selectStyles.itemName}>{selectedGroupItem.name}</h4>
+                  <p className={selectStyles.itemDescription}>{selectedGroupItem.description}</p>
                   <p className={styles.itemPrice}>Цена: {selectedGroupItem.price}</p>
                   {selectedGroupItem.attributes && selectedGroupItem.attributes.length > 0 && (
-                    <div className={styles.attributes}>
+                    <div className={selectStyles.attributes}>
                       <h5>Атрибуты:</h5>
-                      <div className={styles.attributesGrid}>
+                      <div className={selectStyles.attributesGrid}>
                         {availableAttributes.map(attrName => (
-                          <div key={attrName} className={styles.attribute}>
-                            <span className={styles.attributeName}>{attrName}:</span>
-                            <span className={styles.attributeValue}>
+                          <div key={attrName} className={selectStyles.attribute}>
+                            <span className={selectStyles.attributeName}>{attrName}:</span>
+                            <span className={selectStyles.attributeValue}>
                               {getAttributeValue(selectedGroupItem, attrName)}
                             </span>
                           </div>
@@ -283,17 +286,17 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
               </div>
             )}
 
-            <div className={styles.itemsList}>
+            <div className={selectStyles.sectionList}>
               <h3>Доступные предметы ({filteredItems.length})</h3>
               
               {filteredItems.length === 0 ? (
-                <p className={styles.noItems}>Нет доступных предметов</p>
+                <p className={selectStyles.noItems}>Нет доступных предметов</p>
               ) : (
-                <div className={styles.itemsContainer}>
+                <div className={selectStyles.listContainer}>
                   {filteredItems.map(item => (
-                    <div key={item.id} className={styles.itemCard}>
-                      <div className={styles.itemHeader}>
-                        <h4 className={styles.itemName}>{item.name}</h4>
+                    <div key={item.id} className={selectStyles.listItem}>
+                      <div className={selectStyles.itemHeader}>
+                        <h4 className={selectStyles.itemName}>{item.name}</h4>
                         <button
                           onClick={() => handleGroupItemSelect(item)}
                           className={buttonStyles.button}
@@ -303,17 +306,17 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
                         </button>
                       </div>
                       
-                      <p className={styles.itemDescription}>{item.description}</p>
+                      <p className={selectStyles.itemDescription}>{item.description}</p>
                       <p className={styles.itemPrice}>Цена: {item.price}</p>
                       
                       {item.attributes && item.attributes.length > 0 && (
-                        <div className={styles.attributes}>
+                        <div className={selectStyles.attributes}>
                           <h5>Атрибуты:</h5>
-                          <div className={styles.attributesGrid}>
+                          <div className={selectStyles.attributesGrid}>
                             {availableAttributes.map(attrName => (
-                              <div key={attrName} className={styles.attribute}>
-                                <span className={styles.attributeName}>{attrName}:</span>
-                                <span className={styles.attributeValue}>
+                              <div key={attrName} className={selectStyles.attribute}>
+                                <span className={selectStyles.attributeName}>{attrName}:</span>
+                                <span className={selectStyles.attributeValue}>
                                   {getAttributeValue(item, attrName)}
                                 </span>
                               </div>
@@ -332,7 +335,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
         <form onSubmit={handleSubmit}>
           {creationMode === 'new' && (
             <>
-              <div className={styles.formGroup}>
+              <div className={modalStyles.formGroup}>
                 <label>Название:</label>
                 <input
                   type="text"
@@ -344,7 +347,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
                 />
               </div>
 
-              <div className={styles.formGroup}>
+              <div className={modalStyles.formGroup}>
                 <label>Описание:</label>
                 <textarea
                   value={description}
@@ -356,7 +359,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
                 />
               </div>
 
-              <div className={styles.formGroup}>
+              <div className={modalStyles.formGroup}>
                 <label>Цена за единицу:</label>
                 <input
                   type="number"
@@ -369,7 +372,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
                 />
               </div>
 
-              <div className={styles.formGroup}>
+              <div className={modalStyles.formGroup}>
                 <label>Ссылка на изображение (в разработке):</label>
                 <input
                   type="text"
@@ -382,7 +385,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
             </>
           )}
 
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Количество:</label>
             <input
               type="number"
@@ -396,7 +399,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
             />
           </div>
 
-          <div className={styles.buttons}>
+          <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
             </button>

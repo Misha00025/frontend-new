@@ -5,24 +5,31 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { GroupProvider } from './contexts/GroupContext';
 import { useProfile } from './hooks/useProfile';
-import Sidebar from './components/commons/Sidebar/Sidebar';
 import CompleteRegistration from './pages/Authorisation/CompleteRegistration';
 import Dashboard from './pages/Dashboard';
 import Groups from './pages/Groups';
-import GroupDashboard from './pages/Group/GroupDashboard';
+import GroupLayout from './pages/Group/GroupLayout';
+import GroupSettings from './pages/Group/GroupSettings';
 import GroupUsers from './pages/Group/GroupUsers';
 import CharacterTemplates from './pages/Group/Characters/Template/CharacterTemplates';
 import Characters from './pages/Group/Characters/Characters';
+import CharacterLayout from './pages/Group/Characters/CharacterLayout';
 import Character from './pages/Group/Characters/Character/Character';
 import CharacterItems from './pages/Group/Characters/Character/CharacterItems';
+import CharacterSkills from './pages/Group/Characters/Character/CharacterSkills';
+import CharacterNotes from './pages/Group/Characters/Character/CharacterNotes';
 import GroupItems from './pages/Group/GroupItems';
 import Profile from './pages/Profile';
 import './styles/globals.css';
 import { PermissionsProvider } from './contexts/PermissionsContext';
+import { SidebarProvider } from './contexts/SidebarContext';
 import WorkInProgress from './pages/WorkInProgress';
 import GroupSkills from './pages/Group/GroupSkills';
-import CharacterSkills from './pages/Group/Characters/Character/CharacterSkills';
 import Login from './pages/Authorisation/Login';
+
+const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <>{children}</>;
+};
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
@@ -58,25 +65,30 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div style={{ display: 'flex' }}>
-      <Sidebar />
+    <AppLayout>
       <Routes>
         <Route path="/complete-registration" element={<CompleteRegistration />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/groups" element={<Groups />} />
-        <Route path="/group/:groupId" element={<GroupDashboard />} />
-        <Route path="/group/:groupId/users" element={<GroupUsers />} />
-        <Route path="/group/:groupId/templates" element={<CharacterTemplates />} />
-        <Route path="/group/:groupId/characters" element={<Characters />} />
-        <Route path="/group/:groupId/skills" element={<GroupSkills />} />
-        <Route path="/group/:groupId/character/:characterId" element={<Character />} />
-        <Route path="/group/:groupId/character/:characterId/items" element={<CharacterItems />} />
-        <Route path="/group/:groupId/character/:characterId/skills" element={<CharacterSkills />} />
-        <Route path="/group/:groupId/items" element={<GroupItems />} />
+        <Route path="/group/:groupId" element={<GroupLayout />}>
+          <Route index element={<Navigate to="characters" replace />} />
+          <Route path="characters" element={<Characters />} />
+          <Route path="settings" element={<GroupSettings />} />
+          <Route path="users" element={<GroupUsers />} />
+          <Route path="templates" element={<CharacterTemplates />} />
+          <Route path="skills" element={<GroupSkills />} />
+          <Route path="items" element={<GroupItems />} />
+        </Route>
+        <Route path="/group/:groupId/character/:characterId" element={<CharacterLayout />}>
+          <Route index element={<Character />} />
+          <Route path="items" element={<CharacterItems />} />
+          <Route path="skills" element={<CharacterSkills />} />
+          <Route path="notes" element={<CharacterNotes />} />
+        </Route>
         <Route path="/profile" element={<Profile />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
-    </div>
+    </AppLayout>
   );
 };
 
@@ -87,7 +99,9 @@ const App: React.FC = () => {
         <GroupProvider>
           <Router>
             <PermissionsProvider>
-              <AppContent />
+              <SidebarProvider>
+                <AppContent />
+              </SidebarProvider>
             </PermissionsProvider>
           </Router>
         </GroupProvider>

@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
-import styles from './CharacterSkillModal.module.css';
+import modalStyles from '../../../../styles/modal.module.css';
+import selectStyles from '../../../../styles/select-list.module.css';
 import { GroupSkill } from '../../../../types/groupSkills';
 import { CharacterSkill } from '../../../../types/characterSkills';
 
@@ -94,14 +95,14 @@ const CharacterSkillModal: React.FC<CharacterSkillModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>{title}</h2>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
         
-        <div className={styles.filters}>
-          <div className={styles.searchGroup}>
+        <div className={selectStyles.filters}>
+          <div className={selectStyles.searchGroup}>
             <label>Поиск:</label>
             <input
               type="text"
@@ -112,7 +113,7 @@ const CharacterSkillModal: React.FC<CharacterSkillModalProps> = ({
             />
           </div>
           
-          <div className={styles.filterGroup}>
+          <div className={selectStyles.filterGroup}>
             <label>Фильтр по атрибуту:</label>
             <select
               value={selectedAttribute}
@@ -127,17 +128,17 @@ const CharacterSkillModal: React.FC<CharacterSkillModalProps> = ({
           </div>
         </div>
 
-        <div className={styles.skillsList}>
+        <div className={selectStyles.sectionList}>
           <h3>Доступные способности ({filteredSkills.length})</h3>
           
           {filteredSkills.length === 0 ? (
-            <p className={styles.noSkills}>Нет доступных способностей для добавления</p>
+            <p className={selectStyles.noItems}>Нет доступных способностей для добавления</p>
           ) : (
-            <div className={styles.skillsContainer}>
+            <div className={selectStyles.listContainer}>
               {filteredSkills.map(skill => (
-                <div key={skill.id} className={styles.skillItem}>
-                  <div className={styles.skillHeader}>
-                    <h4 className={styles.skillName}>{skill.name}</h4>
+                <div key={skill.id} className={selectStyles.listItem}>
+                  <div className={selectStyles.itemHeader}>
+                    <h4 className={selectStyles.itemName}>{skill.name}</h4>
                     <button
                       onClick={() => handleAddSkill(skill)}
                       className={buttonStyles.button}
@@ -147,15 +148,15 @@ const CharacterSkillModal: React.FC<CharacterSkillModalProps> = ({
                     </button>
                   </div>
                   
-                  <p className={styles.skillDescription}>{skill.description}</p>
+                  <p className={selectStyles.itemDescription}>{skill.description}</p>
                   
-                  <div className={styles.attributes}>
+                  <div className={selectStyles.attributes}>
                     <h5>Атрибуты:</h5>
-                    <div className={styles.attributesGrid}>
+                    <div className={selectStyles.attributesGrid}>
                       {availableAttributes.map(attrName => (
-                        <div key={attrName} className={styles.attribute}>
-                          <span className={styles.attributeName}>{attrName}:</span>
-                          <span className={styles.attributeValue}>
+                        <div key={attrName} className={selectStyles.attribute}>
+                          <span className={selectStyles.attributeName}>{attrName}:</span>
+                          <span className={selectStyles.attributeValue}>
                             {getAttributeValue(skill, attrName)}
                           </span>
                         </div>
@@ -168,7 +169,7 @@ const CharacterSkillModal: React.FC<CharacterSkillModalProps> = ({
           )}
         </div>
 
-        <div className={styles.buttons}>
+        <div className={modalStyles.buttons}>
           <button type="button" onClick={onClose} className={buttonStyles.button}>
             Закрыть
           </button>

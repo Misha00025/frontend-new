@@ -1,13 +1,6 @@
-export interface NavigationItem {
-    id: string;
-    label: string;
-    path: string;
-    icon: string;
-    isBackButton?: boolean;
-  }
-  
-  export interface NavigationConfig {
-    default: NavigationItem[];
-    group: NavigationItem[];
-    character: NavigationItem[];
-  }
+export interface NavItem {
+  id: string;
+  label: string;
+  icon: string;
+  path: string;
+}

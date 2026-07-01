@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { GroupSkill, SkillAttribute } from '../../../../types/groupSkills';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
-import styles from './SkillCard.module.css';
+import cardStyles from '../../../../styles/card-item.module.css';
 import ReactMarkdown from 'react-markdown';
 
 interface SkillCardProps {
@@ -21,20 +21,20 @@ const SkillCard: React.FC<SkillCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div id={`skill-${skill.id}`} className={styles.skillCard}>
-      <div className={styles.header} onClick={() => setIsExpanded(!isExpanded)}>
-        <div className={styles.titleSection}>
-          <h3 className={styles.skillName} title={skill.name}>{skill.name}</h3>
-          <div className={styles.attributesPreview}>
+    <div id={`skill-${skill.id}`} className={cardStyles.card}>
+      <div className={cardStyles.header} onClick={() => setIsExpanded(!isExpanded)}>
+        <div className={cardStyles.titleSection}>
+          <h3 className={cardStyles.name} title={skill.name}>{skill.name}</h3>
+          <div className={cardStyles.attributesPreview}>
             {skill.attributes.map(attr => (
-              <span key={attr.key} className={styles.attributeTag}>
+              <span key={attr.key} className={cardStyles.attributeTag}>
                 {attr.name}: {attr.value}
               </span>
             ))}
           </div>
         </div>
         <button 
-          className={styles.expandButton}
+          className={cardStyles.expandButton}
           onClick={(e) => {
             e.stopPropagation();
             setIsExpanded(!isExpanded);
@@ -45,13 +45,13 @@ const SkillCard: React.FC<SkillCardProps> = ({
       </div>
       
       {isExpanded && (
-        <div className={styles.expandedContent}>
-          <div className={styles.description}>
+        <div className={cardStyles.expandedContent}>
+          <div className={cardStyles.description}>
             <ReactMarkdown>{skill.description}</ReactMarkdown>
           </div>
           
           {showActions && (
-            <div className={styles.actions}>
+            <div className={cardStyles.actions}>
               {onEdit && (
                 <IconButton 
                   icon="edit" 

@@ -3,7 +3,7 @@ import { CreateGroupRequest, Group } from '../../../types/group';
 import { groupAPI } from '../../../services/api';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
-import styles from './CreateGroupModal.module.css';
+import modalStyles from '../../../styles/modal.module.css';
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -48,14 +48,14 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>Создать группу</h2>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
         
         <form onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Название группы:</label>
             <input
               type="text"
@@ -66,7 +66,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
             />
           </div>
           
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Описание (опционально):</label>
             <textarea
               value={description}
@@ -76,7 +76,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
             />
           </div>
           
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Ссылка на иконку (опционально):</label>
             <input
               type="text"
@@ -86,7 +86,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
             />
           </div>
           
-          <div className={styles.buttons}>
+          <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
             </button>

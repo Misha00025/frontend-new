@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { SkillAttributeDefinition } from '../../../../types/groupSkills';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
+import modalStyles from '../../../../styles/modal.module.css';
 import styles from './SkillAttributesModal.module.css';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
 
@@ -98,11 +99,11 @@ const SkillAttributesModal: React.FC<SkillAttributesModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>{title}</h2>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
         
         <div className={styles.attributesTable}>
           <h3>Существующие атрибуты</h3>
@@ -210,7 +211,7 @@ const SkillAttributesModal: React.FC<SkillAttributesModalProps> = ({
           </div>
         </div>
 
-        <div className={styles.buttons}>
+        <div className={modalStyles.buttons}>
           <button type="button" onClick={onClose} className={buttonStyles.button}>
             Отмена
           </button>

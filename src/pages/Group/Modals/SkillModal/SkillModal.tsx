@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
+import modalStyles from '../../../../styles/modal.module.css';
 import styles from './SkillModal.module.css';
 import MDEditor from '@uiw/react-md-editor';
 import { useTheme } from '../../../../contexts/ThemeContext';
@@ -189,7 +190,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
 
     if (isFiltered && possibleValues.length > 0) {
       return (
-        <div className={styles.attributeValueContainer}>
+        <div className={modalStyles.attributeValueContainer}>
           <select
             value={showCustomInput ? '__custom__' : currentValue}
             onChange={(e) => {
@@ -225,7 +226,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
           </select>
 
           {showCustomInput && (
-            <div className={styles.customInputContainer}>
+            <div className={modalStyles.customInputContainer}>
               <input
                 type="text"
                 value={customValues[attr.key] || currentValue}
@@ -283,14 +284,14 @@ const SkillModal: React.FC<SkillModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>{title}</h2>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
         
         <form onSubmit={handleSubmit}>
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Название:</label>
             <input
               type="text"
@@ -301,7 +302,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
             />
           </div>
 
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Описание:</label>
             <div ref={editorRef} className={styles.editorContainer} data-color-mode={theme}>
               <MDEditor
@@ -333,7 +334,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
               />
               Скрытый
             </label>
-          <div className={styles.attributesSection}>
+          <div className={modalStyles.attributesSection}>
             <h3>Атрибуты навыка</h3>
             
             {/* Список существующих атрибутов с возможностью редактирования */}
@@ -342,10 +343,10 @@ const SkillModal: React.FC<SkillModalProps> = ({
               const isFiltered = attributeDef?.isFiltered;
               
               return (
-                <div key={index} className={styles.attributeItem}>
-                  <div className={styles.attributeContent}>
-                    <div className={styles.attributeHeader}>
-                      <span className={styles.attributeName}>{attr.name}</span>
+                <div key={index} className={modalStyles.attributeItem}>
+                  <div className={modalStyles.attributeContent}>
+                    <div className={modalStyles.attributeHeader}>
+                      <span className={modalStyles.attributeName}>{attr.name}</span>
                       {isFiltered && <span className={styles.filteredBadge}>🔍</span>}
                     </div>
                     {renderAttributeValueInput(attr, index)}
@@ -361,7 +362,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
             })}
 
             {/* Секция добавления нового атрибута */}
-            <div className={styles.addAttribute}>
+            <div className={modalStyles.addAttribute}>
               <h4>Добавить атрибут</h4>
               
               <select
@@ -406,7 +407,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
 
               {newAttribute.key && renderAttributeValueInput(newAttribute as SkillAttribute, -1, true)}
 
-              <div className={styles.attributeActions}>
+              <div className={modalStyles.attributeActions}>
                 {newAttribute.key ? (
                   <button type="button" onClick={handleAddAttribute} className={buttonStyles.button}>
                     Добавить выбранный атрибут
@@ -419,7 +420,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
               </div>
             </div>
           </div>
-          <div className={styles.buttons}>
+          <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
             </button>
