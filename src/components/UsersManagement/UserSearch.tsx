@@ -63,7 +63,7 @@ const UserSearch: React.FC<UserSearchProps> = ({
                 <h4>{user.visibleName}</h4>
                 <p>@{user.nickname}</p>
               </div>
-              <div className={stylesUi.actions}>
+              <div className={stylesUi.actionsTop}>
                 {permissionOptions.map(option => (
                   <button
                     key={option.label}

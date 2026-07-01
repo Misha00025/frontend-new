@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { TemplateField } from '../../../../../types/characterTemplates';
 import buttonStyles from '../../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../../styles/components/Input.module.css';
-import styles from './TemplateFieldModal.module.css';
+import modalStyles from '../../../../../styles/modal.module.css';
+import uiStyles from '../../../../../styles/ui.module.css';
 
 interface TemplateFieldModalProps {
   isOpen: boolean;
@@ -117,17 +118,17 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.modal}>
+    <div className={modalStyles.overlay}>
+      <div className={modalStyles.modal}>
         <h2>{title}</h2>
         
-        {error && <div className={styles.error}>{error}</div>}
+        {error && <div className={modalStyles.error}>{error}</div>}
         
         <form onSubmit={handleSubmit}>
 
           {(fullEditMode &&
             <>
-              <div className={styles.formGroup}>
+              <div className={modalStyles.formGroup}>
                 <label>Название поля:</label>
                 <input
                   type="text"
@@ -138,9 +139,9 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
                   required
                 />
               </div>
-              <div className={styles.formGroup}>
+              <div className={modalStyles.formGroup}>
                 <label>Ключ поля:</label>
-                <div className={styles.keyInputGroup}>
+                <div className={uiStyles.keyInputGroup}>
                   <input
                     type="text"
                     value={key}
@@ -156,13 +157,13 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
                     Сгенерировать
                   </button>
                 </div>
-                <small className={styles.helpText}>
+                <small className={modalStyles.helpText}>
                   Ключ будет использоваться в системе (только латинские буквы, цифры и _)
                 </small>
               </div>
             </>
           )}
-          <div className={styles.formGroup}>
+          <div className={modalStyles.formGroup}>
             <label>Формула:</label>
             <input
               type="text"
@@ -172,7 +173,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
             />
           </div>
 
-          {fullEditMode && <div className={styles.formGroup}>
+          {fullEditMode && <div className={modalStyles.formGroup}>
             <label>Значение по умолчанию:</label>
             <input
               type="number"
@@ -186,7 +187,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
 
           {fullEditMode &&
             <>
-              {!isModifier && <div className={styles.formGroup}>
+              {!isModifier && <div className={modalStyles.formGroup}>
                 <label>
                   <input
                     type="checkbox"
@@ -198,7 +199,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
                 </label>
               </div>}
 
-              {!isProperty && <div className={styles.formGroup}>
+              {!isProperty && <div className={modalStyles.formGroup}>
                 <label>
                   <input
                     type="checkbox"
@@ -213,7 +214,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
           }
 
           { isProperty && (
-            <div className={styles.formGroup}>
+            <div className={modalStyles.formGroup}>
               <label>Максимальное значение по умолчанию:</label>
               <input
                 type="number"
@@ -227,7 +228,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
           )}
 
           {isModifier && (
-            <div className={styles.formGroup}>
+            <div className={modalStyles.formGroup}>
               <label>Формула модификатора:</label>
               <input
                 type='text'
@@ -237,7 +238,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
               />
             </div>
           )}
-          {fullEditMode && <div className={styles.formGroup}>
+          {fullEditMode && <div className={modalStyles.formGroup}>
             <label>Описание поля:</label>
             <textarea
               value={description}
@@ -247,7 +248,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
             />
           </div>}
 
-          <div className={styles.buttons}>
+          <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
             </button>

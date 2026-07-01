@@ -39,7 +39,7 @@ const UsersList: React.FC<UsersListProps> = ({
             <p>@{item.user.nickname} {formatPermission(item.permission)}</p>
           </div>
           {canManage && (
-            <div className={stylesUi.actions}>
+            <div className={stylesUi.actionsTop}>
               <IconButton 
                 icon='delete'
                 title='Удалить'
