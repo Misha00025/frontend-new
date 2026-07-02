@@ -27,6 +27,7 @@ import {
   CreateCharacterItemRequest,
   UpdateCharacterItemRequest
 } from '../types/characterItems';
+import { GroupNote, CreateGroupNoteRequest, UpdateGroupNoteRequest } from '../types/groupNotes';
 import { useAuth } from '../contexts/AuthContext';
 import { CreateGroupSkillRequest, CreateSkillAttributeRequest, GroupSkill, GroupSkillsResponse, SkillAttributeDefinition, SkillAttributesResponse, UpdateGroupSkillRequest } from '../types/groupSkills';
 import { GroupSchema, TemplateSchema } from '../types/groupSchemas';
@@ -541,6 +542,75 @@ export const groupItemsAPI = {
     });
     if (!response.ok) {
       throw new Error('Failed to delete group item');
+    }
+  },
+};
+
+export const groupNotesAPI = {
+  getNotes: async (groupId: number): Promise<GroupNote[]> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/notes`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch group notes');
+    }
+    const data = await response.json();
+    if (Array.isArray(data)) {
+      return data;
+    }
+    return data?.notes ?? [];
+  },
+
+  getNote: async (groupId: number, noteId: number): Promise<GroupNote> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/notes/${noteId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch note');
+    }
+    return response.json();
+  },
+
+  createNote: async (groupId: number, noteData: CreateGroupNoteRequest): Promise<GroupNote> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/notes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        Header: noteData.header,
+        short_description: noteData.short_description,
+        Body: noteData.body || null,
+        Keywords: noteData.keywords || [],
+      }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create note');
+    }
+    return response.json();
+  },
+
+  updateNote: async (groupId: number, noteId: number, noteData: UpdateGroupNoteRequest): Promise<GroupNote> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/notes/${noteId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        Header: noteData.header,
+        short_description: noteData.short_description,
+        Body: noteData.body || null,
+        Keywords: noteData.keywords || [],
+      }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update note');
+    }
+    return response.json();
+  },
+
+  deleteNote: async (groupId: number, noteId: number): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/notes/${noteId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete note');
     }
   },
 };
