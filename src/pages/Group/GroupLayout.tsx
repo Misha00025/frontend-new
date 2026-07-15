@@ -52,7 +52,6 @@ const GroupLayout: React.FC = () => {
       header={
         <PageHeader
           title={group.name}
-          subtitle={group.description}
           imageUrl={group.icon ?? undefined}
           imageAlt={group.name}
         />

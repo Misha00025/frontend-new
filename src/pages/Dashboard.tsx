@@ -85,7 +85,6 @@ const Dashboard: React.FC = () => {
           )}
           <div className={dashStyles.info}>
             <h3 className={dashStyles.title}>{lastGroup.name}</h3>
-            <p className={dashStyles.subtitle}>{lastGroup.description}</p>
           </div>
           <div className={dashStyles.action}>
             <button className={buttonStyles.button} onClick={(e) => { e.stopPropagation(); navigate(`/group/${lastGroup.id}`); }}>

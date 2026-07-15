@@ -1,3 +1,4 @@
+import { getApiBase } from '../config';
 import { LoginData, AuthResponse, RefreshResponse, UserProfile } from '../types/auth';
 import { CreateGroupRequest, Group, GroupsResponse } from '../types/group';
 import { storage } from '../utils/storage';
@@ -33,10 +34,9 @@ import { CreateGroupSkillRequest, CreateSkillAttributeRequest, GroupSkill, Group
 import { GroupSchema, TemplateSchema } from '../types/groupSchemas';
 
 
-const API_BASE = 'https://thedun.ru';
-
 export const authAPI = {
   login: async (credentials: LoginData): Promise<AuthResponse> => {
+    const API_BASE = getApiBase();
     const response = await fetch(`${API_BASE}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -46,6 +46,7 @@ export const authAPI = {
   },
 
   refresh: async (token: string): Promise<RefreshResponse> => {
+    const API_BASE = getApiBase();
     const response = await fetch(`${API_BASE}/api/auth/refresh`, {
       method: 'POST',
       headers: { 'Refresh-Token': token },
@@ -54,6 +55,7 @@ export const authAPI = {
   },
 
   register: async (credentials: { username: string, password: string }): Promise<void> => {
+    const API_BASE = getApiBase();
     const response = await fetch(`${API_BASE}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -87,6 +89,7 @@ const processQueue = (error: any = null) => {
 };
 
 export const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}, contentType: string | null = 'application/json'): Promise<Response> => {
+  const API_BASE = getApiBase();
   const accessToken = storage.getAccessToken();
   const refreshToken = storage.getRefreshToken();
   const headers = contentType ? {

@@ -30,7 +30,6 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
   useEffect(() => {
     if (group) {
       setName(group.name);
-      setDescription(group.description || '');
       setIcon(group.icon || '');
     }
   }, [group]);
@@ -95,7 +94,6 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
     // Восстанавливаем исходные данные
     if (group) {
       setName(group.name);
-      setDescription(group.description || '');
       setIcon(group.icon || '');
     }
     onClose();

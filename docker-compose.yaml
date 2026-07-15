@@ -1,10 +1,13 @@
-version: "3"
-
 services:
   frontend:
     build:
-      context: . 
+      context: .
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     container_name: frontend-v2
+    environment:
+      - API_BASE=http://localhost:5000
+    # Чтобы подложить свой config.json (заменит ENV):
+    # volumes:
+    #   - ./config.json:/app/build/config.json:ro
