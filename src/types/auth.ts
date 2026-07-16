@@ -1,14 +1,19 @@
-export interface LoginData {
+export interface LoginRequest {
   username: string;
   password: string;
 }
 
-export interface AuthResponse {
-  token: string;
+export interface RegisterRequest {
+  username: string;
+  password: string;
 }
 
-export interface RefreshResponse {
-  accessToken: string;
+export interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
+  scope?: string;
 }
 
 export interface WhoAmIResponse {
