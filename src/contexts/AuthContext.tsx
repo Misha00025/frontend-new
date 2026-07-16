@@ -1,15 +1,14 @@
-// src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { AuthResponse, RefreshResponse } from '../types/auth';
+import { TokenResponse, WhoAmIResponse } from '../types/auth';
 import { authAPI, makeAuthenticatedRequest } from '../services/api';
 import { storage } from '../utils/storage';
 
 interface AuthContextType {
   accessToken: string | null;
+  userId: number | null;
   login: (username: string, password: string) => Promise<void>;
   register: (username: string, password: string) => Promise<void>;
   logout: () => void;
-  refreshToken: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,57 +16,53 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
-
+  const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    const savedAccessToken = storage.getAccessToken();
-    const savedRefreshToken = storage.getRefreshToken();
-    
-    if (savedAccessToken && savedAccessToken !== 'undefined') {
-      setAccessToken(savedAccessToken);
-    } else if (savedRefreshToken && savedRefreshToken !== 'undefined') {
-      refreshToken();
-    } else {
-      logout()
-    }
-  }, []);
+    const initAuth = async () => {
+      const savedRefreshToken = storage.getRefreshToken();
 
-  const refreshToken = async (): Promise<void> => {
-    const refreshToken = storage.getRefreshToken();
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
-    try {
-      const refreshData: RefreshResponse = await authAPI.refresh(refreshToken);
-      if (!refreshData.accessToken){
-        storage.setRefreshToken('')
-        throw new Error('Token Expired')
+      if (!savedRefreshToken) {
+        setInitializing(false);
+        return;
       }
-      setAccessToken(refreshData.accessToken);
-      storage.setAccessToken(refreshData.accessToken);
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      logout();
-      throw error;
-    }
-  };
+
+      try {
+        const tokenData: TokenResponse = await authAPI.refresh(savedRefreshToken);
+        storage.setAccessToken(tokenData.access_token);
+        storage.setRefreshToken(tokenData.refresh_token);
+        setAccessToken(tokenData.access_token);
+
+        // Получаем whoami
+        const whoamiResponse = await makeAuthenticatedRequest('/whoami');
+        if (whoamiResponse.ok) {
+          const whoamiData: WhoAmIResponse = await whoamiResponse.json();
+          setUserId(whoamiData.id);
+          localStorage.setItem('userId', whoamiData.id.toString());
+        }
+      } catch (error) {
+        console.error('Session restore failed:', error);
+        storage.clearTokens();
+        localStorage.removeItem('userId');
+      } finally {
+        setInitializing(false);
+      }
+    };
+
+    initAuth();
+  }, []);
 
   const login = async (username: string, password: string) => {
     try {
-      const loginData: AuthResponse = await authAPI.login({ username, password });
-      
-      if (!loginData.token)
-        throw new Error('Invalid username or password');
+      const tokenData: TokenResponse = await authAPI.login({ username, password });
 
-      storage.setRefreshToken(loginData.token);
-      
-      const refreshData: RefreshResponse = await authAPI.refresh(loginData.token);
-      setAccessToken(refreshData.accessToken);
-      storage.setAccessToken(refreshData.accessToken);
-      const whoamiResponse = await makeAuthenticatedRequest('/api/whoami');
+      storage.setAccessToken(tokenData.access_token);
+      storage.setRefreshToken(tokenData.refresh_token);
+      setAccessToken(tokenData.access_token);
+
+      const whoamiResponse = await makeAuthenticatedRequest('/whoami');
       if (whoamiResponse.ok) {
-        const whoamiData = await whoamiResponse.json();
+        const whoamiData: WhoAmIResponse = await whoamiResponse.json();
         setUserId(whoamiData.id);
         localStorage.setItem('userId', whoamiData.id.toString());
       }
@@ -94,13 +89,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem('userId');
   };
 
+  if (initializing) {
+    return null; // Или можно показать лоадер
+  }
+
   return (
-    <AuthContext.Provider value={{ 
-      accessToken, 
+    <AuthContext.Provider value={{
+      accessToken,
+      userId,
       login,
       register,
       logout,
-      refreshToken
     }}>
       {children}
     </AuthContext.Provider>

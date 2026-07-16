@@ -1,7 +1,7 @@
 // src/hooks/useProfile.ts
 import { useState, useCallback, useEffect } from 'react';
 import { WhoAmIResponse, UserProfile } from '../types/auth';
-import { makeAuthenticatedRequest, refreshToken } from '../services/api';
+import { makeAuthenticatedRequest } from '../services/api';
 
 export const useProfile = (fetchOnMount: boolean = false) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -13,49 +13,37 @@ export const useProfile = (fetchOnMount: boolean = false) => {
     setLoading(true);
     setError(null);
     setProfileNotFound(false);
-    
+
     try {
       // Первый запрос: whoami
-      const whoamiResponse = await makeAuthenticatedRequest('/api/whoami');
-      
+      const whoamiResponse = await makeAuthenticatedRequest('/whoami');
+
       if (whoamiResponse.status === 401) {
-        // Попытка обновить токен
-        const refreshSuccess = await refreshToken();
-        if (!refreshSuccess) {
-          throw new Error('Session expired. Please login again.');
-        }
-        // Повторяем запрос после обновления токена
-        return fetchProfile();
+        throw new Error('Session expired. Please login again.');
       }
-      
+
       if (!whoamiResponse.ok) {
         throw new Error('Failed to fetch user info');
       }
-      
+
       const whoamiData: WhoAmIResponse = await whoamiResponse.json();
-      
+
       // Второй запрос: данные пользователя
-      const profileResponse = await makeAuthenticatedRequest(`/api/users/${whoamiData.id}`);
-      
+      const profileResponse = await makeAuthenticatedRequest(`/users/${whoamiData.id}`);
+
       if (profileResponse.status === 404) {
         setProfileNotFound(true);
         return;
       }
-      
+
       if (profileResponse.status === 401) {
-        // Попытка обновить токен
-        const refreshSuccess = await refreshToken();
-        if (!refreshSuccess) {
-          throw new Error('Session expired. Please login again.');
-        }
-        // Повторяем запрос после обновления токена
-        return fetchProfile();
+        throw new Error('Session expired. Please login again.');
       }
-      
+
       if (!profileResponse.ok) {
         throw new Error('Failed to fetch profile');
       }
-      
+
       const profileData: UserProfile = await profileResponse.json();
       setProfile(profileData);
       setProfileNotFound(false);

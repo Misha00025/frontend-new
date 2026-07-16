@@ -1,5 +1,5 @@
 import { getApiBase } from '../config';
-import { LoginData, AuthResponse, RefreshResponse, UserProfile } from '../types/auth';
+import { LoginRequest, RegisterRequest, TokenResponse, UserProfile } from '../types/auth';
 import { CreateGroupRequest, Group, GroupsResponse } from '../types/group';
 import { storage } from '../utils/storage';
 import { GroupUser, GroupUsersResponse, SearchUsersResponse, User } from '../types/groupUsers';
@@ -29,52 +29,69 @@ import {
   UpdateCharacterItemRequest
 } from '../types/characterItems';
 import { GroupNote, CreateGroupNoteRequest, UpdateGroupNoteRequest } from '../types/groupNotes';
-import { useAuth } from '../contexts/AuthContext';
 import { CreateGroupSkillRequest, CreateSkillAttributeRequest, GroupSkill, GroupSkillsResponse, SkillAttributeDefinition, SkillAttributesResponse, UpdateGroupSkillRequest } from '../types/groupSkills';
 import { GroupSchema, TemplateSchema } from '../types/groupSchemas';
 
 
 export const authAPI = {
-  login: async (credentials: LoginData): Promise<AuthResponse> => {
+  login: async (credentials: LoginRequest): Promise<TokenResponse> => {
     const API_BASE = getApiBase();
-    const response = await fetch(`${API_BASE}/api/auth/login`, {
+    const response = await fetch(`${API_BASE}/auth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        grant_type: 'password',
+        username: credentials.username,
+        password: credentials.password,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error_description || 'Login failed');
+    }
+
+    return response.json();
+  },
+
+  refresh: async (refreshToken: string): Promise<TokenResponse> => {
+    const API_BASE = getApiBase();
+    const response = await fetch(`${API_BASE}/auth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error_description || 'Token refresh failed');
+    }
+
+    return response.json();
+  },
+
+  register: async (credentials: RegisterRequest): Promise<void> => {
+    const API_BASE = getApiBase();
+    const response = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials),
     });
-    return response.json();
-  },
 
-  refresh: async (token: string): Promise<RefreshResponse> => {
-    const API_BASE = getApiBase();
-    const response = await fetch(`${API_BASE}/api/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Refresh-Token': token },
-    });
-    return response.json();
-  },
-
-  register: async (credentials: { username: string, password: string }): Promise<void> => {
-    const API_BASE = getApiBase();
-    const response = await fetch(`${API_BASE}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials),
-    });
-    
     if (response.status === 409) {
       throw new Error('Username already exists');
     }
-    
+
     if (!response.ok) {
       throw new Error('Registration failed');
     }
   },
 };
 
-// Флаг для отслеживания процесса обновления токена
 let isRefreshing = false;
-// Очередь запросов, которые нужно повторить после обновления токена
 let failedQueue: Array<{ resolve: (value?: any) => void; reject: (reason?: any) => void }> = [];
 
 const processQueue = (error: any = null) => {
@@ -88,41 +105,48 @@ const processQueue = (error: any = null) => {
   failedQueue = [];
 };
 
-export const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}, contentType: string | null = 'application/json'): Promise<Response> => {
+export const makeAuthenticatedRequest = async (
+  endpoint: string,
+  options: RequestInit = {},
+  contentType: string | null = 'application/json'
+): Promise<Response> => {
   const API_BASE = getApiBase();
   const accessToken = storage.getAccessToken();
-  const refreshToken = storage.getRefreshToken();
-  const headers = contentType ? {
-    'Content-Type': contentType,
-    ...options.headers,
-    ...(accessToken ? { 'Authorization': accessToken } : {}),
-  } : {
-    ...options.headers,
-    ...(accessToken ? { 'Authorization': accessToken } : {}),
-  };
-  
+  const refreshTokenValue = storage.getRefreshToken();
+
+  const authHeaders: Record<string, string> = accessToken
+    ? { 'Authorization': `Bearer ${accessToken}` }
+    : {};
+
+  const headers = contentType
+    ? { 'Content-Type': contentType, ...options.headers as Record<string, string>, ...authHeaders }
+    : { ...options.headers as Record<string, string>, ...authHeaders };
+
   try {
     const response = await fetch(`${API_BASE}${endpoint}`, {
       ...options,
       headers,
     });
 
-    if (response.status === 401 && refreshToken && !isRefreshing) {
+    if (response.status === 401 && refreshTokenValue && !isRefreshing) {
       isRefreshing = true;
+
       try {
-        const refreshData = await authAPI.refresh(refreshToken);
-        const newAccessToken = refreshData.accessToken;
-        
-        storage.setAccessToken(newAccessToken);
-        
+        const tokenData = await authAPI.refresh(refreshTokenValue);
+        storage.setAccessToken(tokenData.access_token);
+        storage.setRefreshToken(tokenData.refresh_token);
+
         const newHeaders = {
-          ...headers,
-          'Authorization': newAccessToken,
+          ...options.headers as Record<string, string>,
+          'Authorization': `Bearer ${tokenData.access_token}`,
+          ...(contentType ? { 'Content-Type': contentType } : {}),
         };
+
         const retryResponse = await fetch(`${API_BASE}${endpoint}`, {
           ...options,
           headers: newHeaders,
         });
+
         isRefreshing = false;
         processQueue();
         return retryResponse;
@@ -130,37 +154,36 @@ export const makeAuthenticatedRequest = async (endpoint: string, options: Reques
         isRefreshing = false;
         processQueue(refreshError);
         storage.clearTokens();
-        window.location.reload();
         throw new Error('Session expired. Please login again.');
       }
     }
-    
+
+    if (response.status === 401 && refreshTokenValue && isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      }).then(() => {
+        const newToken = storage.getAccessToken();
+        const newHeaders = {
+          ...options.headers as Record<string, string>,
+          'Authorization': `Bearer ${newToken}`,
+          ...(contentType ? { 'Content-Type': contentType } : {}),
+        };
+        return fetch(`${API_BASE}${endpoint}`, {
+          ...options,
+          headers: newHeaders,
+        });
+      });
+    }
+
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-export const refreshToken = async (): Promise<boolean> => {
-  try {
-    const refreshToken = storage.getRefreshToken();
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-    
-    const refreshData = await authAPI.refresh(refreshToken);
-    storage.setAccessToken(refreshData.accessToken);
-    return true;
-  } catch (error) {
-    console.error('Token refresh failed:', error);
-    storage.clearTokens();
-    return false;
-  }
-};
-
 export const groupAPI = {
   getGroups: async (): Promise<Group[]> => {
-    const response = await makeAuthenticatedRequest('/api/groups');
+    const response = await makeAuthenticatedRequest('/groups');
     if (!response.ok) {
       throw new Error('Failed to fetch groups');
     }
@@ -169,7 +192,7 @@ export const groupAPI = {
   },
 
   getGroup: async (groupId: number): Promise<Group> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}`);
     if (!response.ok) {
       throw new Error('Failed to fetch group');
     }
@@ -177,23 +200,23 @@ export const groupAPI = {
   },
 
   createGroup: async (groupData: CreateGroupRequest): Promise<Group> => {
-    const response = await makeAuthenticatedRequest('/api/groups', {
+    const response = await makeAuthenticatedRequest('/groups', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(groupData),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to create group');
     }
-    
+
     return response.json();
   },
 
   updateGroup: async (groupId: number, groupData: { name?: string; icon?: string }): Promise<Group> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -210,9 +233,8 @@ export const groupAPI = {
 
   getSchema: async (groupId: number, schemaType: 'items' | 'skills'): Promise<GroupSchema> => {
     try {
-      const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/schemas/${schemaType}`);
+      const response = await makeAuthenticatedRequest(`/groups/${groupId}/schemas/${schemaType}`);
       if (!response.ok) {
-        // Если 404 - возвращаем пустую схему
         if (response.status === 404) {
           return { type: schemaType, groupBy: [] };
         }
@@ -220,15 +242,13 @@ export const groupAPI = {
       }
       return response.json();
     } catch (error) {
-      // При любой ошибке возвращаем пустую схему
       console.error(`Error fetching ${schemaType} schema:`, error);
       return { type: schemaType, groupBy: [] };
     }
   },
 
-  // Общий метод для обновления схемы
   updateSchema: async (groupId: number, schemaType: 'items' | 'skills', groupBy: string[]): Promise<GroupSchema> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/schemas/${schemaType}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/schemas/${schemaType}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -241,7 +261,6 @@ export const groupAPI = {
     return response.json();
   },
 
-  // Методы-обёртки для обратной совместимости и удобства
   getItemsSchema: async (groupId: number): Promise<GroupSchema> => {
     return groupAPI.getSchema(groupId, 'items');
   },
@@ -260,9 +279,8 @@ export const groupAPI = {
 
   getTemplateSchema: async (groupId: number): Promise<TemplateSchema> => {
     try {
-      const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/schemas/template`);
+      const response = await makeAuthenticatedRequest(`/groups/${groupId}/schemas/template`);
       if (!response.ok) {
-        // Если 404 - возвращаем пустую схему
         if (response.status === 404) {
           return {categories: []};
         }
@@ -270,14 +288,13 @@ export const groupAPI = {
       }
       return response.json();
     } catch (error) {
-      // При любой ошибке возвращаем пустую схему
       console.error(`Error fetching template schema:`, error);
       return {categories: []};
     }
   },
 
   updateTemplateSchema: async (groupId: number, schema: TemplateSchema): Promise<TemplateSchema> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/schemas/template`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/schemas/template`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -291,7 +308,7 @@ export const groupAPI = {
   },
 
   exportGroup: async (groupId: number): Promise<Record<string, unknown>> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/export`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/export`);
     if (!response.ok) {
       throw new Error('Failed to export group data');
     }
@@ -299,7 +316,7 @@ export const groupAPI = {
   },
 
   importGroup: async (groupId: number, data: Record<string, unknown>): Promise<Record<string, unknown>> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/import`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/import`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -316,7 +333,7 @@ export const groupAPI = {
 
 export const groupUsersAPI = {
   searchUsers: async (nickname: string): Promise<User[]> => {
-    const response = await makeAuthenticatedRequest(`/api/users?nickname=${encodeURIComponent(nickname)}`);
+    const response = await makeAuthenticatedRequest(`/users?nickname=${encodeURIComponent(nickname)}`);
     if (!response.ok) {
       throw new Error('Failed to search users');
     }
@@ -325,7 +342,7 @@ export const groupUsersAPI = {
   },
 
   getGroupUsers: async (groupId: number): Promise<GroupUser[]> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/users`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/users`);
     if (!response.ok) {
       throw new Error('Failed to fetch group users');
     }
@@ -334,7 +351,7 @@ export const groupUsersAPI = {
   },
 
   addUserToGroup: async (groupId: number, userId: number, isAdmin: boolean): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/users/${userId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/users/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -347,7 +364,7 @@ export const groupUsersAPI = {
   },
 
   removeUserFromGroup: async (groupId: number, userId: number): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/users/${userId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/users/${userId}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -359,7 +376,7 @@ export const groupUsersAPI = {
 
 export const characterTemplatesAPI = {
   getTemplates: async (groupId: number): Promise<CharacterTemplate[]> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/templates`);
     if (!response.ok) {
       throw new Error('Failed to fetch templates');
     }
@@ -368,7 +385,7 @@ export const characterTemplatesAPI = {
   },
 
   getTemplate: async (groupId: number, templateId: number): Promise<CharacterTemplate> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates/${templateId}`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/templates/${templateId}`);
     if (!response.ok) {
       throw new Error('Failed to fetch template');
     }
@@ -376,7 +393,7 @@ export const characterTemplatesAPI = {
   },
 
   createTemplate: async (groupId: number, templateData: CreateTemplateRequest): Promise<CharacterTemplate> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/templates`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -390,7 +407,7 @@ export const characterTemplatesAPI = {
   },
 
   updateTemplate: async (groupId: number, templateId: number, templateData: UpdateTemplateRequest): Promise<CharacterTemplate> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/templates`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -404,7 +421,7 @@ export const characterTemplatesAPI = {
   },
 
   deleteTemplate: async (groupId: number, templateId: number): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/templates/${templateId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/templates/${templateId}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -415,7 +432,7 @@ export const characterTemplatesAPI = {
 
 export const charactersAPI = {
   getCharacters: async (groupId: number): Promise<CharacterShort[]> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters`);
     if (!response.ok) {
       throw new Error('Failed to fetch characters');
     }
@@ -423,7 +440,7 @@ export const charactersAPI = {
   },
 
   getCharacter: async (groupId: number, characterId: number): Promise<Character> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}`);
     if (!response.ok) {
       throw new Error('Failed to fetch character');
     }
@@ -431,7 +448,7 @@ export const charactersAPI = {
   },
 
   createCharacter: async (groupId: number, characterData: CreateCharacterRequest): Promise<Character> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -445,7 +462,7 @@ export const charactersAPI = {
   },
 
   updateCharacter: async (groupId: number, characterId: number, characterData: UpdateCharacterRequest): Promise<Character> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -459,7 +476,7 @@ export const charactersAPI = {
   },
 
   deleteCharacter: async (groupId: number, characterId: number): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -470,7 +487,7 @@ export const charactersAPI = {
 
 export const characterUsersAPI = {
   getCharacterUsers: async (groupId: number, characterId: number): Promise<CharacterUser[]> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/users`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/users`);
     if (!response.ok) {
       throw new Error('Failed to fetch character users');
     }
@@ -479,7 +496,7 @@ export const characterUsersAPI = {
   },
 
   addUserToCharacter: async (groupId: number, characterId: number, userId: number, canWrite: boolean): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/users/${userId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/users/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -492,7 +509,7 @@ export const characterUsersAPI = {
   },
 
   removeUserFromCharacter: async (groupId: number, characterId: number, userId: number): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/users/${userId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/users/${userId}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -503,7 +520,7 @@ export const characterUsersAPI = {
 
 export const groupItemsAPI = {
   getItems: async (groupId: number): Promise<GroupItem[]> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/items`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/items`);
     if (!response.ok) {
       throw new Error('Failed to fetch group items');
     }
@@ -512,7 +529,7 @@ export const groupItemsAPI = {
   },
 
   createItem: async (groupId: number, itemData: CreateGroupItemRequest): Promise<GroupItem> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/items`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/items`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -526,7 +543,7 @@ export const groupItemsAPI = {
   },
 
   updateItem: async (groupId: number, itemId: number, itemData: UpdateGroupItemRequest): Promise<GroupItem> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/items/${itemId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/items/${itemId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -540,7 +557,7 @@ export const groupItemsAPI = {
   },
 
   deleteItem: async (groupId: number, itemId: number): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/items/${itemId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/items/${itemId}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -551,7 +568,7 @@ export const groupItemsAPI = {
 
 export const groupNotesAPI = {
   getNotes: async (groupId: number): Promise<GroupNote[]> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/notes`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/notes`);
     if (!response.ok) {
       throw new Error('Failed to fetch group notes');
     }
@@ -563,7 +580,7 @@ export const groupNotesAPI = {
   },
 
   getNote: async (groupId: number, noteId: number): Promise<GroupNote> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/notes/${noteId}`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/notes/${noteId}`);
     if (!response.ok) {
       throw new Error('Failed to fetch note');
     }
@@ -571,7 +588,7 @@ export const groupNotesAPI = {
   },
 
   createNote: async (groupId: number, noteData: CreateGroupNoteRequest): Promise<GroupNote> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/notes`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/notes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -590,7 +607,7 @@ export const groupNotesAPI = {
   },
 
   updateNote: async (groupId: number, noteId: number, noteData: UpdateGroupNoteRequest): Promise<GroupNote> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/notes/${noteId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/notes/${noteId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -609,7 +626,7 @@ export const groupNotesAPI = {
   },
 
   deleteNote: async (groupId: number, noteId: number): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/notes/${noteId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/notes/${noteId}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -620,7 +637,7 @@ export const groupNotesAPI = {
 
 export const characterItemsAPI = {
   getCharacterItems: async (groupId: number, characterId: number): Promise<CharacterItem[]> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/items`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/items`);
     if (!response.ok) {
       throw new Error('Failed to fetch character items');
     }
@@ -629,7 +646,7 @@ export const characterItemsAPI = {
   },
 
   createCharacterItem: async (groupId: number, characterId: number, itemData: CreateCharacterItemRequest): Promise<CharacterItem> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/items`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/items`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -643,7 +660,7 @@ export const characterItemsAPI = {
   },
 
   updateCharacterItem: async (groupId: number, characterId: number, itemId: number, itemData: UpdateCharacterItemRequest): Promise<CharacterItem> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/items/${itemId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/items/${itemId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -657,7 +674,7 @@ export const characterItemsAPI = {
   },
 
   deleteCharacterItem: async (groupId: number, characterId: number, itemId: number): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/items/${itemId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/items/${itemId}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -668,27 +685,27 @@ export const characterItemsAPI = {
 
 export const userAPI = {
   createProfile: async (profileData: { nickname: string, visibleName: string, imageLink?: string }): Promise<UserProfile> => {
-    const response = await makeAuthenticatedRequest('/api/users', {
+    const response = await makeAuthenticatedRequest('/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(profileData),
     });
-    
+
     if (response.status === 409) {
       throw new Error('Nickname already exists');
     }
-    
+
     if (!response.ok) {
       throw new Error('Failed to create profile');
     }
-    
+
     return response.json();
   },
 
   updateProfile: async (userId: number, profileData: { visibleName: string, imageLink?: string }): Promise<UserProfile> => {
-    const response = await makeAuthenticatedRequest(`/api/users/${userId}`, {
+    const response = await makeAuthenticatedRequest(`/users/${userId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -706,9 +723,8 @@ export const userAPI = {
 
 
 export const groupSkillsAPI = {
-  // Получить все навыки группы
   getSkills: async (groupId: number): Promise<GroupSkill[]> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/skills`);
     if (!response.ok) {
       throw new Error('Failed to fetch group skills');
     }
@@ -716,18 +732,16 @@ export const groupSkillsAPI = {
     return data.skills;
   },
 
-  // Получить конкретный навык
   getSkill: async (groupId: number, skillId: number): Promise<GroupSkill> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills/${skillId}`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/skills/${skillId}`);
     if (!response.ok) {
       throw new Error('Failed to fetch skill');
     }
     return response.json();
   },
 
-  // Создать новый навык
   createSkill: async (groupId: number, skillData: CreateGroupSkillRequest): Promise<GroupSkill> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/skills`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -740,9 +754,8 @@ export const groupSkillsAPI = {
     return response.json();
   },
 
-  // Обновить навык
   updateSkill: async (groupId: number, skillId: number, skillData: UpdateGroupSkillRequest): Promise<GroupSkill> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills/${skillId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/skills/${skillId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -755,9 +768,8 @@ export const groupSkillsAPI = {
     return response.json();
   },
 
-  // Удалить навык
   deleteSkill: async (groupId: number, skillId: number): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills/${skillId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/skills/${skillId}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -765,9 +777,8 @@ export const groupSkillsAPI = {
     }
   },
 
-  // Получить атрибуты навыков группы
   getSkillAttributes: async (groupId: number): Promise<SkillAttributeDefinition[]> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills/attributes`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/skills/attributes`);
     if (!response.ok) {
       throw new Error('Failed to fetch skill attributes');
     }
@@ -775,9 +786,8 @@ export const groupSkillsAPI = {
     return data.attributes;
   },
 
-  // Добавить/обновить атрибут навыка
   updateSkillAttributes: async (groupId: number, attributesData: CreateSkillAttributeRequest[]): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills/attributes`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/skills/attributes`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -789,10 +799,9 @@ export const groupSkillsAPI = {
     }
   },
 
-  // Получить навыки с фильтрацией по атрибутам
   getSkillsWithFilter: async (groupId: number, filters: Record<string, string>): Promise<GroupSkill[]> => {
     const params = new URLSearchParams(filters).toString();
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/skills?${params}`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/skills?${params}`);
     if (!response.ok) {
       throw new Error('Failed to fetch filtered skills');
     }
@@ -802,9 +811,8 @@ export const groupSkillsAPI = {
 };
 
 export const characterSkillsAPI = {
-  // Получить навыки персонажа
   getCharacterSkills: async (groupId: number, characterId: number): Promise<GroupSkill[]> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/skills`);
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/skills`);
     if (!response.ok) {
       throw new Error('Failed to fetch character skills');
     }
@@ -812,9 +820,8 @@ export const characterSkillsAPI = {
     return data.skills;
   },
 
-  // Добавить навык персонажу
   addSkillToCharacter: async (groupId: number, characterId: number, skillId: number): Promise<GroupSkill> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/skills/${skillId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/skills/${skillId}`, {
       method: 'PUT',
     });
     if (!response.ok) {
@@ -823,9 +830,8 @@ export const characterSkillsAPI = {
     return response.json();
   },
 
-  // Удалить навык у персонажа
   removeSkillFromCharacter: async (groupId: number, characterId: number, skillId: number): Promise<void> => {
-    const response = await makeAuthenticatedRequest(`/api/groups/${groupId}/characters/${characterId}/skills/${skillId}`, {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/skills/${skillId}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -839,7 +845,6 @@ export const uploadAPI = {
     const formData = new FormData();
     formData.append('file', file);
 
-    // Для FormData не устанавливаем Content-Type вручную, браузер сделает это автоматически
     const response = await makeAuthenticatedRequest('/upload', {
       method: 'POST',
       body: formData,
