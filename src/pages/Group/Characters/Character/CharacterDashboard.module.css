@@ -177,3 +177,19 @@
 .cardList > *:last-child {
   margin-bottom: 0;
 }
+
+.placeholder {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.placeholder p {
+  margin: 0.25rem 0;
+}
+
+.gearHint {
+  font-size: 1rem;
+}

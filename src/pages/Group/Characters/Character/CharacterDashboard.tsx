@@ -123,49 +123,59 @@ const CharacterDashboard: React.FC = () => {
             ⚙️
           </button>
           <div className={styles.dashboardGrid}>
-            {(resourceFields.length > 0 || resourceItems.length > 0) && (
-              <div className={styles.column}>
-                {resourceFields.length > 0 && (
-                  <div className={styles.section}>
-                    <h3 className={styles.sectionTitle}>Поля</h3>
-                    <table className={styles.table}>
-                      <tbody>
-                        {resourceFields.map(([fieldKey, field]) => (
-                          <FieldResourceRow
-                            key={fieldKey}
-                            field={field}
-                            editable={canEditThisCharacter}
-                            onUpdate={(value) => handleUpdateField(fieldKey, value)}
-                          />
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-                {resourceItems.length > 0 && (
-                  <div className={styles.section}>
-                    <h3 className={styles.sectionTitle}>Предметы</h3>
-                    <table className={styles.table}>
-                      <tbody>
-                        {resourceItems.map(item => (
-                          <ItemResourceRow
-                            key={item.id}
-                            item={item}
-                            editable={canEditThisCharacter}
-                            onUpdateAmount={(amount) => handleUpdateItemAmount(item.id, amount)}
-                          />
-                        ))}
-                      </tbody>
-                    </table>
+            {/* Первая колонка: Поля + Предметы */}
+            <div className={styles.column}>
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Поля</h3>
+                {resourceFields.length > 0 ? (
+                  <table className={styles.table}>
+                    <tbody>
+                      {resourceFields.map(([fieldKey, field]) => (
+                        <FieldResourceRow
+                          key={fieldKey}
+                          field={field}
+                          editable={canEditThisCharacter}
+                          onUpdate={(value) => handleUpdateField(fieldKey, value)}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className={styles.placeholder}>
+                    <p>Нет выбранных полей.</p>
+                    <p>Нажмите <span className={styles.gearHint}>⚙️</span>, чтобы настроить отображение.</p>
                   </div>
                 )}
               </div>
-            )}
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>Предметы</h3>
+                {resourceItems.length > 0 ? (
+                  <table className={styles.table}>
+                    <tbody>
+                      {resourceItems.map(item => (
+                        <ItemResourceRow
+                          key={item.id}
+                          item={item}
+                          editable={canEditThisCharacter}
+                          onUpdateAmount={(amount) => handleUpdateItemAmount(item.id, amount)}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className={styles.placeholder}>
+                    <p>Нет выбранных предметов.</p>
+                    <p>Перейдите во вкладку «Инвентарь» и добавьте предметы, затем настройте отображение через ⚙️.</p>
+                  </div>
+                )}
+              </div>
+            </div>
 
-            {equippedItems.length > 0 && (
-              <div className={styles.column}>
-                <div className={styles.cardSection}>
-                  <h3 className={styles.sectionTitle}>Экипировка</h3>
+            {/* Вторая колонка: Экипировка */}
+            <div className={styles.column}>
+              <div className={styles.cardSection}>
+                <h3 className={styles.sectionTitle}>Экипировка</h3>
+                {equippedItems.length > 0 ? (
                   <div className={styles.cardList}>
                     {equippedItems.map(item => (
                       <ItemCard
@@ -177,14 +187,20 @@ const CharacterDashboard: React.FC = () => {
                       />
                     ))}
                   </div>
-                </div>
+                ) : (
+                  <div className={styles.placeholder}>
+                    <p>Нет экипированных предметов.</p>
+                    <p>Отметьте предметы как экипированные во вкладке «Инвентарь», затем настройте отображение через ⚙️.</p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
-            {pinnedSkills.length > 0 && (
-              <div className={styles.column}>
-                <div className={styles.cardSection}>
-                  <h3 className={styles.sectionTitle}>Способности</h3>
+            {/* Третья колонка: Способности */}
+            <div className={styles.column}>
+              <div className={styles.cardSection}>
+                <h3 className={styles.sectionTitle}>Способности</h3>
+                {pinnedSkills.length > 0 ? (
                   <div className={styles.cardList}>
                     {pinnedSkills.map(skill => (
                       <SkillCard
@@ -195,9 +211,14 @@ const CharacterDashboard: React.FC = () => {
                       />
                     ))}
                   </div>
-                </div>
+                ) : (
+                  <div className={styles.placeholder}>
+                    <p>Нет закреплённых способностей.</p>
+                    <p>Перейдите во вкладку «Способности» и закрепите нужные, затем настройте отображение через ⚙️.</p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}
