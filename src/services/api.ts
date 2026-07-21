@@ -128,21 +128,31 @@ export const makeAuthenticatedRequest = async (
     ? { 'Content-Type': contentType, ...options.headers as Record<string, string>, ...authHeaders }
     : { ...options.headers as Record<string, string>, ...authHeaders };
 
-  try {
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-      ...options,
-      headers,
-    });
+  const execute = (): Promise<Response> =>
+    fetch(`${API_BASE}${endpoint}`, { ...options, headers });
 
-    if (response.status === 401) {
+  let response = await execute();
+
+  if (response.status === 401) {
+    tokenManager.invalidateAccessToken();
+    const newToken = await tokenManager.ensureToken();
+
+    if (!newToken) {
       tokenManager.clear();
       throw new Error('Session expired. Please login again.');
     }
 
-    return response;
-  } catch (error) {
-    throw error;
+    authHeaders['Authorization'] = `Bearer ${newToken}`;
+    const retryHeaders = contentType
+      ? { 'Content-Type': contentType, ...options.headers as Record<string, string>, ...authHeaders }
+      : { ...options.headers as Record<string, string>, ...authHeaders };
+
+    Object.assign(headers, retryHeaders);
+
+    response = await execute();
   }
+
+  return response;
 };
 
 export const groupAPI = {

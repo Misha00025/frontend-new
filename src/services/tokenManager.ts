@@ -48,6 +48,10 @@ const tokenManager = {
     localStorage.setItem('refreshToken', refresh);
   },
 
+  invalidateAccessToken: () => {
+    accessToken = null;
+  },
+
   clear: () => {
     accessToken = null;
     localStorage.removeItem('refreshToken');
