@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { GroupItem } from '../../../../types/groupItems';
 import { CharacterItem } from '../../../../types/characterItems';
 import styles from './ItemCard.module.css';
 import cardStyles from '../../../../styles/card-item.module.css';
 import ReactMarkdown from 'react-markdown';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
+import { DashboardSettingsContext } from '../../../../contexts/DashboardSettingsContext';
 
 interface ItemCardProps {
   item: GroupItem | CharacterItem;
@@ -22,6 +23,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
   showAmount = false
 }) => {
   const isCharacterItem = 'amount' in item;
+  const dashboardCtx = useContext(DashboardSettingsContext);
   const [isExpanded, setIsExpanded] = useState(false);
   
   const getExtendedAttributes = () => {
@@ -90,6 +92,30 @@ const ItemCard: React.FC<ItemCardProps> = ({
           </div>
           {showActions && (
             <div className={cardStyles.actions}>
+              {isCharacterItem && dashboardCtx && (
+                <>
+                  <button
+                    className={cardStyles.dashboardAction}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      dashboardCtx.toggleItem(item.id);
+                    }}
+                    title={dashboardCtx.isItemResource(item.id) ? 'Убрать с главной' : 'Добавить как ресурс на главную'}
+                  >
+                    {dashboardCtx.isItemResource(item.id) ? '📦✓' : '📦'}
+                  </button>
+                  <button
+                    className={`${cardStyles.dashboardAction} ${dashboardCtx.isItemEquipped(item.id) ? cardStyles.equipped : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      dashboardCtx.toggleEquipped(item.id);
+                    }}
+                    title={dashboardCtx.isItemEquipped(item.id) ? 'Снять экипировку' : 'Экипировать'}
+                  >
+                    {dashboardCtx.isItemEquipped(item.id) ? '⚔️✓' : '⚔️'}
+                  </button>
+                </>
+              )}
               {onEdit && (
                 <IconButton 
                   icon="edit" 

@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react';
 import { CategoryData } from '../../../../../utils/characterFields';
 import styles from './CategoryTable.module.css';
 import { TemplateEditContext } from '../../../../../contexts/TemplateEditContext';
+import { useDashboardSettingsContext } from '../../../../../contexts/DashboardSettingsContext';
 import DropdownMenu, { MenuItem } from '../../../../../components/commons/DropdownMenu/DropdownMenu';
 import FieldRow from '../FieldCard/FieldRow';
 
@@ -27,6 +28,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
 }) => {
   const templateEditContext = useContext(TemplateEditContext);
   const editMode = templateEditContext?.editMode || false;
+  const { isFieldOnDashboard, toggleField } = useDashboardSettingsContext();
   const [isDragOver, setIsDragOver] = useState(false);
   const draggableFields = templateEditContext?.onMoveFieldToCategory !== undefined && editMode
 
@@ -48,6 +50,12 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
         onClick: () => templateEditContext.onChangeFieldType?.(fieldKey),
       });
     }
+    
+    const isOnDashboard = isFieldOnDashboard(fieldKey);
+    items.push({
+      label: isOnDashboard ? '📌 Убрать с главной' : '📌 На главную',
+      onClick: () => toggleField(fieldKey),
+    });
     
     if (templateEditContext?.onDeleteField) {
       items.push({

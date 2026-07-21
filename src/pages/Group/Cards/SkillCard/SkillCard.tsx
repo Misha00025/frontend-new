@@ -1,9 +1,10 @@
 // components/Cards/SkillCard.tsx
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { GroupSkill, SkillAttribute } from '../../../../types/groupSkills';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
 import cardStyles from '../../../../styles/card-item.module.css';
 import ReactMarkdown from 'react-markdown';
+import { DashboardSettingsContext } from '../../../../contexts/DashboardSettingsContext';
 
 interface SkillCardProps {
   skill: GroupSkill;
@@ -19,6 +20,7 @@ const SkillCard: React.FC<SkillCardProps> = ({
   showActions = true
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const dashboardCtx = useContext(DashboardSettingsContext);
 
   return (
     <div id={`skill-${skill.id}`} className={cardStyles.card}>
@@ -52,6 +54,18 @@ const SkillCard: React.FC<SkillCardProps> = ({
           
           {showActions && (
             <div className={cardStyles.actions}>
+              {dashboardCtx && (
+                <button
+                  className={cardStyles.dashboardAction}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    dashboardCtx.togglePinnedSkill(skill.id);
+                  }}
+                  title={dashboardCtx.isSkillPinned(skill.id) ? 'Убрать с главной' : 'Запомнить на главной'}
+                >
+                  {dashboardCtx.isSkillPinned(skill.id) ? '📌✓' : '📌'}
+                </button>
+              )}
               {onEdit && (
                 <IconButton 
                   icon="edit" 

@@ -9,6 +9,7 @@ export interface CharacterItem {
   price: number;
   image_link: string | null;
   isSecret: boolean;
+  isEquipped?: boolean;
 }
 
 export interface CharacterItemsResponse {
