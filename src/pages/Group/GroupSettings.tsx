@@ -5,8 +5,9 @@ import { useGroup } from '../../contexts/GroupContext';
 import { usePermissions } from '../../contexts/PermissionsContext';
 import { groupAPI, characterTemplatesAPI } from '../../services/api';
 import { CharacterTemplate } from '../../types/characterTemplates';
-import styles from '../../styles/common.module.css';
+import commonStyles from '../../styles/common.module.css';
 import buttonStyles from '../../styles/components/Button.module.css';
+import styles from './GroupSettings.module.css';
 import GroupEditModal from '../../components/Modals/CreateGroupModal/EditGroupModal';
 import List from '../../components/List/List';
 import { usePlatform } from '../../hooks/usePlatform';
@@ -90,62 +91,66 @@ const GroupSettings: React.FC = () => {
     }
   }, [groupId, isImporting]);
 
-  if (!selectedGroup) return <div className={styles.container}>Загрузка...</div>;
+  if (!selectedGroup) return <div className={commonStyles.container}>Загрузка...</div>;
 
   return (
-    <div className={styles.container}>
+    <div className={commonStyles.container}>
       <h2>Управление</h2>
-      <div className={isMobile ? styles.footer : ''}>
-        <List>
-          {isGroupAdmin && (
-            <button
-              className={`${buttonStyles.button} ${styles.link}`}
-              onClick={() => setIsEditModalOpen(true)}
+      <div className={`${styles.settingsSection} ${isMobile ? commonStyles.footer : ''}`}>
+        <div className={styles.settingsList}>
+          <List>
+            {isGroupAdmin && (
+              <button
+                className={`${buttonStyles.button} ${commonStyles.link}`}
+                onClick={() => setIsEditModalOpen(true)}
+              >
+                Редактировать группу
+              </button>
+            )}
+            <Link
+              to={`/group/${groupId}/users`}
+              className={`${commonStyles.link}`}
             >
-              Редактировать группу
+              Пользователи
+            </Link>
+            <Link
+              to={`/group/${groupId}/templates`}
+              className={`${commonStyles.link}`}
+            >
+              Шаблоны
+            </Link>
+            <button
+              className={`${buttonStyles.button} ${commonStyles.link}`}
+              onClick={() => setIsResourcesModalOpen(true)}
+            >
+              Поля на главной персонажа
             </button>
-          )}
-          <Link
-            to={`/group/${groupId}/users`}
-            className={`${styles.link}`}
-          >
-            Пользователи
-          </Link>
-          <Link
-            to={`/group/${groupId}/templates`}
-            className={`${styles.link}`}
-          >
-            Шаблоны
-          </Link>
-          <button
-            className={`${buttonStyles.button} ${styles.link}`}
-            onClick={() => setIsResourcesModalOpen(true)}
-          >
-            Поля на главной персонажа
-          </button>
-        </List>
+          </List>
+        </div>
       </div>
 
       {isGroupAdmin && (
         <>
-          <h2 style={{ marginTop: '2rem' }}>Экспорт/Импорт данных</h2>
-          <div className={isMobile ? styles.footer : ''}>
-            <List>
-              <button
-                className={`${buttonStyles.button} ${styles.link}`}
-                onClick={handleExport}
-                disabled={isExporting}
-              >
-                {isExporting ? 'Экспорт...' : 'Экспорт данных'}
-              </button>
-              <button
-                className={`${buttonStyles.button} ${styles.link}`}
-                onClick={handleImportClick}
-                disabled={isImporting}
-              >
-                {isImporting ? 'Импорт...' : 'Импорт данных'}
-              </button>
-            </List>
+          <h2 style={{ marginTop: '2rem', textAlign: 'center' }}>Экспорт/Импорт данных</h2>
+          <div className={`${styles.settingsSection} ${isMobile ? commonStyles.footer : ''}`}>
+            <div className={styles.settingsList}>
+              <List>
+                <button
+                  className={`${buttonStyles.button} ${commonStyles.link}`}
+                  onClick={handleExport}
+                  disabled={isExporting}
+                >
+                  {isExporting ? 'Экспорт...' : 'Экспорт данных'}
+                </button>
+                <button
+                  className={`${buttonStyles.button} ${commonStyles.link}`}
+                  onClick={handleImportClick}
+                  disabled={isImporting}
+                >
+                  {isImporting ? 'Импорт...' : 'Импорт данных'}
+                </button>
+              </List>
+            </div>
           </div>
           <input
             ref={fileInputRef}

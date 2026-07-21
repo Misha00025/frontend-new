@@ -21,12 +21,18 @@ const CharacterResourcesModal: React.FC<CharacterResourcesModalProps> = ({
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // Collect all unique field keys from all templates
   const allFieldKeys = Array.from(
     new Set(
       templates.flatMap(t => Object.keys(t.fields))
     )
+  );
+
+  const availableFieldKeys = allFieldKeys.filter(
+    key => !selectedFields.includes(key)
   );
 
   useEffect(() => {
@@ -45,12 +51,53 @@ const CharacterResourcesModal: React.FC<CharacterResourcesModalProps> = ({
     }
   };
 
-  const toggleField = (fieldKey: string) => {
-    setSelectedFields(prev =>
-      prev.includes(fieldKey)
-        ? prev.filter(f => f !== fieldKey)
-        : [...prev, fieldKey]
-    );
+  const moveInArray = <T,>(arr: T[], from: number, to: number): T[] => {
+    const next = [...arr];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    return next;
+  };
+
+  const handleDragStart = (index: number) => (e: React.DragEvent) => {
+    setDragIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(index));
+  };
+
+  const handleDragOver = (index: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (dropIndex: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (dragIndex === null || dragIndex === dropIndex) {
+      setDragIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+    setSelectedFields(moveInArray(selectedFields, dragIndex, dropIndex));
+    setDragIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const addField = (fieldKey: string) => {
+    setSelectedFields(prev => [...prev, fieldKey]);
+  };
+
+  const removeField = (fieldKey: string) => {
+    setSelectedFields(prev => prev.filter(f => f !== fieldKey));
   };
 
   const handleSave = async () => {
@@ -67,7 +114,6 @@ const CharacterResourcesModal: React.FC<CharacterResourcesModalProps> = ({
   };
 
   const getFieldName = (fieldKey: string): string => {
-    // Try to get the display name from any template
     for (const t of templates) {
       const field = t.fields[fieldKey];
       if (field) return field.name;
@@ -84,6 +130,7 @@ const CharacterResourcesModal: React.FC<CharacterResourcesModalProps> = ({
         <p className={styles.hint}>
           Выберите поля, которые будут отображаться на дашборде персонажа и на карточках в списке персонажей.
           Эти поля GM считает основными ресурсами (HP, Gold, MP и т.д.).
+          Перетаскивайте или используйте кнопки ▲▼ для сортировки. ✕ — убрать из выбранных.
         </p>
 
         {error && <div className={modalStyles.error}>{error}</div>}
@@ -91,19 +138,71 @@ const CharacterResourcesModal: React.FC<CharacterResourcesModalProps> = ({
         {allFieldKeys.length === 0 ? (
           <p className={styles.empty}>Нет доступных полей. Сначала создайте шаблоны персонажей с полями.</p>
         ) : (
-          <div className={styles.fieldList}>
-            {allFieldKeys.map(fieldKey => (
-              <label key={fieldKey} className={styles.fieldItem}>
-                <input
-                  type="checkbox"
-                  checked={selectedFields.includes(fieldKey)}
-                  onChange={() => toggleField(fieldKey)}
-                />
-                <span className={styles.fieldName}>{getFieldName(fieldKey)}</span>
-                <span className={styles.fieldKey}>{fieldKey}</span>
-              </label>
-            ))}
-          </div>
+          <>
+            <div className={styles.selectedSection}>
+              <h3 className={styles.sectionTitle}>Выбранные поля</h3>
+              {selectedFields.length === 0 ? (
+                <p className={styles.emptyHint}>Поля не выбраны. Добавьте поля из списка "Доступные поля".</p>
+              ) : (
+                <div className={styles.list}>
+                  {selectedFields.map((fieldKey, index) => (
+                    <div
+                      key={fieldKey}
+                      className={`${styles.item} ${dragIndex === index ? styles.dragging : ''} ${dragOverIndex === index ? styles.dragOver : ''}`}
+                      draggable
+                      onDragStart={handleDragStart(index)}
+                      onDragOver={handleDragOver(index)}
+                      onDragLeave={handleDragLeave()}
+                      onDrop={handleDrop(index)}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <span className={styles.dragHandle}>⠿</span>
+                      <span className={styles.fieldName}>{getFieldName(fieldKey)}</span>
+                      <span className={styles.fieldKey}>{fieldKey}</span>
+                      <div className={styles.fieldActions}>
+                        <button
+                          className={styles.moveBtn}
+                          disabled={index === 0}
+                          onClick={() => setSelectedFields(moveInArray(selectedFields, index, index - 1))}
+                        >▲</button>
+                        <button
+                          className={styles.moveBtn}
+                          disabled={index === selectedFields.length - 1}
+                          onClick={() => setSelectedFields(moveInArray(selectedFields, index, index + 1))}
+                        >▼</button>
+                        <button
+                          className={styles.removeBtn}
+                          onClick={() => removeField(fieldKey)}
+                        >✕</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className={styles.availableSection}>
+              <h3 className={styles.sectionTitle}>Доступные поля</h3>
+              {availableFieldKeys.length === 0 ? (
+                <p className={styles.emptyHint}>Все поля уже выбраны.</p>
+              ) : (
+                <div className={styles.availableList}>
+                  {availableFieldKeys.map(fieldKey => (
+                    <div key={fieldKey} className={styles.availableItem}>
+                      <span className={styles.fieldName}>{getFieldName(fieldKey)}</span>
+                      <span className={styles.fieldKey}>{fieldKey}</span>
+                      <button
+                        className={`${buttonStyles.button} ${buttonStyles.small}`}
+                        onClick={() => addField(fieldKey)}
+                      >
+                        Добавить
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
         )}
 
         <div className={modalStyles.buttons}>

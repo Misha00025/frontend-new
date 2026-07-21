@@ -28,20 +28,10 @@
 }
 
 .categoryTitle {
-  color: #ffffff;
-  background-color: var(--accent-color);
-  height: 2rem;
+  composes: sectionTitle from '../../../../../styles/character-table.module.css';
   margin-top: 0;
   margin-bottom: 1.5rem;
-  font-size: 1.1rem;
-  text-align: center;
-  vertical-align: middle;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: relative;
-  padding: 0 1rem;
-  transition: background-color 0.3s ease;
 }
 
 .categorySection.dragOver .categoryTitle {
@@ -62,9 +52,7 @@
 }
 
 .table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 0.5rem;
+  composes: table from '../../../../../styles/character-table.module.css';
 }
 
 .dragging {

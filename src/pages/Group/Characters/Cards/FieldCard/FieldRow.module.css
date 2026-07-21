@@ -1,7 +1,5 @@
-/* components/Views/FieldRow/FieldRow.module.css */
 .row {
-  border-bottom: 1px solid var(--border-color);
-  transition: background-color 0.2s ease;
+  composes: row from '../../../../../styles/character-table.module.css';
 }
 
 .row[draggable="true"]:hover {
@@ -13,15 +11,8 @@
   background-color: color-mix(in srgb, var(--accent-color) 20%, transparent);
 }
 
-.row:last-child {
-  border-bottom: none;
-}
-
 .nameCell {
-  padding: 0.5rem;
-  font-weight: 500;
-  width: 60%;
-  vertical-align: top;
+  composes: nameCell from '../../../../../styles/character-table.module.css';
 }
 
 .nameContent {
@@ -32,12 +23,11 @@
 }
 
 .fieldName {
-  flex: 1;
+  composes: fieldName from '../../../../../styles/character-table.module.css';
 }
 
 .valueCell {
-  padding: 0.5rem;
-  width: 40%;
+  composes: valueCell from '../../../../../styles/character-table.module.css';
 }
 
 .value {
@@ -45,44 +35,23 @@
 }
 
 .editableValue {
-  min-height: 1rem;
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: var(--border-radius-sm);
-}
-
-.editableValue:hover {
-  background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  composes: editableValue from '../../../../../styles/character-table.module.css';
 }
 
 .editInput {
-  width: 100%;
-  padding: 0.25rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  composes: editInput from '../../../../../styles/character-table.module.css';
 }
 
 .progressContainer {
-  width: 100%;
-  background-color: var(--progress-bg, var(--bg-primary));
-  border-radius: var(--border-radius-sm);
-  overflow: hidden;
-  position: relative;
-  height: 20px;
+  composes: progressContainer from '../../../../../styles/character-table.module.css';
 }
 
 .progressBar {
-  height: 100%;
-  transition: width 0.3s ease;
-  position: relative;
+  composes: progressBar from '../../../../../styles/character-table.module.css';
 }
 
 .progressText {
-  position: absolute;
-  left: 8px;
-  color: var(--text-primary);
+  composes: progressText from '../../../../../styles/character-table.module.css';
 }
 
 [data-theme="dark"] .progressText {
