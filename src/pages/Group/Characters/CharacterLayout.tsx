@@ -43,6 +43,7 @@ const CharacterLayout: React.FC = () => {
 
   const characterTabs: TabItem[] = [
     { id: 'stats', label: 'Статы', path: '' },
+    { id: 'resources', label: 'Ресурсы', path: 'resources' },
     { id: 'items', label: 'Инвентарь', path: 'items' },
     { id: 'skills', label: 'Способности', path: 'skills' },
     // { id: 'notes', label: 'Заметки', path: 'notes' },

@@ -1,0 +1,91 @@
+.checkboxList {
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.checkboxItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  border-radius: var(--border-radius-sm);
+  transition: background-color 0.15s, border-color 0.15s;
+  border: 1px solid transparent;
+  cursor: grab;
+  user-select: none;
+}
+
+.checkboxItem:hover {
+  background-color: var(--bg-primary);
+}
+
+.checkboxItem.dragging {
+  opacity: 0.5;
+  background-color: var(--bg-primary);
+}
+
+.checkboxItem.dragOver {
+  border-color: var(--accent-color);
+  background-color: color-mix(in srgb, var(--accent-color) 10%, transparent);
+}
+
+.dragHandle {
+  cursor: grab;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  line-height: 1;
+  user-select: none;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: normal;
+  flex: 1;
+}
+
+.sectionTitle {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.empty {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.moveButtons {
+  display: flex;
+  gap: 0.125rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.moveButton {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  padding: 0.125rem 0.3rem;
+  font-size: 0.7rem;
+  line-height: 1;
+  color: var(--text-secondary);
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.moveButton:hover:not(:disabled) {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+.moveButton:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
