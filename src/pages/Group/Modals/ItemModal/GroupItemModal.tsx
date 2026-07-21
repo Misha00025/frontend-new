@@ -129,7 +129,6 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
   const renderAttributeValueInput = (attr: SkillAttribute, index: number, isNew: boolean = false) => {
     
     const currentValue = isNew ? newAttribute.value || '' : attr.value;
-    const showCustomInput = true;
 
       return (
         <div className={modalStyles.attributeValueContainer}>

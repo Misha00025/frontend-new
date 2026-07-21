@@ -1,8 +1,8 @@
-// components/Views/FieldRow/FieldRow.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CharacterField } from '../../../../../types/characters';
 import styles from './FieldRow.module.css';
 import DropdownMenu, { MenuItem } from '../../../../../components/commons/DropdownMenu/DropdownMenu';
+import EvaluatedInput from '../../../../../components/commons/EvaluatedInput/EvaluatedInput';
 
 interface FieldRowProps {
   field: CharacterField;
@@ -27,15 +27,10 @@ const FieldRow: React.FC<FieldRowProps> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(field.value.toString());
-  const editInputRef = useRef<HTMLInputElement>(null);
 
-  // Фокус на поле ввода при редактировании
   useEffect(() => {
-    if (isEditing && editInputRef.current) {
-      editInputRef.current.focus();
-      editInputRef.current.select();
-    }
-  }, [isEditing]);
+    setEditValue(field.value.toString());
+  }, [field.value]);
 
   const handleDragStart = (e: React.DragEvent) => {
     if (draggable && onDragStart) {
@@ -75,29 +70,19 @@ const FieldRow: React.FC<FieldRowProps> = ({
   const renderFieldValue = () => {
     if (isEditing) {
       return (
-        <input
-          ref={editInputRef}
-          type="text"
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
-          onBlur={() => {
-            if (onValueChange) {
-              onValueChange(editValue);
-            }
+        <EvaluatedInput
+          initialValue={editValue}
+          onCommit={(value) => {
+            setEditValue(value);
+            if (onValueChange) onValueChange(value);
             setIsEditing(false);
           }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              if (onValueChange) {
-                onValueChange(editValue);
-              }
-              setIsEditing(false);
-            } else if (e.key === 'Escape') {
-              setEditValue(field.value.toString());
-              setIsEditing(false);
-            }
+          onCancel={() => {
+            setEditValue(field.value.toString());
+            setIsEditing(false);
           }}
           className={styles.editInput}
+          autoFocus
         />
       );
     }

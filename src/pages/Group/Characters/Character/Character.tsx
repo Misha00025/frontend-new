@@ -60,20 +60,20 @@ const Character: React.FC = () => {
 
   const handleUpdateFieldValue = async (fieldKey: string, newValue: string) => {
     if (!character) return;
-  
+
     try {
       const field = character.fields[fieldKey];
       const updatedField = {
         ...field,
         value: Number(newValue)
       };
-  
+
       const updateData: any = {
         fields: {
           [fieldKey]: updatedField
         }
       };
-  
+
       const updatedCharacter = await charactersAPI.updateCharacter(
         parseInt(groupId!), 
         parseInt(characterId!), 
