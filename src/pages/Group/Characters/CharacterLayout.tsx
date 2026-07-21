@@ -8,6 +8,8 @@ import PageLayout from '../../../components/commons/PageLayout/PageLayout';
 import PageHeader from '../../../components/commons/PageLayout/PageHeader';
 import { TabItem } from '../../../components/commons/PageLayout/TabBar';
 import { useVisited } from '../../../contexts/VisitedContext';
+import { useDashboardSettings } from '../../../hooks/useDashboardSettings';
+import { DashboardSettingsProvider } from '../../../contexts/DashboardSettingsContext';
 
 const CharacterLayout: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -49,6 +51,8 @@ const CharacterLayout: React.FC = () => {
     // { id: 'notes', label: 'Заметки', path: 'notes' },
   ];
 
+  const dashboardSettings = useDashboardSettings(Number(groupId), Number(characterId));
+
   if (loading) return <div>Загрузка...</div>;
   if (error) return <div>Ошибка: {error}</div>;
   if (!character || !group) return <div>Персонаж не найден</div>;
@@ -71,7 +75,9 @@ const CharacterLayout: React.FC = () => {
       tabBasePath={`/group/${groupId}/character/${characterId}`}
       tabOrientation={isMobile ? 'bottom' : 'top'}
     >
-      <Outlet />
+      <DashboardSettingsProvider value={dashboardSettings}>
+        <Outlet />
+      </DashboardSettingsProvider>
     </PageLayout>
   );
 };

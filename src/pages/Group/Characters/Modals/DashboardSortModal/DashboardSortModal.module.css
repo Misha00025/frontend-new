@@ -1,33 +1,39 @@
-.checkboxList {
-  max-height: 300px;
+.hint {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.list {
+  max-height: 250px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
 }
 
-.checkboxItem {
+.item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.375rem 0.5rem;
   border-radius: var(--border-radius-sm);
-  transition: background-color 0.15s, border-color 0.15s;
   border: 1px solid transparent;
   cursor: grab;
   user-select: none;
+  transition: background-color 0.15s, border-color 0.15s;
 }
 
-.checkboxItem:hover {
+.item:hover {
   background-color: var(--bg-primary);
 }
 
-.checkboxItem.dragging {
+.item.dragging {
   opacity: 0.5;
   background-color: var(--bg-primary);
 }
 
-.checkboxItem.dragOver {
+.item.dragOver {
   border-color: var(--accent-color);
   background-color: color-mix(in srgb, var(--accent-color) 10%, transparent);
 }
@@ -40,34 +46,19 @@
   user-select: none;
 }
 
-.checkboxLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-weight: normal;
+.itemName {
   flex: 1;
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
-.sectionTitle {
-  margin: 0 0 0.5rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.empty {
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
-.moveButtons {
+.itemActions {
   display: flex;
   gap: 0.125rem;
-  margin-left: auto;
   flex-shrink: 0;
 }
 
-.moveButton {
+.moveBtn {
   background: none;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-sm);
@@ -79,13 +70,45 @@
   transition: background-color 0.15s, color 0.15s;
 }
 
-.moveButton:hover:not(:disabled) {
+.moveBtn:hover:not(:disabled) {
   background-color: var(--accent-color);
   color: white;
   border-color: var(--accent-color);
 }
 
-.moveButton:disabled {
+.moveBtn:disabled {
   opacity: 0.25;
   cursor: not-allowed;
+}
+
+.removeBtn {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  padding: 0.125rem 0.3rem;
+  font-size: 0.7rem;
+  line-height: 1;
+  color: var(--text-danger, #e74c3c);
+  transition: background-color 0.15s, color 0.15s;
+  margin-left: 0.25rem;
+}
+
+.removeBtn:hover {
+  background-color: var(--text-danger, #e74c3c);
+  color: white;
+  border-color: var(--text-danger, #e74c3c);
+}
+
+.empty {
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+}
+
+.sectionTitle {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
 }

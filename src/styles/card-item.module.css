@@ -115,6 +115,27 @@
   border-top: 1px solid var(--border-color);
 }
 
+.dashboardAction {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  transition: background-color 0.15s, border-color 0.15s;
+  line-height: 1.4;
+}
+
+.dashboardAction:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.dashboardAction.equipped {
+  border-color: var(--accent-color);
+  background-color: color-mix(in srgb, var(--accent-color) 15%, transparent);
+}
+
 @media (max-width: 768px) {
   .attributeTag {
     font-size: 0.7rem;
