@@ -1,7 +1,7 @@
 import { getApiBase } from '../config';
 import { LoginRequest, RegisterRequest, TokenResponse, UserProfile } from '../types/auth';
 import { CreateGroupRequest, Group, GroupsResponse } from '../types/group';
-import { storage } from '../utils/storage';
+import tokenManager from './tokenManager';
 import { GroupUser, GroupUsersResponse, SearchUsersResponse, User } from '../types/groupUsers';
 import {
   CharacterTemplate,
@@ -73,7 +73,7 @@ export const authAPI = {
     return response.json();
   },
 
-  register: async (credentials: RegisterRequest): Promise<void> => {
+  register: async (credentials: RegisterRequest): Promise<TokenResponse> => {
     const API_BASE = getApiBase();
     const response = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
@@ -88,21 +88,24 @@ export const authAPI = {
     if (!response.ok) {
       throw new Error('Registration failed');
     }
-  },
-};
 
-let isRefreshing = false;
-let failedQueue: Array<{ resolve: (value?: any) => void; reject: (reason?: any) => void }> = [];
+    // After registration, log in automatically
+    const loginResponse = await fetch(`${API_BASE}/auth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        grant_type: 'password',
+        username: credentials.username,
+        password: credentials.password,
+      }),
+    });
 
-const processQueue = (error: any = null) => {
-  failedQueue.forEach(promise => {
-    if (error) {
-      promise.reject(error);
-    } else {
-      promise.resolve();
+    if (!loginResponse.ok) {
+      throw new Error('Auto-login after registration failed');
     }
-  });
-  failedQueue = [];
+
+    return loginResponse.json();
+  },
 };
 
 export const makeAuthenticatedRequest = async (
@@ -111,12 +114,15 @@ export const makeAuthenticatedRequest = async (
   contentType: string | null = 'application/json'
 ): Promise<Response> => {
   const API_BASE = getApiBase();
-  const accessToken = storage.getAccessToken();
-  const refreshTokenValue = storage.getRefreshToken();
 
-  const authHeaders: Record<string, string> = accessToken
-    ? { 'Authorization': `Bearer ${accessToken}` }
-    : {};
+  const token = await tokenManager.ensureToken();
+  if (!token) {
+    throw new Error('Session expired. Please login again.');
+  }
+
+  const authHeaders: Record<string, string> = {
+    'Authorization': `Bearer ${token}`,
+  };
 
   const headers = contentType
     ? { 'Content-Type': contentType, ...options.headers as Record<string, string>, ...authHeaders }
@@ -128,51 +134,9 @@ export const makeAuthenticatedRequest = async (
       headers,
     });
 
-    if (response.status === 401 && refreshTokenValue && !isRefreshing) {
-      isRefreshing = true;
-
-      try {
-        const tokenData = await authAPI.refresh(refreshTokenValue);
-        storage.setAccessToken(tokenData.access_token);
-        storage.setRefreshToken(tokenData.refresh_token);
-
-        const newHeaders = {
-          ...options.headers as Record<string, string>,
-          'Authorization': `Bearer ${tokenData.access_token}`,
-          ...(contentType ? { 'Content-Type': contentType } : {}),
-        };
-
-        const retryResponse = await fetch(`${API_BASE}${endpoint}`, {
-          ...options,
-          headers: newHeaders,
-        });
-
-        isRefreshing = false;
-        processQueue();
-        return retryResponse;
-      } catch (refreshError) {
-        isRefreshing = false;
-        processQueue(refreshError);
-        storage.clearTokens();
-        throw new Error('Session expired. Please login again.');
-      }
-    }
-
-    if (response.status === 401 && refreshTokenValue && isRefreshing) {
-      return new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject });
-      }).then(() => {
-        const newToken = storage.getAccessToken();
-        const newHeaders = {
-          ...options.headers as Record<string, string>,
-          'Authorization': `Bearer ${newToken}`,
-          ...(contentType ? { 'Content-Type': contentType } : {}),
-        };
-        return fetch(`${API_BASE}${endpoint}`, {
-          ...options,
-          headers: newHeaders,
-        });
-      });
+    if (response.status === 401) {
+      tokenManager.clear();
+      throw new Error('Session expired. Please login again.');
     }
 
     return response;

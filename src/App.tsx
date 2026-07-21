@@ -35,7 +35,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
-  const { profile, loading, profileNotFound, fetchProfile } = useProfile(true);
+  const { profile, loading, profileNotFound, fetchProfile } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
 
