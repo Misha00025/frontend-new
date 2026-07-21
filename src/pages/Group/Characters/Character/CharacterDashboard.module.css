@@ -190,3 +190,23 @@
   color: var(--text-secondary);
   font-size: 0.75rem;
 }
+
+.cardSection {
+  background: var(--bg-primary);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  min-height: 100px;
+  padding-bottom: 0.5rem;
+}
+
+.cardList {
+  padding: 0.5rem;
+}
+
+.cardList > * {
+  margin-bottom: 0.5rem;
+}
+
+.cardList > *:last-child {
+  margin-bottom: 0;
+}

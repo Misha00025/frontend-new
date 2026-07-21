@@ -11,6 +11,8 @@ import EvaluatedInput from '../../../../components/commons/EvaluatedInput/Evalua
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import { useDashboardSettingsContext } from '../../../../contexts/DashboardSettingsContext';
 import DashboardSortModal from '../Modals/DashboardSortModal/DashboardSortModal';
+import ItemCard from '../../Cards/ItemCard/ItemCard';
+import SkillCard from '../../Cards/SkillCard/SkillCard';
 import styles from './CharacterDashboard.module.css';
 
 const CharacterDashboard: React.FC = () => {
@@ -162,30 +164,37 @@ const CharacterDashboard: React.FC = () => {
 
             {equippedItems.length > 0 && (
               <div className={styles.column}>
-                <div className={styles.section}>
+                <div className={styles.cardSection}>
                   <h3 className={styles.sectionTitle}>Экипировка</h3>
-                  <table className={styles.table}>
-                    <tbody>
-                      {equippedItems.map(item => (
-                        <EquippedItemRow key={item.id} item={item} />
-                      ))}
-                    </tbody>
-                  </table>
+                  <div className={styles.cardList}>
+                    {equippedItems.map(item => (
+                      <ItemCard
+                        key={item.id}
+                        item={item}
+                        showActions={false}
+                        showAmount={false}
+                        onRemoveFromDashboard={() => toggleEquipped(item.id)}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
 
             {pinnedSkills.length > 0 && (
               <div className={styles.column}>
-                <div className={styles.section}>
+                <div className={styles.cardSection}>
                   <h3 className={styles.sectionTitle}>Способности</h3>
-                  <table className={styles.table}>
-                    <tbody>
-                      {pinnedSkills.map(skill => (
-                        <PinnedSkillRow key={skill.id} skill={skill} />
-                      ))}
-                    </tbody>
-                  </table>
+                  <div className={styles.cardList}>
+                    {pinnedSkills.map(skill => (
+                      <SkillCard
+                        key={skill.id}
+                        skill={skill}
+                        showActions={false}
+                        onRemoveFromDashboard={() => togglePinnedSkill(skill.id)}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -318,62 +327,6 @@ const ItemResourceRow: React.FC<ItemResourceRowProps> = ({ item, editable, onUpd
               +1
             </button>
           )}
-        </div>
-      </td>
-    </tr>
-  );
-};
-
-interface EquippedItemRowProps {
-  item: CharacterItem;
-}
-
-const EquippedItemRow: React.FC<EquippedItemRowProps> = ({ item }) => {
-  const { toggleEquipped } = useDashboardSettingsContext();
-
-  return (
-    <tr className={styles.row}>
-      <td className={styles.nameCell}>{item.name}</td>
-      <td className={styles.valueCell}>
-        <button
-          className={styles.itemButton}
-          onClick={() => toggleEquipped(item.id)}
-          title="Снять экипировку"
-        >
-          ✕
-        </button>
-      </td>
-    </tr>
-  );
-};
-
-interface PinnedSkillRowProps {
-  skill: CharacterSkill;
-}
-
-const PinnedSkillRow: React.FC<PinnedSkillRowProps> = ({ skill }) => {
-  const { togglePinnedSkill } = useDashboardSettingsContext();
-
-  return (
-    <tr className={styles.row}>
-      <td className={styles.nameCell}>{skill.name}</td>
-      <td className={styles.valueCell}>
-        <div className={styles.itemControls}>
-          {skill.attributes.slice(0, 2).map(attr => (
-            <span key={attr.key} className={styles.skillAttr}>
-              {attr.value}
-            </span>
-          ))}
-          {skill.attributes.length > 2 && (
-            <span className={styles.skillAttrMore}>+{skill.attributes.length - 2}</span>
-          )}
-          <button
-            className={styles.itemButton}
-            onClick={() => togglePinnedSkill(skill.id)}
-            title="Убрать с главной"
-          >
-            ✕
-          </button>
         </div>
       </td>
     </tr>
