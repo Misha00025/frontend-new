@@ -84,8 +84,9 @@ const AppContent: React.FC = () => {
           <Route path="notes" element={<GroupNotes />} />
         </Route>
         <Route path="/group/:groupId/character/:characterId" element={<CharacterLayout />}>
-          <Route index element={<Character />} />
+          <Route index element={<CharacterResources />} />
           <Route path="resources" element={<CharacterResources />} />
+          <Route path="stats" element={<Character />} />
           <Route path="items" element={<CharacterItems />} />
           <Route path="skills" element={<CharacterSkills />} />
           <Route path="notes" element={<CharacterNotes />} />
