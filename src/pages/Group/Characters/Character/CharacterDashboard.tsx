@@ -293,6 +293,15 @@ const ItemResourceRow: React.FC<ItemResourceRowProps> = ({ item, editable, onUpd
           {editable && (
             <button
               className={styles.itemButton}
+              onClick={() => onUpdateAmount(Math.max(0, item.amount - 5))}
+              disabled={item.amount <= 0}
+            >
+              -5
+            </button>
+          )}
+          {editable && (
+            <button
+              className={styles.itemButton}
               onClick={() => onUpdateAmount(Math.max(0, item.amount - 1))}
               disabled={item.amount <= 0}
             >
@@ -325,6 +334,14 @@ const ItemResourceRow: React.FC<ItemResourceRowProps> = ({ item, editable, onUpd
               onClick={() => onUpdateAmount(item.amount + 1)}
             >
               +1
+            </button>
+          )}
+          {editable && (
+            <button
+              className={styles.itemButton}
+              onClick={() => onUpdateAmount(item.amount + 5)}
+            >
+              +5
             </button>
           )}
         </div>
