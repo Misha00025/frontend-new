@@ -142,6 +142,13 @@
   border-radius: var(--border-radius-md);
 }
 
+.emptyActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
 .progressContainer {
   width: 100%;
   background-color: var(--progress-bg, var(--bg-primary));

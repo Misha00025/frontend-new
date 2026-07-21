@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Character, CharacterField } from '../../../../types/characters';
 import { CharacterItem } from '../../../../types/characterItems';
 import { ResourceSettings } from '../../../../types/resourceSettings';
@@ -115,13 +115,18 @@ const CharacterResources: React.FC = () => {
 
       {!hasResources ? (
         <div className={styles.emptyState}>
-          <p>Ресурсы не настроены. Выберите, что отображать на этой вкладке.</p>
-          <button
-            className={buttonStyles.button}
-            onClick={() => setIsModalOpen(true)}
-          >
-            Настроить ресурсы
-          </button>
+          <p>Ресурсы не настроены.</p>
+          <div className={styles.emptyActions}>
+            <button
+              className={buttonStyles.button}
+              onClick={() => setIsModalOpen(true)}
+            >
+              Настроить ресурсы
+            </button>
+            <Link to="stats" className={buttonStyles.button}>
+              Перейти к статам
+            </Link>
+          </div>
         </div>
       ) : (
         <div style={{ position: 'relative' }}>
