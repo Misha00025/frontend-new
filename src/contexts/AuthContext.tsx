@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { TokenResponse, WhoAmIResponse } from '../types/auth';
 import { authAPI, makeAuthenticatedRequest } from '../services/api';
-import { storage } from '../utils/storage';
+import tokenManager from '../services/tokenManager';
 
 interface AuthContextType {
   accessToken: string | null;
@@ -14,39 +14,29 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
     const initAuth = async () => {
-      const savedRefreshToken = storage.getRefreshToken();
+      const token = await tokenManager.ensureToken();
 
-      if (!savedRefreshToken) {
-        setInitializing(false);
-        return;
-      }
-
-      try {
-        const tokenData: TokenResponse = await authAPI.refresh(savedRefreshToken);
-        storage.setAccessToken(tokenData.access_token);
-        storage.setRefreshToken(tokenData.refresh_token);
-        setAccessToken(tokenData.access_token);
-
-        // Получаем whoami
-        const whoamiResponse = await makeAuthenticatedRequest('/whoami');
-        if (whoamiResponse.ok) {
-          const whoamiData: WhoAmIResponse = await whoamiResponse.json();
-          setUserId(whoamiData.id);
-          localStorage.setItem('userId', whoamiData.id.toString());
+      if (token) {
+        try {
+          const whoamiResponse = await makeAuthenticatedRequest('/whoami');
+          if (whoamiResponse.ok) {
+            const whoamiData: WhoAmIResponse = await whoamiResponse.json();
+            setUserId(whoamiData.id);
+            localStorage.setItem('userId', whoamiData.id.toString());
+          }
+        } catch (error) {
+          console.error('Session restore failed:', error);
+          tokenManager.clear();
+          localStorage.removeItem('userId');
         }
-      } catch (error) {
-        console.error('Session restore failed:', error);
-        storage.clearTokens();
-        localStorage.removeItem('userId');
-      } finally {
-        setInitializing(false);
       }
+
+      setInitializing(false);
     };
 
     initAuth();
@@ -55,10 +45,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (username: string, password: string) => {
     try {
       const tokenData: TokenResponse = await authAPI.login({ username, password });
-
-      storage.setAccessToken(tokenData.access_token);
-      storage.setRefreshToken(tokenData.refresh_token);
-      setAccessToken(tokenData.access_token);
+      tokenManager.setTokens(tokenData.access_token, tokenData.refresh_token);
 
       const whoamiResponse = await makeAuthenticatedRequest('/whoami');
       if (whoamiResponse.ok) {
@@ -74,8 +61,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const register = async (username: string, password: string) => {
     try {
-      await authAPI.register({ username, password });
-      await login(username, password);
+      const tokenData: TokenResponse = await authAPI.register({ username, password });
+      tokenManager.setTokens(tokenData.access_token, tokenData.refresh_token);
+
+      const whoamiResponse = await makeAuthenticatedRequest('/whoami');
+      if (whoamiResponse.ok) {
+        const whoamiData: WhoAmIResponse = await whoamiResponse.json();
+        setUserId(whoamiData.id);
+        localStorage.setItem('userId', whoamiData.id.toString());
+      }
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;
@@ -83,19 +77,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const logout = () => {
-    setAccessToken(null);
     setUserId(null);
-    storage.clearTokens();
+    tokenManager.clear();
     localStorage.removeItem('userId');
   };
 
   if (initializing) {
-    return null; // Или можно показать лоадер
+    return null;
   }
 
   return (
     <AuthContext.Provider value={{
-      accessToken,
+      accessToken: tokenManager.getAccessToken(),
       userId,
       login,
       register,

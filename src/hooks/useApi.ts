@@ -1,6 +1,6 @@
 // hooks/useApi.ts
 import { useState, useCallback } from 'react';
-import { makeAuthenticatedRequest, refreshToken } from '../services/api';
+import { makeAuthenticatedRequest } from '../services/api';
 
 export const useApi = () => {
   const [loading, setLoading] = useState(false);
@@ -11,20 +11,7 @@ export const useApi = () => {
     setError(null);
     
     try {
-      // Первый запрос
-      let response = await makeAuthenticatedRequest(endpoint, options);
-      
-      // Если получили 401, пытаемся обновить токен и повторить запрос
-      if (response.status === 401) {
-        const refreshSuccess = await refreshToken();
-        
-        if (refreshSuccess) {
-          // Повторяем запрос с новым токеном
-          response = await makeAuthenticatedRequest(endpoint, options);
-        } else {
-          throw new Error('Session expired. Please login again.');
-        }
-      }
+      const response = await makeAuthenticatedRequest(endpoint, options);
       
       if (!response.ok) {
         throw new Error(`Request failed with status ${response.status}`);

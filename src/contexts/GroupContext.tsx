@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { Group } from '../types/group';
 import { groupAPI } from '../services/api';
 import { storage } from '../utils/storage';
+import { useAuth } from './AuthContext';
 
 interface GroupContextType {
   selectedGroup: Group | null;
@@ -12,9 +13,12 @@ const GroupContext = createContext<GroupContextType | undefined>(undefined);
 
 export const GroupProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const { accessToken } = useAuth();
 
   // Восстанавливаем выбранную группу из localStorage при загрузке
   useEffect(() => {
+    if (!accessToken) return;
+
     const savedGroupId = storage.getSelectedGroupId();
     if (savedGroupId) {
       const fetchGroup = async () => {
@@ -29,7 +33,7 @@ export const GroupProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       
       fetchGroup();
     }
-  }, []);
+  }, [accessToken]);
 
   // Сохраняем ID группы в localStorage при изменении
   useEffect(() => {
