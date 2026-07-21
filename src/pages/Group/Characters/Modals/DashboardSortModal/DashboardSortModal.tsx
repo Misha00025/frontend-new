@@ -26,7 +26,7 @@ const DashboardSortModal: React.FC<DashboardSortModalProps> = ({
   items,
   skills,
 }) => {
-  const { settings, toggleField, toggleItem, toggleEquipped, togglePinnedSkill } = useDashboardSettingsContext();
+  const { settings, toggleField, toggleItem, toggleEquipped, togglePinnedSkill, saveEquippedOrder } = useDashboardSettingsContext();
 
   const [orderedFields, setOrderedFields] = useState<string[]>([...settings.fields]);
   const [orderedItems, setOrderedItems] = useState<number[]>([...settings.items]);
@@ -79,7 +79,7 @@ const DashboardSortModal: React.FC<DashboardSortModalProps> = ({
     setDragOver(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const newSettings = {
       fields: orderedFields,
       items: orderedItems,
@@ -87,6 +87,7 @@ const DashboardSortModal: React.FC<DashboardSortModalProps> = ({
       pinnedSkills: orderedPinned,
     };
     localStorage.setItem(`character_dashboard_${groupId}_${characterId}`, JSON.stringify(newSettings));
+    await saveEquippedOrder(orderedEquipped);
     onClose();
   };
 

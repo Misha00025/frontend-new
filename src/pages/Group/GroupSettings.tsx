@@ -1,14 +1,16 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Group } from '../../types/group';
 import { useGroup } from '../../contexts/GroupContext';
 import { usePermissions } from '../../contexts/PermissionsContext';
-import { groupAPI } from '../../services/api';
+import { groupAPI, characterTemplatesAPI } from '../../services/api';
+import { CharacterTemplate } from '../../types/characterTemplates';
 import styles from '../../styles/common.module.css';
 import buttonStyles from '../../styles/components/Button.module.css';
 import GroupEditModal from '../../components/Modals/CreateGroupModal/EditGroupModal';
 import List from '../../components/List/List';
 import { usePlatform } from '../../hooks/usePlatform';
+import CharacterResourcesModal from './Modals/ResourcesModal/CharacterResourcesModal';
 
 const GroupSettings: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -19,6 +21,22 @@ const GroupSettings: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [templates, setTemplates] = useState<CharacterTemplate[]>([]);
+  const [isResourcesModalOpen, setIsResourcesModalOpen] = useState(false);
+
+  const loadTemplates = useCallback(async () => {
+    if (!groupId) return;
+    try {
+      const templatesData = await characterTemplatesAPI.getTemplates(parseInt(groupId));
+      setTemplates(templatesData);
+    } catch (err) {
+      console.error('Failed to load templates:', err);
+    }
+  }, [groupId]);
+
+  useEffect(() => {
+    loadTemplates();
+  }, [loadTemplates]);
 
   const handleGroupUpdated = (updatedGroup: Group) => {
     setSelectedGroup(updatedGroup);
@@ -99,6 +117,12 @@ const GroupSettings: React.FC = () => {
           >
             Шаблоны
           </Link>
+          <button
+            className={`${buttonStyles.button} ${styles.link}`}
+            onClick={() => setIsResourcesModalOpen(true)}
+          >
+            Поля на главной персонажа
+          </button>
         </List>
       </div>
 
@@ -141,6 +165,12 @@ const GroupSettings: React.FC = () => {
           onGroupUpdated={handleGroupUpdated}
         />
       )}
+      <CharacterResourcesModal
+        isOpen={isResourcesModalOpen}
+        onClose={() => setIsResourcesModalOpen(false)}
+        groupId={Number(groupId)}
+        templates={templates}
+      />
     </div>
   );
 };

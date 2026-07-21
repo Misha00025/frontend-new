@@ -1,0 +1,48 @@
+.hint {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.empty {
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 2rem;
+}
+
+.fieldList {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.fieldItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+  transition: background-color 0.15s;
+}
+
+.fieldItem:hover {
+  background-color: var(--bg-accent, #f0f0f0);
+}
+
+.fieldItem input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  cursor: pointer;
+}
+
+.fieldName {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.fieldKey {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-family: monospace;
+}

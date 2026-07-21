@@ -302,6 +302,24 @@ export const groupAPI = {
     }
     return response.json();
   },
+
+  getCharacterResources: async (groupId: number): Promise<string[]> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/schemas/characters/resources`);
+    if (!response.ok) throw new Error('Failed to fetch character resources');
+    const data = await response.json();
+    return data.fields ?? [];
+  },
+
+  updateCharacterResources: async (groupId: number, fields: string[]): Promise<string[]> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/schemas/characters/resources`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields }),
+    });
+    if (!response.ok) throw new Error('Failed to update character resources');
+    const data = await response.json();
+    return data.fields ?? [];
+  },
 };
 
 
@@ -695,7 +713,6 @@ export const userAPI = {
   },
 };
 
-
 export const groupSkillsAPI = {
   getSkills: async (groupId: number): Promise<GroupSkill[]> => {
     const response = await makeAuthenticatedRequest(`/groups/${groupId}/skills`);
@@ -831,5 +848,36 @@ export const uploadAPI = {
     }
 
     return response.json();
+  },
+};
+
+export const characterEquipmentAPI = {
+  getEquipment: async (groupId: number, characterId: number): Promise<number[]> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/equipment`);
+    if (!response.ok) throw new Error('Failed to fetch equipment');
+    const data = await response.json();
+    return Array.isArray(data) ? data : (data?.items ?? []);
+  },
+
+  patchEquipment: async (groupId: number, characterId: number, action: 'add' | 'remove', itemId: number): Promise<number[]> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/equipment`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, itemId }),
+    });
+    if (!response.ok) throw new Error('Failed to update equipment');
+    const data = await response.json();
+    return Array.isArray(data) ? data : (data?.items ?? []);
+  },
+
+  putEquipment: async (groupId: number, characterId: number, itemIds: number[]): Promise<number[]> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/equipment`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ itemIds }),
+    });
+    if (!response.ok) throw new Error('Failed to update equipment order');
+    const data = await response.json();
+    return Array.isArray(data) ? data : (data?.items ?? []);
   },
 };
