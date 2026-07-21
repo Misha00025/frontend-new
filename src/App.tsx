@@ -16,6 +16,7 @@ import CharacterTemplates from './pages/Group/Characters/Template/CharacterTempl
 import Characters from './pages/Group/Characters/Characters';
 import CharacterLayout from './pages/Group/Characters/CharacterLayout';
 import Character from './pages/Group/Characters/Character/Character';
+import CharacterResources from './pages/Group/Characters/Character/CharacterResources';
 import CharacterItems from './pages/Group/Characters/Character/CharacterItems';
 import CharacterSkills from './pages/Group/Characters/Character/CharacterSkills';
 import CharacterNotes from './pages/Group/Characters/Character/CharacterNotes';
@@ -84,6 +85,7 @@ const AppContent: React.FC = () => {
         </Route>
         <Route path="/group/:groupId/character/:characterId" element={<CharacterLayout />}>
           <Route index element={<Character />} />
+          <Route path="resources" element={<CharacterResources />} />
           <Route path="items" element={<CharacterItems />} />
           <Route path="skills" element={<CharacterSkills />} />
           <Route path="notes" element={<CharacterNotes />} />
