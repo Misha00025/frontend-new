@@ -13,6 +13,7 @@ interface ItemCardProps {
   onDelete?: () => void;
   showActions?: boolean;
   showAmount?: boolean;
+  onRemoveFromDashboard?: () => void;
 }
 
 const ItemCard: React.FC<ItemCardProps> = ({
@@ -20,7 +21,8 @@ const ItemCard: React.FC<ItemCardProps> = ({
   onEdit,
   onDelete,
   showActions = true,
-  showAmount = false
+  showAmount = false,
+  onRemoveFromDashboard,
 }) => {
   const isCharacterItem = 'amount' in item;
   const dashboardCtx = useContext(DashboardSettingsContext);
@@ -62,6 +64,18 @@ const ItemCard: React.FC<ItemCardProps> = ({
   return (
     <div className={item.isSecret && !isCharacterItem ? styles.itemCardHide : cardStyles.card}>
       <div className={cardStyles.header} onClick={() => setIsExpanded(!isExpanded)}>
+        {onRemoveFromDashboard && (
+          <button
+            className={cardStyles.removeButton}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemoveFromDashboard();
+            }}
+            title="Убрать с главной"
+          >
+            ✕
+          </button>
+        )}
         {item.image_link && (
           <img src={item.image_link} alt={item.name} className={styles.itemImage} />
         )}
