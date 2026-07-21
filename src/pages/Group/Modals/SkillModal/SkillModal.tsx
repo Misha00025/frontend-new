@@ -405,7 +405,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
                 </>
               )}
 
-              {newAttribute.key && renderAttributeValueInput(newAttribute as SkillAttribute, -1, true)}
+              {renderAttributeValueInput(newAttribute as SkillAttribute, -1, true)}
 
               <div className={modalStyles.attributeActions}>
                 {newAttribute.key ? (
