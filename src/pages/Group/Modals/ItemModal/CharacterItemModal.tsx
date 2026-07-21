@@ -7,6 +7,7 @@ import modalStyles from '../../../../styles/modal.module.css';
 import styles from './CharacterItemModal.module.css';
 import uiStyles from '../../../../styles/ui.module.css';
 import selectStyles from '../../../../styles/select-list.module.css';
+import EvaluatedInput from '../../../../components/commons/EvaluatedInput/EvaluatedInput';
 
 interface CharacterItemModalProps {
   isOpen: boolean;
@@ -101,56 +102,6 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
 
     setFilteredItems(result);
   }, [groupItems, searchTerm, selectedAttribute, isOpen, creationMode, editingItem]);
-
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === '') {
-      setPrice('');
-    } else {
-      const numValue = Number(value);
-      if (!isNaN(numValue)) {
-        setPrice(numValue);
-      }
-    }
-  };
-
-  const handlePriceBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === '') {
-      setPrice(0);
-    } else {
-      const numValue = Number(value);
-      if (!isNaN(numValue)) {
-        setPrice(numValue);
-      }
-    }
-  };
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === '') {
-      setAmount('');
-    } else {
-      const numValue = Number(value);
-      if (!isNaN(numValue)) {
-        setAmount(numValue);
-      }
-    }
-  };
-
-  const handleAmountBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === '') {
-      setAmount(1);
-    } else if (amount !== '' && amount < 0) {
-      setAmount(0);
-    } else {
-      const numValue = Number(value);
-      if (!isNaN(numValue)) {
-        setAmount(numValue);
-      }
-    }
-  };
 
   const handleGroupItemSelect = (item: GroupItem) => {
     setSelectedGroupItem(item);
@@ -361,12 +312,11 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
 
               <div className={modalStyles.formGroup}>
                 <label>Цена за единицу:</label>
-                <input
-                  type="number"
-                  value={price}
-                  onChange={handlePriceChange}
-                  onBlur={handlePriceBlur}
+                <EvaluatedInput
+                  initialValue={price === '' ? '' : price.toString()}
+                  onCommit={(value) => setPrice(value.trim() === '' ? 0 : Math.max(0, Number(value.trim())))}
                   className={inputStyles.input}
+                  placeholder="Цена за единицу"
                   required
                   disabled={!!editingItem}
                 />
@@ -387,14 +337,12 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
 
           <div className={modalStyles.formGroup}>
             <label>Количество:</label>
-            <input
-              type="number"
-              value={amount}
-              onChange={handleAmountChange}
-              onBlur={handleAmountBlur}
+            <EvaluatedInput
+              initialValue={amount === '' ? '' : amount.toString()}
+              onCommit={(value) => setAmount(value.trim() === '' ? 1 : Math.max(0, Number(value.trim())))}
               className={inputStyles.input}
+              placeholder="Количество"
               required
-              min="0"
               disabled={creationMode === 'existing' && !selectedGroupItem && !editingItem}
             />
           </div>

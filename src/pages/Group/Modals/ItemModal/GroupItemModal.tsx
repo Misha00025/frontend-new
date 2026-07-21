@@ -6,6 +6,7 @@ import modalStyles from '../../../../styles/modal.module.css';
 import { SkillAttribute } from '../../../../types/groupSkills';
 import { generateKey } from '../../../../utils/generateKey';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
+import EvaluatedInput from '../../../../components/commons/EvaluatedInput/EvaluatedInput';
 
 interface GroupItemModalProps {
   isOpen: boolean;
@@ -51,30 +52,6 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
       setCustomValues({});
     }
   }, [editingItem, isOpen]);
-
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === '') {
-      setPrice('');
-    } else {
-      const numValue = Number(value);
-      if (!isNaN(numValue)) {
-        setPrice(numValue);
-      }
-    }
-  };
-
-  const handlePriceBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value === '') {
-      setPrice(0);
-    } else {
-      const numValue = Number(value);
-      if (!isNaN(numValue)) {
-        setPrice(numValue);
-      }
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -206,12 +183,11 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
 
           <div className={modalStyles.formGroup}>
             <label>Цена:</label>
-            <input
-              type="number"
-              value={price}
-              onChange={handlePriceChange}
-              onBlur={handlePriceBlur}
+            <EvaluatedInput
+              initialValue={price === '' ? '' : price.toString()}
+              onCommit={(value) => setPrice(value.trim() === '' ? 0 : Math.max(0, Number(value.trim())))}
               className={inputStyles.input}
+              placeholder="Цена"
               required
             />
           </div>
