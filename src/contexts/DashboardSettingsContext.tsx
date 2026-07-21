@@ -1,12 +1,14 @@
 import React, { createContext, useContext } from 'react';
 import { DashboardSettings } from '../types/dashboardSettings';
 
-interface DashboardSettingsContextType {
+export interface DashboardSettingsContextType {
   settings: DashboardSettings;
+  baseResourceFields: string[];
   toggleField: (fieldKey: string) => void;
   toggleItem: (itemId: number) => void;
-  toggleEquipped: (itemId: number) => void;
+  toggleEquipped: (itemId: number) => Promise<void>;
   togglePinnedSkill: (skillId: number) => void;
+  saveEquippedOrder: (itemIds: number[]) => Promise<void>;
   isFieldOnDashboard: (fieldKey: string) => boolean;
   isItemResource: (itemId: number) => boolean;
   isItemEquipped: (itemId: number) => boolean;

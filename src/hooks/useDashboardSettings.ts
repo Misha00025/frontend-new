@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { DashboardSettings } from '../types/dashboardSettings';
+import { groupAPI, characterEquipmentAPI } from '../services/api';
 
 const STORAGE_KEY = (gid: number, cid: number) => `character_dashboard_${gid}_${cid}`;
 
@@ -12,24 +13,69 @@ const defaultSettings: DashboardSettings = {
 
 export function useDashboardSettings(groupId: number, characterId: number) {
   const [settings, setSettings] = useState<DashboardSettings>(defaultSettings);
+  const [baseResourceFields, setBaseResourceFields] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY(groupId, characterId));
-    if (saved) {
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+
+      let baseFields: string[] = [];
       try {
-        const parsed = JSON.parse(saved);
-        setSettings({
-          fields: parsed.fields || [],
-          items: parsed.items || [],
-          equipped: parsed.equipped || [],
-          pinnedSkills: parsed.pinnedSkills || [],
-        });
-      } catch {
-        setSettings(defaultSettings);
+        baseFields = await groupAPI.getCharacterResources(groupId);
+      } catch (err) {
+        console.error('Failed to load character resources:', err);
       }
-    } else {
-      setSettings(defaultSettings);
-    }
+
+      let serverEquipped: number[] = [];
+      try {
+        serverEquipped = await characterEquipmentAPI.getEquipment(groupId, characterId);
+      } catch (err) {
+        console.error('Failed to load equipment:', err);
+      }
+
+      let localSettings = defaultSettings;
+      const saved = localStorage.getItem(STORAGE_KEY(groupId, characterId));
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          localSettings = {
+            fields: Array.isArray(parsed.fields) ? parsed.fields : [],
+            items: Array.isArray(parsed.items) ? parsed.items : [],
+            equipped: Array.isArray(parsed.equipped) ? parsed.equipped : [],
+            pinnedSkills: Array.isArray(parsed.pinnedSkills) ? parsed.pinnedSkills : [],
+          };
+        } catch {
+          localSettings = defaultSettings;
+        }
+      }
+
+      if (!cancelled) {
+        setBaseResourceFields(baseFields);
+
+        const mergedFields = baseFields.concat(
+  localSettings.fields.filter(f => !baseFields.includes(f))
+);
+
+        const mergedSettings: DashboardSettings = {
+          ...localSettings,
+          fields: mergedFields,
+          equipped: Array.isArray(serverEquipped) ? serverEquipped : [],
+        };
+
+        setSettings(mergedSettings);
+
+        localStorage.setItem(STORAGE_KEY(groupId, characterId), JSON.stringify(mergedSettings));
+
+        setLoading(false);
+      }
+    };
+
+    load();
+
+    return () => { cancelled = true; };
   }, [groupId, characterId]);
 
   const saveSettings = useCallback((newSettings: DashboardSettings) => {
@@ -59,15 +105,33 @@ export function useDashboardSettings(groupId: number, characterId: number) {
     });
   }, [groupId, characterId]);
 
-  const toggleEquipped = useCallback((itemId: number) => {
-    setSettings(prev => {
-      const equipped = prev.equipped.includes(itemId)
-        ? prev.equipped.filter(id => id !== itemId)
-        : [...prev.equipped, itemId];
-      const next = { ...prev, equipped };
-      localStorage.setItem(STORAGE_KEY(groupId, characterId), JSON.stringify(next));
-      return next;
-    });
+  const toggleEquipped = useCallback(async (itemId: number) => {
+    const isCurrentlyEquipped = settings.equipped.includes(itemId);
+    const action: 'add' | 'remove' = isCurrentlyEquipped ? 'remove' : 'add';
+
+    try {
+      const updatedEquipment = await characterEquipmentAPI.patchEquipment(groupId, characterId, action, itemId);
+      setSettings(prev => {
+        const next = { ...prev, equipped: updatedEquipment };
+        localStorage.setItem(STORAGE_KEY(groupId, characterId), JSON.stringify(next));
+        return next;
+      });
+    } catch (err) {
+      console.error('Failed to update equipment:', err);
+    }
+  }, [groupId, characterId, settings.equipped]);
+
+  const saveEquippedOrder = useCallback(async (itemIds: number[]) => {
+    try {
+      const updatedEquipment = await characterEquipmentAPI.putEquipment(groupId, characterId, itemIds);
+      setSettings(prev => {
+        const next = { ...prev, equipped: updatedEquipment };
+        localStorage.setItem(STORAGE_KEY(groupId, characterId), JSON.stringify(next));
+        return next;
+      });
+    } catch (err) {
+      console.error('Failed to save equipment order:', err);
+    }
   }, [groupId, characterId]);
 
   const togglePinnedSkill = useCallback((skillId: number) => {
@@ -89,9 +153,12 @@ export function useDashboardSettings(groupId: number, characterId: number) {
   return {
     settings,
     saveSettings,
+    baseResourceFields,
+    loading,
     toggleField,
     toggleItem,
     toggleEquipped,
+    saveEquippedOrder,
     togglePinnedSkill,
     isFieldOnDashboard,
     isItemResource,

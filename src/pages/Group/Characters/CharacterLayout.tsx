@@ -9,7 +9,7 @@ import PageHeader from '../../../components/commons/PageLayout/PageHeader';
 import { TabItem } from '../../../components/commons/PageLayout/TabBar';
 import { useVisited } from '../../../contexts/VisitedContext';
 import { useDashboardSettings } from '../../../hooks/useDashboardSettings';
-import { DashboardSettingsProvider } from '../../../contexts/DashboardSettingsContext';
+import { DashboardSettingsProvider, DashboardSettingsContextType } from '../../../contexts/DashboardSettingsContext';
 
 const CharacterLayout: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
@@ -75,7 +75,7 @@ const CharacterLayout: React.FC = () => {
       tabBasePath={`/group/${groupId}/character/${characterId}`}
       tabOrientation={isMobile ? 'bottom' : 'top'}
     >
-      <DashboardSettingsProvider value={dashboardSettings}>
+      <DashboardSettingsProvider value={dashboardSettings as DashboardSettingsContextType}>
         <Outlet />
       </DashboardSettingsProvider>
     </PageLayout>

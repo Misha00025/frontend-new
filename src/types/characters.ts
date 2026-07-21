@@ -2,6 +2,7 @@ export interface CharacterShort {
     id: number;
     name: string;
     description: string;
+    fields?: Record<string, CharacterField>;
   }
   
   export interface Character {
