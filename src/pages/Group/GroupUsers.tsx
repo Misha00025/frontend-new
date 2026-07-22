@@ -20,7 +20,7 @@ const GroupUsers: React.FC = () => {
     if (groupId) {
       loadGroupUsers();
     }
-  }, [groupId, loading]);
+  }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadGroupUsers = async () => {
     const users = await groupUsersAPI.getGroupUsers(parseInt(groupId!));

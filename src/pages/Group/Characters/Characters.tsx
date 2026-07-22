@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CharacterShort } from '../../../types/characters';
-import { CreateCharacterRequest } from '../../../types/characters';
 import { CharacterTemplate } from '../../../types/characterTemplates';
 import { charactersAPI, characterTemplatesAPI } from '../../../services/api';
 import CharacterModal from './Modals/CharacterModal/CharacterModal';
@@ -27,7 +26,7 @@ const Characters: React.FC = () => {
       loadCharacters();
       loadTemplates();
     }
-  }, [groupId]);
+  }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadCharacters = async () => {
     try {

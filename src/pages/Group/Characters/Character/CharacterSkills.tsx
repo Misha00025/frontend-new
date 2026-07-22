@@ -1,13 +1,12 @@
 // pages/CharacterSkills.tsx
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterSkill } from '../../../../types/characterSkills';
-import { CreateGroupSkillRequest, GroupSkill, SkillAttributeDefinition, SkillGroup, UpdateGroupSkillRequest } from '../../../../types/groupSkills';
+import { GroupSkill, SkillAttributeDefinition } from '../../../../types/groupSkills';
 import { characterSkillsAPI, groupAPI, groupSkillsAPI } from '../../../../services/api';
 import SkillCard from '../../Cards/SkillCard/SkillCard';
 import commonStyles from '../../../../styles/common.module.css';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
-import { usePlatform } from '../../../../hooks/usePlatform';
 import ResourcePage from '../../../../components/commons/Pages/ResourcePage/ResourcePage';
 import CharacterSkillModal from '../../Modals/SkillModal/CharacterSkillModal';
 import SkillModal from '../../Modals/SkillModal/SkillModal';
@@ -30,7 +29,6 @@ const SkillCardWrapper: React.FC<{
 
 const CharacterSkills: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const isMobile = usePlatform();
   const [skills, setSkills] = useState<CharacterSkill[]>([]);
   const [groupSkills, setGroupSkills] = useState<GroupSkill[]>([]);
   const [loading, setLoading] = useState(false);
@@ -49,7 +47,7 @@ const CharacterSkills: React.FC = () => {
       loadGroupSkills();
       loadAttributes();
     }
-  }, [groupId, characterId]);
+  }, [groupId, characterId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadAttributes = async () => {
     try {

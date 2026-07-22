@@ -21,7 +21,7 @@ const Groups: React.FC = () => {
   useEffect(() => {
     loadGroups();
     setSelectedGroup(null);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadGroups = async () => {
     try {

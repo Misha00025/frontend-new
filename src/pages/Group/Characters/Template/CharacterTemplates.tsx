@@ -1,5 +1,5 @@
 // CharacterTemplates.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterTemplate, TemplateField, UpdateTemplateRequest } from '../../../../types/characterTemplates';
 import { characterTemplatesAPI, groupAPI } from '../../../../services/api';
@@ -42,16 +42,12 @@ const CharacterTemplates: React.FC = () => {
   const [editingField, setEditingField] = useState<{ field: TemplateField | null; fieldKey: string }>({ field: null, fieldKey: '' });
   const [currentCategoryKey, setCurrentCategoryKey]= useState<string|null>(null)
 
-  // Рефы для сохранения значений перед редактированием
-  const templateBeforeEdit = useRef<CharacterTemplate | null>(null);
-  const schemaBeforeEdit = useRef<TemplateSchema | null>(null);
-
   useEffect(() => {
     if (groupId) {
       loadTemplate();
     }
     setCurrentCategoryKey(null);
-  }, [groupId, editMode]);
+  }, [groupId, editMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadTemplate = async () => {
     try {

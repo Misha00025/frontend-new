@@ -7,7 +7,6 @@ import { groupItemsAPI } from '../../../../services/api';
 import CharacterItemModal from '../../Modals/ItemModal/CharacterItemModal';
 import commonStyles from '../../../../styles/common.module.css';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
-import { usePlatform } from '../../../../hooks/usePlatform';
 import ResourcePage from '../../../../components/commons/Pages/ResourcePage/ResourcePage';
 import ItemCard from '../../Cards/ItemCard/ItemCard';
 
@@ -30,7 +29,6 @@ const ItemCardWrapper: React.FC<{
 
 const CharacterItems: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const isMobile = usePlatform();
   const [items, setItems] = useState<CharacterItem[]>([]);
   const [groupItems, setGroupItems] = useState<GroupItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -46,7 +44,7 @@ const CharacterItems: React.FC = () => {
       loadItems();
       loadGroupItems();
     }
-  }, [groupId, characterId]);
+  }, [groupId, characterId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadItems = async () => {
     try {

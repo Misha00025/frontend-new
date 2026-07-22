@@ -41,7 +41,7 @@ const GroupSkills: React.FC = () => {
       loadSchema();
       loadSkills();
     }
-  }, [groupId]);
+  }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
   
   
   const loadSchema = async () => {

@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
-import { useLocation, useParams } from 'react-router-dom';
-import { GroupUser } from '../types/groupUsers';
-import { CharacterUser } from '../types/characterUsers';
+import { useLocation } from 'react-router-dom';
 import { groupUsersAPI } from '../services/api';
 import { characterUsersAPI } from '../services/api';
 

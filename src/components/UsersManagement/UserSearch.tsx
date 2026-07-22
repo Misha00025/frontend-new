@@ -23,7 +23,7 @@ const UserSearch: React.FC<UserSearchProps> = ({
 }) => {
   const [searchNickname, setSearchNickname] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   const handleSearch = async () => {
     if (!searchNickname.trim()) return;

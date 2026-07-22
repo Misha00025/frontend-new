@@ -24,13 +24,13 @@ const CharacterDashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSortModalOpen, setIsSortModalOpen] = useState(false);
   const { canEditThisCharacter } = useActionPermissions();
-  const { settings, toggleField, toggleItem, toggleEquipped, togglePinnedSkill, isItemResource, isItemEquipped } = useDashboardSettingsContext();
+  const { settings, toggleEquipped, togglePinnedSkill } = useDashboardSettingsContext();
 
   useEffect(() => {
     if (groupId && characterId) {
       loadData();
     }
-  }, [groupId, characterId]);
+  }, [groupId, characterId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadData = async () => {
     try {
@@ -244,7 +244,6 @@ interface FieldResourceRowProps {
 
 const FieldResourceRow: React.FC<FieldResourceRowProps> = ({ field, editable, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const { isFieldOnDashboard, toggleField } = useDashboardSettingsContext();
 
   const renderProgressBar = (f: CharacterField) => {
     const percentage = (f.value / f.maxValue!) * 100;

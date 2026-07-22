@@ -105,10 +105,6 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
     element.classList.add(styles.dragging);
   };
 
-  const handleDragEnd = (e: React.DragEvent) => {
-    const element = e.currentTarget as HTMLElement;
-    element.classList.remove(styles.dragging);
-  };
 
   const renderCategoryActions = () => {
     const menuItems = categoryMenuItems || [];

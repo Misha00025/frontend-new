@@ -30,6 +30,7 @@ const GroupLayout: React.FC = () => {
       setGroup(selectedGroup);
       visitGroup(selectedGroup.id);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId]);
 
   const groupTabs: TabItem[] = [
