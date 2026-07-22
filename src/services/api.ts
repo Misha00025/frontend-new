@@ -31,6 +31,7 @@ import {
 import { GroupNote, CreateGroupNoteRequest, UpdateGroupNoteRequest } from '../types/groupNotes';
 import { CreateGroupSkillRequest, CreateSkillAttributeRequest, GroupSkill, GroupSkillsResponse, SkillAttributeDefinition, SkillAttributesResponse, UpdateGroupSkillRequest } from '../types/groupSkills';
 import { GroupSchema, TemplateSchema } from '../types/groupSchemas';
+import { ActionLogResponse } from '../types/actionLog';
 
 
 export const authAPI = {
@@ -879,5 +880,25 @@ export const characterEquipmentAPI = {
     if (!response.ok) throw new Error('Failed to update equipment order');
     const data = await response.json();
     return Array.isArray(data) ? data : (data?.items ?? []);
+  },
+};
+
+export const characterLogAPI = {
+  getLog: async (
+    groupId: number,
+    characterId: number,
+    params?: { limit?: number; offset?: number }
+  ): Promise<ActionLogResponse> => {
+    const query = new URLSearchParams();
+    if (params?.limit !== undefined) query.set('limit', String(params.limit));
+    if (params?.offset !== undefined) query.set('offset', String(params.offset));
+    const qs = query.toString();
+    const endpoint = `/groups/${groupId}/characters/${characterId}/log${qs ? `?${qs}` : ''}`;
+
+    const response = await makeAuthenticatedRequest(endpoint);
+    if (!response.ok) {
+      throw new Error('Failed to fetch character action log');
+    }
+    return response.json();
   },
 };
