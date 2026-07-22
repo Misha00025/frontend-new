@@ -1,4 +1,4 @@
-export type PresetTheme = 'dark' | 'ocean' | 'forest' | 'sunset' | 'lavender' | 'forest-dark' | 'ocean-dark' | 'sunset-dark' | 'lavender-dark';
+export type PresetTheme = 'clean' | 'dark' | 'ocean' | 'forest' | 'sunset' | 'lavender' | 'forest-dark' | 'ocean-dark' | 'sunset-dark' | 'lavender-dark';
 
 export interface CustomColors {
   bgPrimary: string;
@@ -11,9 +11,10 @@ export type ThemeConfig =
   | { type: 'custom'; colors: CustomColors };
 
 // Для сериализации в localStorage
-export const DEFAULT_THEME: ThemeConfig = { type: 'preset', name: 'forest' };
+export const DEFAULT_THEME: ThemeConfig = { type: 'preset', name: 'clean' };
 
 export const PRESET_LABELS: Record<PresetTheme, string> = {
+  clean: 'Светлая',
   dark: 'Тёмная',
   ocean: 'Океан',
   forest: 'Лес',

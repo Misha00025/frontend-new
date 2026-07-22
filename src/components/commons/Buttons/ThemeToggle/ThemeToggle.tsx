@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import PersonalizeModal from '../../../Modals/PersonalizeModal/PersonalizeModal';
 import styles from './ThemeToggle.module.css';
@@ -18,7 +19,10 @@ const ThemeToggle: React.FC = () => {
       >
         🎨
       </button>
-      <PersonalizeModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      {isOpen && createPortal(
+        <PersonalizeModal isOpen={isOpen} onClose={() => setIsOpen(false)} />,
+        document.body
+      )}
     </>
   );
 };

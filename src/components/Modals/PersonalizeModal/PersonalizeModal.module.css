@@ -1,5 +1,62 @@
+/* Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+}
+
+/* Modal (desktop) */
+.modal {
+  width: 90%;
+  max-width: 740px;
+  background: var(--bg-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 2rem 1.5rem 2rem;
+  position: relative;
+  margin-top: 2rem;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition);
+}
+
+.closeBtn:hover {
+  background: var(--bg-secondary);
+}
+
+/* Section groups */
 .sectionGroup {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .groupTitle {
@@ -8,32 +65,14 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-secondary);
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.75rem 0;
 }
 
+/* Preset grid */
 .presetsGrid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   gap: 0.75rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: 0.5rem;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-color) transparent;
-  -webkit-overflow-scrolling: touch;
-  margin-bottom: 1.5rem;
-}
-
-.presetsGrid::-webkit-scrollbar {
-  height: 4px;
-}
-
-.presetsGrid::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.presetsGrid::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
 }
 
 .presetCard {
@@ -47,14 +86,12 @@
   cursor: pointer;
   background: var(--bg-primary);
   transition: var(--transition);
-  flex: 0 0 auto;
-  width: 100px;
-  scroll-snap-align: start;
 }
 
 .presetCard:hover {
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-color: var(--accent-color);
 }
 
 .presetCardActive {
@@ -63,13 +100,9 @@
 }
 
 .colorPreview {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
@@ -80,6 +113,7 @@
   text-align: center;
 }
 
+/* Custom colors section */
 .customSection {
   border-top: 1px solid var(--border-color);
   padding-top: 1rem;
@@ -115,8 +149,27 @@
   cursor: pointer;
   padding: 0;
   background: none;
+  flex-shrink: 0;
 }
 
+.hexInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.hexInput:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+/* Buttons row */
 .buttons {
   display: flex;
   gap: 0.75rem;
@@ -131,4 +184,41 @@
   white-space: nowrap;
   text-align: center;
   font-size: 0.85rem;
+}
+
+/* Mobile: fullscreen */
+@media (max-width: 768px) {
+  .overlay {
+    background: var(--bg-primary);
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .modal {
+    max-width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 1.5rem 1rem 2rem;
+    margin-top: 0;
+    min-height: 100vh;
+  }
+
+  .presetsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .presetCard {
+    padding: 0.5rem 0.25rem;
+    gap: 0.3rem;
+  }
+
+  .colorPreview {
+    width: 24px;
+    height: 24px;
+  }
+
+  .presetLabel {
+    font-size: 0.75rem;
+  }
 }
