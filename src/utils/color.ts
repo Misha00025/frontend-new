@@ -91,3 +91,23 @@ export function computeDangerColor(accentColor: string): string {
   // Берём красный оттенок: смешиваем accentColor с #d93025 (60/40)
   return blendHex(accentColor, '#d93025', 0.4);
 }
+
+/**
+ * Вычисляет --text-on-accent: белый или чёрный, в зависимости от яркости акцентного цвета
+ */
+export function computeTextOnAccent(accentColor: string): string {
+  return isLight(accentColor) ? '#000000' : '#ffffff';
+}
+
+/**
+ * Вычисляет --text-shadow: тень нужна, если фон светлый, а текст тёмный (для читаемости на прогресс-баре)
+ */
+export function computeTextShadow(bgPrimary: string, textPrimary: string): string {
+  // Тень нужна только если текст и фон сильно контрастируют
+  const bgLight = isLight(bgPrimary);
+  const textLight = isLight(textPrimary);
+  if (bgLight !== textLight) {
+    return '0 0 2px rgba(0,0,0,0.5)';
+  }
+  return 'none';
+}

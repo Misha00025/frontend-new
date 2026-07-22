@@ -64,7 +64,7 @@
 }
 
 .editableValue:hover {
-  background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  background-color: color-mix(in srgb, var(--accent-color) 10%, transparent);
 }
 
 .editInput {

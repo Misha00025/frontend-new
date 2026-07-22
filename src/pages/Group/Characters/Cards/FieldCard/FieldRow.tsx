@@ -56,7 +56,7 @@ const FieldRow: React.FC<FieldRowProps> = ({
           className={styles.progressBar}
           style={{ 
             width: `${percentage}%`,
-            backgroundColor: `hsl(${percentage * 1.2}, 70%, 45%)`
+            backgroundColor: `color-mix(in srgb, var(--danger-color) ${100 - percentage}%, var(--accent-color))`
           }}
         >
           <span className={styles.progressText}>

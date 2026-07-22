@@ -6,6 +6,8 @@ import {
   computeTextSecondary,
   computeBorderColor,
   computeDangerColor,
+  computeTextOnAccent,
+  computeTextShadow,
 } from '../utils/color';
 
 interface ThemeContextType {
@@ -55,6 +57,8 @@ function applyCustom(colors: CustomColors) {
       --accent-color: ${colors.accentColor};
       --border-color: ${computeBorderColor(colors.bgPrimary, colors.textPrimary)};
       --danger-color: ${computeDangerColor(colors.accentColor)};
+      --text-on-accent: ${computeTextOnAccent(colors.accentColor)};
+      --text-shadow: ${computeTextShadow(colors.bgPrimary, colors.textPrimary)};
     }
   `;
 }

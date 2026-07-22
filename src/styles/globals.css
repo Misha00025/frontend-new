@@ -4,6 +4,8 @@
     --border-radius-md: 8px;
     --border-radius-lg: 12px;
     --transition: all 0.3s ease;
+    --text-on-accent: #ffffff;
+    --text-shadow: none;
   }
   
 
@@ -16,6 +18,8 @@
   --accent-color: #2c2c2c;
   --border-color: #d0d0d0;
   --danger-color: #d93025;
+  --text-on-accent: #ffffff;
+  --text-shadow: none;
 }
 
   /* Тёмная тема (нейтральная) */
@@ -27,6 +31,8 @@
     --accent-color: #545454;
     --border-color: #444444;
     --danger-color: #c00000;
+    --text-on-accent: #ffffff;
+    --text-shadow: 0 0 2px rgba(0, 0, 0, 1);
   }
 
   /* Базовые стили */
@@ -110,6 +116,8 @@ html, body {
   --accent-color: #2e86ab;
   --border-color: #8ab4c8;
   --danger-color: #c0392b;
+  --text-on-accent: #ffffff;
+  --text-shadow: none;
 }
 
 /* Лес */
@@ -121,6 +129,8 @@ html, body {
   --accent-color: #4a7c3f;
   --border-color: #a0b88a;
   --danger-color: #a33b20;
+  --text-on-accent: #ffffff;
+  --text-shadow: none;
 }
 
 /* Закат */
@@ -132,6 +142,8 @@ html, body {
   --accent-color: #c96b3e;
   --border-color: #d4a88a;
   --danger-color: #b83030;
+  --text-on-accent: #ffffff;
+  --text-shadow: none;
 }
 
 /* Лаванда */
@@ -143,6 +155,8 @@ html, body {
   --accent-color: #7a4fa0;
   --border-color: #b8a0d0;
   --danger-color: #a04060;
+  --text-on-accent: #ffffff;
+  --text-shadow: none;
 }
 
 /* Тёмный лес (теперь как нейтральная тёмная) */
@@ -154,6 +168,8 @@ html, body {
   --accent-color: #4aa334;
   --border-color: #444444;
   --danger-color: #c00000;
+  --text-on-accent: #ffffff;
+  --text-shadow: 0 0 2px rgba(0, 0, 0, 1);
 }
 
 /* Тёмный океан */
@@ -165,6 +181,8 @@ html, body {
   --accent-color: #3a9ec4;
   --border-color: #2a4a60;
   --danger-color: #c0392b;
+  --text-on-accent: #ffffff;
+  --text-shadow: 0 0 2px rgba(0, 0, 0, 1);
 }
 
 /* Тёмный закат */
@@ -176,6 +194,8 @@ html, body {
   --accent-color: #d08040;
   --border-color: #5a3a2a;
   --danger-color: #b83030;
+  --text-on-accent: #ffffff;
+  --text-shadow: 0 0 2px rgba(0, 0, 0, 1);
 }
 
 /* Тёмная лаванда */
@@ -187,4 +207,6 @@ html, body {
   --accent-color: #9060c0;
   --border-color: #4a3a6a;
   --danger-color: #b04070;
+  --text-on-accent: #ffffff;
+  --text-shadow: 0 0 2px rgba(0, 0, 0, 1);
 }
