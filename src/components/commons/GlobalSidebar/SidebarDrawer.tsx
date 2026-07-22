@@ -62,11 +62,13 @@ const SidebarDrawer: React.FC<SidebarDrawerProps> = ({ inline = false }) => {
         </nav>
 
         <div className={styles.drawerFooter}>
-          <button className={styles.footerBtn} onClick={handleLogout}>
-            <span className={styles.icon}>🚪</span>
-            <span className={styles.label}>Выйти</span>
-          </button>
-          <ThemeToggle />
+          <div className={styles.footerRow}>
+            <button className={styles.footerBtn} onClick={handleLogout}>
+              <span className={styles.icon}>🚪</span>
+              <span className={styles.label}>Выйти</span>
+            </button>
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </>

@@ -6,17 +6,6 @@
     --transition: all 0.3s ease;
   }
   
-  /* Светлая тема */
-  [data-theme="light"] {
-    --bg-primary: #ece1e7;
-    --bg-secondary: #c7d7e0;
-    --text-primary: #333333;
-    --text-secondary: #666666;
-    --accent-color: #6a936f;
-    --border-color: #c0c0c0;
-    --danger-color: #f80b0b;
-  }
-  
   /* Тёмная тема */
   [data-theme="dark"] {
     --bg-primary: #1a1a1a;
@@ -98,4 +87,92 @@ html, body {
     font-size: 0.7rem;
     padding: 0.2rem 0.4rem;
   }
+}
+
+/* Океан */
+[data-theme="ocean"] {
+  --bg-primary: #e8f4f8;
+  --bg-secondary: #b8d4e8;
+  --text-primary: #1a3a4a;
+  --text-secondary: #4a6a7a;
+  --accent-color: #2e86ab;
+  --border-color: #8ab4c8;
+  --danger-color: #c0392b;
+}
+
+/* Лес */
+[data-theme="forest"] {
+  --bg-primary: #eaf7e1;
+  --bg-secondary: #c5dfb0;
+  --text-primary: #2d3e1f;
+  --text-secondary: #5a7050;
+  --accent-color: #4a7c3f;
+  --border-color: #a0b88a;
+  --danger-color: #a33b20;
+}
+
+/* Закат */
+[data-theme="sunset"] {
+  --bg-primary: #fdf0e0;
+  --bg-secondary: #f5d4b8;
+  --text-primary: #4a2512;
+  --text-secondary: #7a5540;
+  --accent-color: #c96b3e;
+  --border-color: #d4a88a;
+  --danger-color: #b83030;
+}
+
+/* Лаванда */
+[data-theme="lavender"] {
+  --bg-primary: #f3eef9;
+  --bg-secondary: #ddd0ef;
+  --text-primary: #2e1a47;
+  --text-secondary: #5e4a77;
+  --accent-color: #7a4fa0;
+  --border-color: #b8a0d0;
+  --danger-color: #a04060;
+}
+
+/* Тёмный лес */
+[data-theme="forest-dark"] {
+  --bg-primary: #1a2e1a;
+  --bg-secondary: #2a4030;
+  --text-primary: #d4e8c8;
+  --text-secondary: #90a888;
+  --accent-color: #5a9a4f;
+  --border-color: #3a5540;
+  --danger-color: #b84530;
+}
+
+/* Тёмный океан */
+[data-theme="ocean-dark"] {
+  --bg-primary: #0d2137;
+  --bg-secondary: #1a3348;
+  --text-primary: #d0e4f0;
+  --text-secondary: #90b0c8;
+  --accent-color: #3a9ec4;
+  --border-color: #2a4a60;
+  --danger-color: #c0392b;
+}
+
+/* Тёмный закат */
+[data-theme="sunset-dark"] {
+  --bg-primary: #2a1a12;
+  --bg-secondary: #3d2820;
+  --text-primary: #f0ddd0;
+  --text-secondary: #c0a090;
+  --accent-color: #d08040;
+  --border-color: #5a3a2a;
+  --danger-color: #b83030;
+}
+
+/* Тёмная лаванда */
+[data-theme="lavender-dark"] {
+  --bg-primary: #1e1430;
+  --bg-secondary: #2e2040;
+  --text-primary: #ddd0f0;
+  --text-secondary: #a090c0;
+  --accent-color: #9060c0;
+  --border-color: #4a3a6a;
+  --danger-color: #b04070;
 }

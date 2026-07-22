@@ -3,7 +3,6 @@ import buttonStyles from '../../styles/components/Button.module.css';
 import inputStyles from '../../styles/components/Input.module.css';
 import modalStyles from '../../styles/modal.module.css';
 import { useAuth } from '../../contexts/AuthContext';
-import ThemeToggle from '../../components/commons/Buttons/ThemeToggle/ThemeToggle';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -33,9 +32,6 @@ const Login: React.FC = () => {
       minHeight: '100vh',
       background: 'var(--bg-primary)'
     }}>
-      <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-        <ThemeToggle />
-      </div>
       
       <form
         style={{

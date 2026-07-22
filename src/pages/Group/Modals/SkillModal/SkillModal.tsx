@@ -36,7 +36,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
   const [newAttribute, setNewAttribute] = useState<Partial<SkillAttribute>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { theme } = useTheme();
+  const { themeConfig } = useTheme();
   const editorRef = useRef<HTMLDivElement>(null);
   const [customValues, setCustomValues] = useState<{[key: string]: string}>({});
 
@@ -304,7 +304,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
 
           <div className={modalStyles.formGroup}>
             <label>Описание:</label>
-            <div ref={editorRef} className={styles.editorContainer} data-color-mode={theme}>
+            <div ref={editorRef} className={styles.editorContainer} data-color-mode={themeConfig.type === 'preset' && themeConfig.name === 'dark' ? 'dark' : 'light'}>
               <MDEditor
                 value={description}
                 onChange={(value) => setDescription(value || '')}
