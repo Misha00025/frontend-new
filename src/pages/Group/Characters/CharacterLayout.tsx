@@ -6,6 +6,7 @@ import { Character } from '../../../types/characters';
 import { Group } from '../../../types/group';
 import PageLayout from '../../../components/commons/PageLayout/PageLayout';
 import PageHeader from '../../../components/commons/PageLayout/PageHeader';
+import ActionLogSidebar from '../../../components/commons/ActionLogSidebar/ActionLogSidebar';
 import { TabItem } from '../../../components/commons/PageLayout/TabBar';
 import { useVisited } from '../../../contexts/VisitedContext';
 import { useDashboardSettings } from '../../../hooks/useDashboardSettings';
@@ -59,6 +60,7 @@ const CharacterLayout: React.FC = () => {
   if (!character || !group) return <div>Персонаж не найден</div>;
 
   return (
+    <>
     <PageLayout
       breadcrumbs={[
         { label: 'Главная', path: '/dashboard' },
@@ -80,6 +82,8 @@ const CharacterLayout: React.FC = () => {
         <Outlet />
       </DashboardSettingsProvider>
     </PageLayout>
+    <ActionLogSidebar groupId={Number(groupId)} characterId={Number(characterId)} />
+    </>
   );
 };
 
