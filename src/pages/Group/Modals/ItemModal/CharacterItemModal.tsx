@@ -125,9 +125,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       <h2>{title}</h2>
-      <div className={modalStyles.modalBody}>
-        {error && <div className={modalStyles.error}>{error}</div>}
-
+      <div className={modalStyles.topPanel}>
         {!editingItem && (
           <div className={modalStyles.formGroup}>
             <label>Способ добавления:</label>
@@ -164,16 +162,20 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
             </div>
           </div>
         )}
+        {creationMode === 'existing' && step === 'select' && !editingItem && (
+          <SearchBar
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            placeholder="Поиск предмета..."
+            showClearButton={false}
+          />
+        )}
+      </div>
+      <div className={modalStyles.modalBody}>
+        {error && <div className={modalStyles.error}>{error}</div>}
 
         {creationMode === 'existing' && step === 'select' && !editingItem && (
           <>
-            <SearchBar
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              placeholder="Поиск предмета..."
-              showClearButton={false}
-            />
-
             {filteredItems.map(item => (
               <ItemCard
                 key={item.id}

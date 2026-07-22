@@ -54,6 +54,11 @@
   margin-top: 1rem;
 }
 
+.topPanel {
+  flex-shrink: 0;
+  margin-bottom: 1rem;
+}
+
 .helpText {
   color: var(--text-secondary);
   font-size: 0.8rem;

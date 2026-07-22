@@ -81,18 +81,21 @@ const CharacterSkillModal: React.FC<CharacterSkillModalProps> = ({
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
         <h2>{title}</h2>
-        <div className={modalStyles.modalBody}>
-        {error && <div className={modalStyles.error}>{error}</div>}
-
-        {!selectedSkill ? (
-          <>
+        {!selectedSkill && (
+          <div className={modalStyles.topPanel}>
             <SearchBar
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
               placeholder="Поиск способности..."
               showClearButton={false}
             />
+          </div>
+        )}
+        <div className={modalStyles.modalBody}>
+        {error && <div className={modalStyles.error}>{error}</div>}
 
+        {!selectedSkill ? (
+          <>
             {filteredSkills.map(skill => (
               <SkillCard
                 key={skill.id}
