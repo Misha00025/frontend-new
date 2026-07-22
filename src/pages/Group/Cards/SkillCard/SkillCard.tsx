@@ -12,6 +12,7 @@ interface SkillCardProps {
   onDelete?: () => void;
   showActions?: boolean;
   onRemoveFromDashboard?: () => void;
+  onSelect?: () => void;
 }
 
 const SkillCard: React.FC<SkillCardProps> = ({
@@ -20,13 +21,20 @@ const SkillCard: React.FC<SkillCardProps> = ({
   onDelete,
   showActions = true,
   onRemoveFromDashboard,
+  onSelect,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const dashboardCtx = useContext(DashboardSettingsContext);
 
   return (
-    <div id={`skill-${skill.id}`} className={cardStyles.card}>
-      <div className={cardStyles.header} onClick={() => setIsExpanded(!isExpanded)}>
+    <div id={`skill-${skill.id}`} className={`${cardStyles.card} ${onSelect ? cardStyles.selectable : ''}`}>
+      <div className={cardStyles.header} onClick={() => {
+        if (onSelect) {
+          onSelect();
+        } else {
+          setIsExpanded(!isExpanded);
+        }
+      }}>
         {onRemoveFromDashboard && (
           <button
             className={cardStyles.removeButton}

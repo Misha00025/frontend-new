@@ -5,10 +5,10 @@ import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
 import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
-import styles from './CharacterItemModal.module.css';
 import uiStyles from '../../../../styles/ui.module.css';
-import selectStyles from '../../../../styles/select-list.module.css';
 import EvaluatedInput from '../../../../components/commons/EvaluatedInput/EvaluatedInput';
+import SearchBar from '../../../../components/commons/Search/SearchBar';
+import ItemCard from '../../Cards/ItemCard/ItemCard';
 
 interface CharacterItemModalProps {
   isOpen: boolean;
@@ -19,6 +19,8 @@ interface CharacterItemModalProps {
   groupItems: GroupItem[];
 }
 
+type Step = 'select' | 'details';
+
 const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
   isOpen,
   onClose,
@@ -27,6 +29,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
   title,
   groupItems
 }) => {
+  const [step, setStep] = useState<Step>('select');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState<number | ''>(1);
@@ -36,12 +39,8 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [creationMode, setCreationMode] = useState<'new' | 'existing'>('existing');
   const [selectedGroupItem, setSelectedGroupItem] = useState<GroupItem | null>(null);
-  
-  // Добавляем состояния для поиска и фильтрации
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedAttribute, setSelectedAttribute] = useState<string>('');
   const [filteredItems, setFilteredItems] = useState<GroupItem[]>([]);
-  const [availableAttributes, setAvailableAttributes] = useState<string[]>([]);
 
   useEffect(() => {
     if (editingItem) {
@@ -51,6 +50,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
       setPrice(editingItem.price);
       setImageLink(editingItem.image_link || '');
       setCreationMode('existing');
+      setStep('details');
     } else {
       setName('');
       setDescription('');
@@ -60,24 +60,10 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
       setCreationMode('existing');
       setSelectedGroupItem(null);
       setSearchTerm('');
-      setSelectedAttribute('');
+      setStep('select');
     }
   }, [editingItem, isOpen]);
 
-  // Получаем уникальные атрибуты из всех предметов группы
-  useEffect(() => {
-    if (isOpen && creationMode === 'existing' && !editingItem) {
-      const attributes = new Set<string>();
-      groupItems.forEach(item => {
-        item.attributes?.forEach(attr => {
-          attributes.add(attr.name);
-        });
-      });
-      setAvailableAttributes(Array.from(attributes));
-    }
-  }, [groupItems, isOpen, creationMode, editingItem]);
-
-  // Фильтрация предметов
   useEffect(() => {
     if (!isOpen || creationMode !== 'existing' || editingItem) return;
 
@@ -95,21 +81,21 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
       );
     }
 
-    if (selectedAttribute) {
-      result = result.filter(item =>
-        item.attributes?.some(attr => attr.name === selectedAttribute)
-      );
-    }
-
     setFilteredItems(result);
-  }, [groupItems, searchTerm, selectedAttribute, isOpen, creationMode, editingItem]);
+  }, [groupItems, searchTerm, isOpen, creationMode, editingItem]);
 
-  const handleGroupItemSelect = (item: GroupItem) => {
+  const handleSelectItem = (item: GroupItem) => {
     setSelectedGroupItem(item);
     setName(item.name);
     setDescription(item.description);
     setPrice(item.price);
     setImageLink(item.image_link || '');
+    setStep('details');
+  };
+
+  const handleBackToSelect = () => {
+    setStep('select');
+    setSelectedGroupItem(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -136,20 +122,12 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
     }
   };
 
-  const getAttributeValue = (item: GroupItem, attributeName: string): string => {
-    const attribute = item.attributes?.find(attr => attr.name === attributeName);
-    return attribute ? attribute.value : '-';
-  };
-
-
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
-      
-        <h2>{title}</h2>
-        <div className={modalStyles.modalBody}>
-        
+      <h2>{title}</h2>
+      <div className={modalStyles.modalBody}>
         {error && <div className={modalStyles.error}>{error}</div>}
-        
+
         {!editingItem && (
           <div className={modalStyles.formGroup}>
             <label>Способ добавления:</label>
@@ -166,6 +144,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
                     setDescription('');
                     setPrice(0);
                     setImageLink('');
+                    setStep('details');
                   }}
                 />
                 Создать новый
@@ -175,7 +154,10 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
                   type="radio"
                   value="existing"
                   checked={creationMode === 'existing'}
-                  onChange={() => setCreationMode('existing')}
+                  onChange={() => {
+                    setCreationMode('existing');
+                    setStep('select');
+                  }}
                 />
                 Добавить готовый
               </label>
@@ -183,187 +165,140 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
           </div>
         )}
 
-        {creationMode === 'existing' && !editingItem && (
+        {creationMode === 'existing' && step === 'select' && !editingItem && (
           <>
-            <div className={selectStyles.filters}>
-              <div className={selectStyles.searchGroup}>
-                <label>Поиск:</label>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className={inputStyles.input}
-                  placeholder="Название, описание или атрибут..."
-                />
-              </div>
-              
-              <div className={selectStyles.filterGroup}>
-                <label>Фильтр по атрибуту:</label>
-                <select
-                  value={selectedAttribute}
-                  onChange={(e) => setSelectedAttribute(e.target.value)}
-                  className={inputStyles.input}
-                >
-                  <option value="">Все атрибуты</option>
-                  {availableAttributes.map(attr => (
-                    <option key={attr} value={attr}>{attr}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
+            <SearchBar
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              placeholder="Поиск предмета..."
+              showClearButton={false}
+            />
 
-            {selectedGroupItem && (
-              <div className={styles.selectedItem}>
-                <h3>Выбранный предмет:</h3>
-                <div className={selectStyles.listItem}>
-                  <h4 className={selectStyles.itemName}>{selectedGroupItem.name}</h4>
-                  <p className={selectStyles.itemDescription}>{selectedGroupItem.description}</p>
-                  <p className={styles.itemPrice}>Цена: {selectedGroupItem.price}</p>
-                  {selectedGroupItem.attributes && selectedGroupItem.attributes.length > 0 && (
-                    <div className={selectStyles.attributes}>
-                      <h5>Атрибуты:</h5>
-                      <div className={selectStyles.attributesGrid}>
-                        {availableAttributes.map(attrName => (
-                          <div key={attrName} className={selectStyles.attribute}>
-                            <span className={selectStyles.attributeName}>{attrName}:</span>
-                            <span className={selectStyles.attributeValue}>
-                              {getAttributeValue(selectedGroupItem, attrName)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+            {filteredItems.map(item => (
+              <ItemCard
+                key={item.id}
+                item={item}
+                onSelect={() => handleSelectItem(item)}
+                showActions={false}
+              />
+            ))}
+            {filteredItems.length === 0 && (
+              <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginTop: '1rem' }}>
+                Нет доступных предметов
+              </p>
             )}
-
-            <div className={selectStyles.sectionList}>
-              <h3>Доступные предметы ({filteredItems.length})</h3>
-              
-              {filteredItems.length === 0 ? (
-                <p className={selectStyles.noItems}>Нет доступных предметов</p>
-              ) : (
-                <div className={selectStyles.listContainer}>
-                  {filteredItems.map(item => (
-                    <div key={item.id} className={selectStyles.listItem}>
-                      <div className={selectStyles.itemHeader}>
-                        <h4 className={selectStyles.itemName}>{item.name}</h4>
-                        <button
-                          onClick={() => handleGroupItemSelect(item)}
-                          className={buttonStyles.button}
-                          disabled={loading}
-                        >
-                          {selectedGroupItem?.id === item.id ? 'Выбран' : 'Выбрать'}
-                        </button>
-                      </div>
-                      
-                      <p className={selectStyles.itemDescription}>{item.description}</p>
-                      <p className={styles.itemPrice}>Цена: {item.price}</p>
-                      
-                      {item.attributes && item.attributes.length > 0 && (
-                        <div className={selectStyles.attributes}>
-                          <h5>Атрибуты:</h5>
-                          <div className={selectStyles.attributesGrid}>
-                            {availableAttributes.map(attrName => (
-                              <div key={attrName} className={selectStyles.attribute}>
-                                <span className={selectStyles.attributeName}>{attrName}:</span>
-                                <span className={selectStyles.attributeValue}>
-                                  {getAttributeValue(item, attrName)}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </>
         )}
 
-        <form onSubmit={handleSubmit}>
-          {creationMode === 'new' && (
-            <>
-              <div className={modalStyles.formGroup}>
-                <label>Название:</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className={inputStyles.input}
-                  required
-                  disabled={!!editingItem}
-                />
-              </div>
+        {creationMode === 'existing' && step === 'details' && selectedGroupItem && (
+          <ItemCard item={selectedGroupItem} showActions={false} />
+        )}
 
-              <div className={modalStyles.formGroup}>
-                <label>Описание:</label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className={inputStyles.input}
-                  rows={3}
-                  required
-                  disabled={!!editingItem}
-                />
-              </div>
-
-              <div className={modalStyles.formGroup}>
-                <label>Цена за единицу:</label>
-                <EvaluatedInput
-                  initialValue={price === '' ? '' : price.toString()}
-                  onCommit={(value) => setPrice(value.trim() === '' ? 0 : Math.max(0, Number(value.trim())))}
-                  className={inputStyles.input}
-                  placeholder="Цена за единицу"
-                  required
-                  disabled={!!editingItem}
-                />
-              </div>
-
-              <div className={modalStyles.formGroup}>
-                <label>Ссылка на изображение (в разработке):</label>
-                <input
-                  type="text"
-                  value={imageLink}
-                  onChange={(e) => setImageLink(e.target.value)}
-                  className={inputStyles.input}
-                  disabled={!!editingItem}
-                />
-              </div>
-            </>
-          )}
-
-          <div className={modalStyles.formGroup}>
-            <label>Количество:</label>
-            <EvaluatedInput
-              initialValue={amount === '' ? '' : amount.toString()}
-              onCommit={(value) => setAmount(value.trim() === '' ? 1 : Math.max(0, Number(value.trim())))}
-              className={inputStyles.input}
-              placeholder="Количество"
-              required
-              disabled={creationMode === 'existing' && !selectedGroupItem && !editingItem}
-            />
-          </div>
-
+        {creationMode === 'new' && (
+          <form id="new-item-form" onSubmit={handleSubmit}>
+            <div className={modalStyles.formGroup}>
+              <label>Название:</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className={inputStyles.input}
+                required
+              />
+            </div>
+            <div className={modalStyles.formGroup}>
+              <label>Описание:</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className={inputStyles.input}
+                rows={3}
+                required
+              />
+            </div>
+            <div className={modalStyles.formGroup}>
+              <label>Цена:</label>
+              <EvaluatedInput
+                initialValue={price === '' ? '' : price.toString()}
+                onCommit={(value) => setPrice(value.trim() === '' ? 0 : Math.max(0, Number(value.trim())))}
+                className={inputStyles.input}
+                placeholder="Цена за единицу"
+                required
+              />
+            </div>
+            <div className={modalStyles.formGroup}>
+              <label>Количество:</label>
+              <EvaluatedInput
+                initialValue={amount === '' ? '' : amount.toString()}
+                onCommit={(value) => setAmount(value.trim() === '' ? 1 : Math.max(0, Number(value.trim())))}
+                className={inputStyles.input}
+                placeholder="Количество"
+                required
+              />
+            </div>
           </form>
-          </div>
-          <div className={modalStyles.buttons}>
-            <button type="button" onClick={onClose} className={buttonStyles.button}>
-              Отмена
+        )}
+
+        {editingItem && selectedGroupItem && (
+          <ItemCard item={selectedGroupItem} showActions={false} />
+        )}
+
+      </div>
+      <div className={modalStyles.buttons}>
+        {creationMode === 'existing' && step === 'select' && !editingItem && (
+          <button type="button" onClick={onClose} className={buttonStyles.button}>
+            Отмена
+          </button>
+        )}
+        {creationMode === 'existing' && step === 'details' && !editingItem && (
+          <>
+            <button type="button" onClick={handleBackToSelect} className={buttonStyles.button}>
+              ← Назад
             </button>
-            <button 
-              type="submit" 
-              className={buttonStyles.button} 
-              disabled={loading || (creationMode === 'existing' && !selectedGroupItem && !editingItem)}
+            <div className={modalStyles.formGroup} style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1 }}>
+              <label style={{ whiteSpace: 'nowrap', margin: 0 }}>Количество:</label>
+              <span style={{ width: '80px' }}>
+              <EvaluatedInput
+                initialValue={amount === '' ? '' : amount.toString()}
+                onCommit={(value) => setAmount(value.trim() === '' ? 1 : Math.max(0, Number(value.trim())))}
+                className={inputStyles.input}
+                placeholder="Количество"
+                required
+              />
+              </span>
+            </div>
+            <button
+              type="button"
+              className={buttonStyles.button}
+              onClick={handleSubmit}
+              disabled={loading}
             >
               {loading ? 'Сохранение...' : 'Сохранить'}
             </button>
-          </div>
-
-  </ModalPortal>
+          </>
+        )}
+        {creationMode === 'new' && (
+          <>
+            <button type="button" onClick={onClose} className={buttonStyles.button}>
+              Отмена
+            </button>
+            <button type="submit" form="new-item-form" className={buttonStyles.button} disabled={loading}>
+              {loading ? 'Сохранение...' : 'Сохранить'}
+            </button>
+          </>
+        )}
+        {editingItem && (
+          <>
+            <button type="button" onClick={onClose} className={buttonStyles.button}>
+              Отмена
+            </button>
+            <button type="button" className={buttonStyles.button} onClick={handleSubmit} disabled={loading}>
+              {loading ? 'Сохранение...' : 'Сохранить'}
+            </button>
+          </>
+        )}
+      </div>
+    </ModalPortal>
   );
 };
 

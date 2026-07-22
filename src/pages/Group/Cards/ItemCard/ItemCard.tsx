@@ -14,6 +14,7 @@ interface ItemCardProps {
   showActions?: boolean;
   showAmount?: boolean;
   onRemoveFromDashboard?: () => void;
+  onSelect?: () => void;
 }
 
 const ItemCard: React.FC<ItemCardProps> = ({
@@ -23,6 +24,7 @@ const ItemCard: React.FC<ItemCardProps> = ({
   showActions = true,
   showAmount = false,
   onRemoveFromDashboard,
+  onSelect,
 }) => {
   const isCharacterItem = 'amount' in item;
   const dashboardCtx = useContext(DashboardSettingsContext);
@@ -63,7 +65,13 @@ const ItemCard: React.FC<ItemCardProps> = ({
 
   return (
     <div className={item.isSecret && !isCharacterItem ? styles.itemCardHide : cardStyles.card}>
-      <div className={cardStyles.header} onClick={() => setIsExpanded(!isExpanded)}>
+      <div className={cardStyles.header} onClick={() => {
+        if (onSelect) {
+          onSelect();
+        } else {
+          setIsExpanded(!isExpanded);
+        }
+      }}>
         {onRemoveFromDashboard && (
           <button
             className={cardStyles.removeButton}
