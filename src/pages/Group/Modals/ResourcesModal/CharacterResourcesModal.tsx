@@ -125,6 +125,7 @@ const CharacterResourcesModal: React.FC<CharacterResourcesModalProps> = ({
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       <h2>Поля на главной странице персонажа</h2>
+      <div className={modalStyles.modalBody}>
       <p className={styles.hint}>
         Выберите поля, которые будут отображаться на дашборде персонажа и на карточках в списке персонажей.
         Эти поля GM считает основными ресурсами (HP, Gold, MP и т.д.).
@@ -203,6 +204,7 @@ const CharacterResourcesModal: React.FC<CharacterResourcesModalProps> = ({
         </>
       )}
 
+      </div>
       <div className={modalStyles.buttons}>
         <button className={buttonStyles.button} onClick={onClose}>
           Отмена

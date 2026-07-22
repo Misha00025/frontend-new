@@ -16,8 +16,17 @@
   padding: 2rem;
   border-radius: var(--border-radius-md);
   width: 90%;
-  max-height: 80vh;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalBody {
+  flex: 1;
   overflow-y: auto;
+  min-height: 0;
+  margin: 0 -0.25rem;
+  padding: 0 0.25rem;
 }
 
 .formGroup {

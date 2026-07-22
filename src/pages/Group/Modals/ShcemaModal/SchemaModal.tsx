@@ -95,6 +95,7 @@ const SchemaModal: React.FC<SchemaModalProps> = ({
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       
         <h2>{title}</h2>
+        <div className={modalStyles.modalBody}>
         
         {error && <div className={modalStyles.error}>{error}</div>}
         
@@ -191,6 +192,8 @@ const SchemaModal: React.FC<SchemaModalProps> = ({
             </div>
           </div>
 
+          </form>
+          </div>
           <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
@@ -199,7 +202,6 @@ const SchemaModal: React.FC<SchemaModalProps> = ({
               {loading ? 'Сохранение...' : 'Сохранить схему'}
             </button>
           </div>
-        </form>
 
   </ModalPortal>
   );

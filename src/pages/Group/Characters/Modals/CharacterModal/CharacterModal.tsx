@@ -60,6 +60,7 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       <h2>{title}</h2>
+      <div className={modalStyles.modalBody}>
       
       {error && <div className={modalStyles.error}>{error}</div>}
       
@@ -103,6 +104,8 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
           </select>
         </div>
 
+        </form>
+        </div>
         <div className={modalStyles.buttons}>
           <button type="button" onClick={onClose} className={buttonStyles.button}>
             Отмена
@@ -111,7 +114,6 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
             {loading ? 'Создание...' : 'Создать'}
           </button>
         </div>
-      </form>
     </ModalPortal>
   );
 };

@@ -51,6 +51,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       
         <h2>Создать группу</h2>
+        <div className={modalStyles.modalBody}>
         
         {error && <div className={modalStyles.error}>{error}</div>}
         
@@ -86,6 +87,8 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
             />
           </div>
           
+          </form>
+          </div>
           <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
@@ -94,7 +97,6 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
               {loading ? 'Создание...' : 'Создать'}
             </button>
           </div>
-        </form>
 
   </ModalPortal>
   );

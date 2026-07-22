@@ -105,6 +105,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       
         <h2>Редактировать группу</h2>
+        <div className={modalStyles.modalBody}>
         
         {error && <div className={modalStyles.error}>{error}</div>}
         
@@ -168,6 +169,8 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
             <div className={modalStyles.readOnlyField}>{group.id}</div>
           </div>
           
+          </form>
+          </div>
           <div className={modalStyles.buttons}>
             <button 
               type="button" 
@@ -185,7 +188,6 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
               {loading ? 'Сохранение...' : 'Сохранить'}
             </button>
           </div>
-        </form>
 
   </ModalPortal>
   );

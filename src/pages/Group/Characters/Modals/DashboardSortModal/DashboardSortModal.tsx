@@ -98,6 +98,7 @@ const DashboardSortModal: React.FC<DashboardSortModalProps> = ({
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       <h2>Настройка главной страницы</h2>
+      <div className={modalStyles.modalBody}>
       <p className={styles.hint}>Перетаскивайте или используйте кнопки ▲▼ для сортировки. ✕ — убрать с главной.</p>
 
       {orderedFields.length > 0 && (
@@ -246,6 +247,7 @@ const DashboardSortModal: React.FC<DashboardSortModalProps> = ({
         <p className={styles.empty}>Главная страница пуста. Добавьте элементы на вкладках Статы, Инвентарь или Способности.</p>
       )}
 
+      </div>
       <div className={modalStyles.buttons}>
         <button className={buttonStyles.button} onClick={handleSave}>Готово</button>
       </div>

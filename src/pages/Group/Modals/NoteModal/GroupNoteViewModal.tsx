@@ -70,6 +70,7 @@ const GroupNoteViewModal: React.FC<GroupNoteViewModalProps> = ({
       )}
 
       <h2 style={{ margin: '0 0 0.5rem 0' }}>{note.header}</h2>
+      <div className={modalStyles.modalBody}>
       
       {note.short_description && (
         <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
@@ -130,6 +131,7 @@ const GroupNoteViewModal: React.FC<GroupNoteViewModalProps> = ({
         </div>
       )}
 
+      </div>
       {!isMobile && (
         <div className={modalStyles.buttons}>
           <div style={{ display: 'flex', gap: '0.5rem', marginRight: 'auto' }}>

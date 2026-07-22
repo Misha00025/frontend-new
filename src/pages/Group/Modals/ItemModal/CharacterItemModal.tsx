@@ -146,6 +146,7 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       
         <h2>{title}</h2>
+        <div className={modalStyles.modalBody}>
         
         {error && <div className={modalStyles.error}>{error}</div>}
         
@@ -347,6 +348,8 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
             />
           </div>
 
+          </form>
+          </div>
           <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
               Отмена
@@ -359,7 +362,6 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
               {loading ? 'Сохранение...' : 'Сохранить'}
             </button>
           </div>
-        </form>
 
   </ModalPortal>
   );

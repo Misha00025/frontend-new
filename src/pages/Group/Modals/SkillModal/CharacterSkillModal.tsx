@@ -98,6 +98,7 @@ const CharacterSkillModal: React.FC<CharacterSkillModalProps> = ({
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       
         <h2>{title}</h2>
+        <div className={modalStyles.modalBody}>
         
         {error && <div className={modalStyles.error}>{error}</div>}
         
@@ -169,6 +170,7 @@ const CharacterSkillModal: React.FC<CharacterSkillModalProps> = ({
           )}
         </div>
 
+        </div>
         <div className={modalStyles.buttons}>
           <button type="button" onClick={onClose} className={buttonStyles.button}>
             Закрыть
