@@ -1,6 +1,5 @@
 import React from 'react';
 import { User } from '../../types/groupUsers';
-import buttonStyles from '../../styles/components/Button.module.css';
 import stylesUi from '../../styles/ui.module.css';
 import IconButton from '../commons/Buttons/IconButton/IconButton';
 import List from '../List/List';

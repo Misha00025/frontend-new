@@ -22,14 +22,14 @@ const GroupNotes: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [viewingNoteData, setViewingNoteData] = useState<GroupNote | null>(null);
-  const [viewLoading, setViewLoading] = useState(false);
+  const [, setViewLoading] = useState(false);
   const { canEditGroup } = useActionPermissions();
 
   useEffect(() => {
     if (groupId) {
       loadNotes();
     }
-  }, [groupId]);
+  }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadNotes = async () => {
     try {

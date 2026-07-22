@@ -93,7 +93,6 @@ const DashboardSortModal: React.FC<DashboardSortModalProps> = ({
 
   if (!isOpen) return null;
 
-  const fieldKeys = character ? Object.keys(character.fields) : [];
   const itemMap = new Map(items.map(i => [i.id, i]));
   const skillMap = new Map(skills.map(s => [s.id, s]));
 

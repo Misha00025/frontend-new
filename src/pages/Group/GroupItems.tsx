@@ -41,7 +41,7 @@ const GroupItems: React.FC = () => {
       loadSchema();
       loadItems();
     }
-  }, [groupId]);
+  }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
   
   const loadItems = async () => {
     try {

@@ -68,15 +68,6 @@ const ResourcePage = <T extends {
   const isMobile = usePlatform();
   const [searchTerm, setSearchTerm] = useState('');
   
-  const availableAttributes = useMemo(() => {
-    const attrs = new Set<string>();
-    items.forEach(item => {
-      item.attributes?.forEach(attr => {
-        attrs.add(attr.name);
-      });
-    });
-    return Array.from(attrs).sort();
-  }, [items]);
   
   const filteredItems = useMemo(() => {
     if (!searchTerm.trim()) return items;

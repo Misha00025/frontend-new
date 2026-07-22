@@ -23,7 +23,7 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     fetchProfile();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Инициализируем форму данными профиля
   useEffect(() => {

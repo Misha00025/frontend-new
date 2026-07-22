@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Character as CharacterData, CharacterField } from '../../../../types/characters';
+import { Character as CharacterData } from '../../../../types/characters';
 import { charactersAPI, characterTemplatesAPI, groupAPI } from '../../../../services/api';
 import commonStyles from '../../../../styles/common.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
@@ -29,7 +29,7 @@ const Character: React.FC = () => {
     if (groupId && characterId) {
       loadCharacter();
     }
-  }, [groupId, characterId]);
+  }, [groupId, characterId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadCharacter = async () => {
     try {
@@ -103,7 +103,7 @@ const Character: React.FC = () => {
       if (fields.length > 0){
         fields.map(([key, value]) => 
           items.push({
-            label: `Добавить \'${value.name}\'`,
+            label: `Добавить '${value.name}'`,
             onClick: () => { handleUpdateFieldValue(key, '1') },
           })
         );

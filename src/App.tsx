@@ -26,7 +26,6 @@ import Profile from './pages/Profile';
 import './styles/globals.css';
 import { PermissionsProvider } from './contexts/PermissionsContext';
 import { SidebarProvider } from './contexts/SidebarContext';
-import WorkInProgress from './pages/WorkInProgress';
 import GroupSkills from './pages/Group/GroupSkills';
 import Login from './pages/Authorisation/Login';
 
@@ -36,7 +35,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
-  const { profile, loading, profileNotFound, fetchProfile } = useProfile();
+  const { loading, profileNotFound, fetchProfile } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Outlet, useLocation } from 'react-router-dom';
+import { useParams, Outlet } from 'react-router-dom';
 import { usePlatform } from '../../../hooks/usePlatform';
 import { charactersAPI, groupAPI } from '../../../services/api';
 import { Character } from '../../../types/characters';
@@ -41,6 +41,7 @@ const CharacterLayout: React.FC = () => {
       }
     };
     loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId, characterId]);
 
   const characterTabs: TabItem[] = [

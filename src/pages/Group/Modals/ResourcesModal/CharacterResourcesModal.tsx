@@ -39,7 +39,7 @@ const CharacterResourcesModal: React.FC<CharacterResourcesModalProps> = ({
     if (isOpen) {
       loadCurrentResources();
     }
-  }, [isOpen, groupId]);
+  }, [isOpen, groupId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadCurrentResources = async () => {
     try {

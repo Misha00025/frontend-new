@@ -29,7 +29,7 @@ const CharacterUsersTable: React.FC<CharacterUsersTableProps> = ({
 
   useEffect(() => {
     loadCharacters();
-  }, [groupId]);
+  }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadCharacters = async () => {
     const chars = await charactersAPI.getCharacters(groupId);

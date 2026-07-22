@@ -1,7 +1,7 @@
 import { usePermissions } from '../contexts/PermissionsContext';
 
 export const useActionPermissions = () => {
-  const { isGroupAdmin, canEditCharacter, canDeleteCharacter } = usePermissions();
+  const { isGroupAdmin, canEditCharacter } = usePermissions();
 
   const canEditGroup = isGroupAdmin;
   const canDeleteGroup = isGroupAdmin;

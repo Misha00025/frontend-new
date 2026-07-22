@@ -1,6 +1,5 @@
 // utils/characterFields.ts
 import { Character, CharacterField } from '../types/characters';
-import { CharacterTemplate } from '../types/characterTemplates';
 import { TemplateCategory, TemplateSchema } from '../types/groupSchemas';
 
 export interface CategoryData {
