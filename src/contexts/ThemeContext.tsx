@@ -8,6 +8,8 @@ import {
   computeDangerColor,
   computeTextOnAccent,
   computeTextShadow,
+  computeProgressFrom,
+  computeProgressTo,
 } from '../utils/color';
 
 interface ThemeContextType {
@@ -22,16 +24,16 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Цвета всех пресетов (используются для превью в UI)
 export const PRESET_COLORS: Record<PresetTheme, CustomColors> = {
-  clean: { bgPrimary: '#ffffff', textPrimary: '#000000', accentColor: '#2c2c2c' },
-  dark: { bgPrimary: '#1a1a1a', textPrimary: '#ffffff', accentColor: '#545454' },
-  ocean: { bgPrimary: '#e8f4f8', textPrimary: '#1a3a4a', accentColor: '#2e86ab' },
-  forest: { bgPrimary: '#eaf7e1', textPrimary: '#2d3e1f', accentColor: '#4a7c3f' },
-  sunset: { bgPrimary: '#fdf0e0', textPrimary: '#4a2512', accentColor: '#c96b3e' },
-  lavender: { bgPrimary: '#f3eef9', textPrimary: '#2e1a47', accentColor: '#7a4fa0' },
-  'forest-dark': { bgPrimary: '#1a1a1a', textPrimary: '#ffffff', accentColor: '#4aa334' },
-  'ocean-dark': { bgPrimary: '#1a1a1a', textPrimary: '#d0e4f0', accentColor: '#3a9ec4' },
-  'sunset-dark': { bgPrimary: '#1a1a1a', textPrimary: '#f0ddd0', accentColor: '#d08040' },
-  'lavender-dark': { bgPrimary: '#1a1a1a', textPrimary: '#ddd0f0', accentColor: '#9060c0' },
+  clean: { bgPrimary: '#ffffff', textPrimary: '#000000', accentColor: '#2c2c2c', progressFrom: '#e53935', progressTo: '#66bb6a' },
+  dark: { bgPrimary: '#1a1a1a', textPrimary: '#ffffff', accentColor: '#545454', progressFrom: '#e53935', progressTo: '#43a047' },
+  ocean: { bgPrimary: '#e8f4f8', textPrimary: '#1a3a4a', accentColor: '#2e86ab', progressFrom: '#e53935', progressTo: '#66bb6a' },
+  forest: { bgPrimary: '#eaf7e1', textPrimary: '#2d3e1f', accentColor: '#4a7c3f', progressFrom: '#e53935', progressTo: '#66bb6a' },
+  sunset: { bgPrimary: '#fdf0e0', textPrimary: '#4a2512', accentColor: '#c96b3e', progressFrom: '#e53935', progressTo: '#66bb6a' },
+  lavender: { bgPrimary: '#f3eef9', textPrimary: '#2e1a47', accentColor: '#7a4fa0', progressFrom: '#e53935', progressTo: '#66bb6a' },
+  'forest-dark': { bgPrimary: '#1a1a1a', textPrimary: '#ffffff', accentColor: '#4aa334', progressFrom: '#e53935', progressTo: '#43a047' },
+  'ocean-dark': { bgPrimary: '#1a1a1a', textPrimary: '#d0e4f0', accentColor: '#3a9ec4', progressFrom: '#e53935', progressTo: '#43a047' },
+  'sunset-dark': { bgPrimary: '#1a1a1a', textPrimary: '#f0ddd0', accentColor: '#d08040', progressFrom: '#e53935', progressTo: '#43a047' },
+  'lavender-dark': { bgPrimary: '#1a1a1a', textPrimary: '#ddd0f0', accentColor: '#9060c0', progressFrom: '#e53935', progressTo: '#43a047' },
 };
 
 function applyPreset(name: PresetTheme) {
@@ -59,6 +61,8 @@ function applyCustom(colors: CustomColors) {
       --danger-color: ${computeDangerColor(colors.accentColor)};
       --text-on-accent: ${computeTextOnAccent(colors.accentColor)};
       --text-shadow: ${computeTextShadow(colors.bgPrimary, colors.textPrimary)};
+      --progress-bar-from: ${colors.progressFrom || computeProgressFrom()};
+      --progress-bar-to: ${colors.progressTo || computeProgressTo(colors.bgPrimary)};
     }
   `;
 }

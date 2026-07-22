@@ -4,6 +4,8 @@ export interface CustomColors {
   bgPrimary: string;
   textPrimary: string;
   accentColor: string;
+  progressFrom: string;
+  progressTo: string;
 }
 
 export type ThemeConfig =

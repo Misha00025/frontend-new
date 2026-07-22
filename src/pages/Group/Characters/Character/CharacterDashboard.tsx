@@ -253,7 +253,7 @@ const FieldResourceRow: React.FC<FieldResourceRowProps> = ({ field, editable, on
           className={styles.progressBar}
           style={{
             width: `${percentage}%`,
-            backgroundColor: `color-mix(in srgb, var(--danger-color) ${100 - percentage}%, var(--accent-color))`
+            backgroundColor: `color-mix(in srgb, var(--progress-bar-from) ${100 - percentage}%, var(--progress-bar-to))`
           }}
         >
           <span className={styles.progressText}>{f.value}/{f.maxValue}</span>

@@ -6,6 +6,8 @@
     --transition: all 0.3s ease;
     --text-on-accent: #ffffff;
     --text-shadow: none;
+    --progress-bar-from: #e53935;
+    --progress-bar-to: #66bb6a;
   }
   
 
@@ -20,6 +22,8 @@
   --danger-color: #d93025;
   --text-on-accent: #ffffff;
   --text-shadow: none;
+  --progress-bar-from: #e53935;
+  --progress-bar-to: #66bb6a;
 }
 
   /* Тёмная тема (нейтральная) */
@@ -33,6 +37,8 @@
     --danger-color: #c00000;
     --text-on-accent: #ffffff;
     --text-shadow: 0 0 2px rgba(0, 0, 0, 1);
+    --progress-bar-from: #e53935;
+    --progress-bar-to: #43a047;
   }
 
   /* Базовые стили */
@@ -118,6 +124,8 @@ html, body {
   --danger-color: #c0392b;
   --text-on-accent: #ffffff;
   --text-shadow: none;
+  --progress-bar-from: #e53935;
+  --progress-bar-to: #66bb6a;
 }
 
 /* Лес */
@@ -131,6 +139,8 @@ html, body {
   --danger-color: #a33b20;
   --text-on-accent: #ffffff;
   --text-shadow: none;
+  --progress-bar-from: #e53935;
+  --progress-bar-to: #66bb6a;
 }
 
 /* Закат */
@@ -144,6 +154,8 @@ html, body {
   --danger-color: #b83030;
   --text-on-accent: #ffffff;
   --text-shadow: none;
+  --progress-bar-from: #e53935;
+  --progress-bar-to: #66bb6a;
 }
 
 /* Лаванда */
@@ -157,6 +169,8 @@ html, body {
   --danger-color: #a04060;
   --text-on-accent: #ffffff;
   --text-shadow: none;
+  --progress-bar-from: #e53935;
+  --progress-bar-to: #66bb6a;
 }
 
 /* Тёмный лес (теперь как нейтральная тёмная) */
@@ -170,6 +184,8 @@ html, body {
   --danger-color: #c00000;
   --text-on-accent: #ffffff;
   --text-shadow: 0 0 2px rgba(0, 0, 0, 1);
+  --progress-bar-from: #e53935;
+  --progress-bar-to: #43a047;
 }
 
 /* Тёмный океан */
@@ -183,6 +199,8 @@ html, body {
   --danger-color: #c0392b;
   --text-on-accent: #ffffff;
   --text-shadow: 0 0 2px rgba(0, 0, 0, 1);
+  --progress-bar-from: #e53935;
+  --progress-bar-to: #43a047;
 }
 
 /* Тёмный закат */
@@ -196,6 +214,8 @@ html, body {
   --danger-color: #b83030;
   --text-on-accent: #ffffff;
   --text-shadow: 0 0 2px rgba(0, 0, 0, 1);
+  --progress-bar-from: #e53935;
+  --progress-bar-to: #43a047;
 }
 
 /* Тёмная лаванда */
@@ -209,4 +229,6 @@ html, body {
   --danger-color: #b04070;
   --text-on-accent: #ffffff;
   --text-shadow: 0 0 2px rgba(0, 0, 0, 1);
+  --progress-bar-from: #e53935;
+  --progress-bar-to: #43a047;
 }

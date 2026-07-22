@@ -111,3 +111,19 @@ export function computeTextShadow(bgPrimary: string, textPrimary: string): strin
   }
   return 'none';
 }
+
+/**
+ * Цвет прогресс-бара при 0% (пустое значение)
+ * Фиксированный красный оттенок, не зависит от темы
+ */
+export function computeProgressFrom(): string {
+  return '#e53935';
+}
+
+/**
+ * Цвет прогресс-бара при 100% (полное значение)
+ * Светло-зелёный для светлых тем, тёмно-зелёный для тёмных
+ */
+export function computeProgressTo(bgPrimary: string): string {
+  return isLight(bgPrimary) ? '#66bb6a' : '#43a047';
+}

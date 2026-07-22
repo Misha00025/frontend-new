@@ -14,20 +14,11 @@ interface PersonalizeModalProps {
 const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) => {
   const { themeConfig, setPreset, setCustomColors, getCurrentColors } = useTheme();
   const currentColors = getCurrentColors();
-  const [customColors, setCustomColorsState] = useState<CustomColors>({
-    bgPrimary: currentColors.bgPrimary,
-    textPrimary: currentColors.textPrimary,
-    accentColor: currentColors.accentColor,
-  });
+  const [customColors, setCustomColorsState] = useState<CustomColors>({ ...currentColors });
 
 
   useEffect(() => {
-    const colors = getCurrentColors();
-    setCustomColorsState({
-      bgPrimary: colors.bgPrimary,
-      textPrimary: colors.textPrimary,
-      accentColor: colors.accentColor,
-    });
+    setCustomColorsState({ ...getCurrentColors() });
   }, [themeConfig, getCurrentColors]);
   if (!isOpen) return null;
 
@@ -107,7 +98,7 @@ const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) 
         <div className={styles.customSection}>
           <h3 className={styles.customTitle}>Свои цвета</h3>
           {(['bgPrimary', 'textPrimary', 'accentColor'] as (keyof CustomColors)[]).map(field => {
-            const labels: Record<keyof CustomColors, string> = {
+            const labels: Record<string, string> = {
               bgPrimary: 'Фон',
               textPrimary: 'Текст',
               accentColor: 'Акцент',
@@ -132,6 +123,41 @@ const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) 
             );
           })}
 
+          <h3 className={styles.progressTitle}>Шкала прогресса</h3>
+          <div className={styles.progressRow}>
+            <div className={styles.progressItem}>
+              <label htmlFor="custom-progressFrom">От</label>
+              <input
+                id="custom-progressFrom"
+                type="color"
+                value={customColors.progressFrom}
+                onChange={handleColorChange('progressFrom')}
+              />
+              <input
+                type="text"
+                className={styles.hexInput}
+                value={customColors.progressFrom}
+                onChange={handleHexChange('progressFrom')}
+                onBlur={handleHexBlur('progressFrom')}
+              />
+            </div>
+            <div className={styles.progressItem}>
+              <label htmlFor="custom-progressTo">До</label>
+              <input
+                id="custom-progressTo"
+                type="color"
+                value={customColors.progressTo}
+                onChange={handleColorChange('progressTo')}
+              />
+              <input
+                type="text"
+                className={styles.hexInput}
+                value={customColors.progressTo}
+                onChange={handleHexChange('progressTo')}
+                onBlur={handleHexBlur('progressTo')}
+              />
+            </div>
+          </div>
         </div>
 
         <div className={styles.buttons}>
