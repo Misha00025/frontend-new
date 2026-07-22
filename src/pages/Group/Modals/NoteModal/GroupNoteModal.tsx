@@ -27,7 +27,7 @@ const GroupNoteModal: React.FC<GroupNoteModalProps> = ({
   const [keywordsInput, setKeywordsInput] = useState('');
   const [keywords, setKeywords] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
-  const { theme } = useTheme();
+  const { themeConfig } = useTheme();
 
   useEffect(() => {
     if (editingNote) {
@@ -117,7 +117,7 @@ const GroupNoteModal: React.FC<GroupNoteModalProps> = ({
           
           <div className={modalStyles.formGroup}>
             <label>Текст заметки (Markdown)</label>
-            <div data-color-mode={theme === 'dark' ? 'dark' : 'light'}>
+            <div data-color-mode={themeConfig.type === 'preset' && themeConfig.name === 'dark' ? 'dark' : 'light'}>
               <MDEditor
                 value={body}
                 onChange={(val) => setBody(val || '')}

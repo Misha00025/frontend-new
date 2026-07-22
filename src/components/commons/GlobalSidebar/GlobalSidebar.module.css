@@ -141,3 +141,10 @@
 .footerBtn:hover {
   background: var(--bg-hover, rgba(0,0,0,0.05));
 }
+
+.footerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
