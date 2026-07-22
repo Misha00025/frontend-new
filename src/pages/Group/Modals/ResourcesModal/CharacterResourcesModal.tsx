@@ -4,6 +4,7 @@ import { groupAPI } from '../../../../services/api';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
 import styles from './CharacterResourcesModal.module.css';
+import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
 
 interface CharacterResourcesModalProps {
   isOpen: boolean;
@@ -121,104 +122,100 @@ const CharacterResourcesModal: React.FC<CharacterResourcesModalProps> = ({
     return fieldKey;
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className={modalStyles.overlay} onClick={onClose}>
-      <div className={modalStyles.modal} onClick={e => e.stopPropagation()}>
-        <h2>Поля на главной странице персонажа</h2>
-        <p className={styles.hint}>
-          Выберите поля, которые будут отображаться на дашборде персонажа и на карточках в списке персонажей.
-          Эти поля GM считает основными ресурсами (HP, Gold, MP и т.д.).
-          Перетаскивайте или используйте кнопки ▲▼ для сортировки. ✕ — убрать из выбранных.
-        </p>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      <h2>Поля на главной странице персонажа</h2>
+      <p className={styles.hint}>
+        Выберите поля, которые будут отображаться на дашборде персонажа и на карточках в списке персонажей.
+        Эти поля GM считает основными ресурсами (HP, Gold, MP и т.д.).
+        Перетаскивайте или используйте кнопки ▲▼ для сортировки. ✕ — убрать из выбранных.
+      </p>
 
-        {error && <div className={modalStyles.error}>{error}</div>}
+      {error && <div className={modalStyles.error}>{error}</div>}
 
-        {allFieldKeys.length === 0 ? (
-          <p className={styles.empty}>Нет доступных полей. Сначала создайте шаблоны персонажей с полями.</p>
-        ) : (
-          <>
-            <div className={styles.selectedSection}>
-              <h3 className={styles.sectionTitle}>Выбранные поля</h3>
-              {selectedFields.length === 0 ? (
-                <p className={styles.emptyHint}>Поля не выбраны. Добавьте поля из списка "Доступные поля".</p>
-              ) : (
-                <div className={styles.list}>
-                  {selectedFields.map((fieldKey, index) => (
-                    <div
-                      key={fieldKey}
-                      className={`${styles.item} ${dragIndex === index ? styles.dragging : ''} ${dragOverIndex === index ? styles.dragOver : ''}`}
-                      draggable
-                      onDragStart={handleDragStart(index)}
-                      onDragOver={handleDragOver(index)}
-                      onDragLeave={handleDragLeave()}
-                      onDrop={handleDrop(index)}
-                      onDragEnd={handleDragEnd}
-                    >
-                      <span className={styles.dragHandle}>⠿</span>
-                      <span className={styles.fieldName}>{getFieldName(fieldKey)}</span>
-                      <span className={styles.fieldKey}>{fieldKey}</span>
-                      <div className={styles.fieldActions}>
-                        <button
-                          className={styles.moveBtn}
-                          disabled={index === 0}
-                          onClick={() => setSelectedFields(moveInArray(selectedFields, index, index - 1))}
-                        >▲</button>
-                        <button
-                          className={styles.moveBtn}
-                          disabled={index === selectedFields.length - 1}
-                          onClick={() => setSelectedFields(moveInArray(selectedFields, index, index + 1))}
-                        >▼</button>
-                        <button
-                          className={styles.removeBtn}
-                          onClick={() => removeField(fieldKey)}
-                        >✕</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className={styles.availableSection}>
-              <h3 className={styles.sectionTitle}>Доступные поля</h3>
-              {availableFieldKeys.length === 0 ? (
-                <p className={styles.emptyHint}>Все поля уже выбраны.</p>
-              ) : (
-                <div className={styles.availableList}>
-                  {availableFieldKeys.map(fieldKey => (
-                    <div key={fieldKey} className={styles.availableItem}>
-                      <span className={styles.fieldName}>{getFieldName(fieldKey)}</span>
-                      <span className={styles.fieldKey}>{fieldKey}</span>
+      {allFieldKeys.length === 0 ? (
+        <p className={styles.empty}>Нет доступных полей. Сначала создайте шаблоны персонажей с полями.</p>
+      ) : (
+        <>
+          <div className={styles.selectedSection}>
+            <h3 className={styles.sectionTitle}>Выбранные поля</h3>
+            {selectedFields.length === 0 ? (
+              <p className={styles.emptyHint}>Поля не выбраны. Добавьте поля из списка "Доступные поля".</p>
+            ) : (
+              <div className={styles.list}>
+                {selectedFields.map((fieldKey, index) => (
+                  <div
+                    key={fieldKey}
+                    className={`${styles.item} ${dragIndex === index ? styles.dragging : ''} ${dragOverIndex === index ? styles.dragOver : ''}`}
+                    draggable
+                    onDragStart={handleDragStart(index)}
+                    onDragOver={handleDragOver(index)}
+                    onDragLeave={handleDragLeave()}
+                    onDrop={handleDrop(index)}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <span className={styles.dragHandle}>⠿</span>
+                    <span className={styles.fieldName}>{getFieldName(fieldKey)}</span>
+                    <span className={styles.fieldKey}>{fieldKey}</span>
+                    <div className={styles.fieldActions}>
                       <button
-                        className={`${buttonStyles.button} ${buttonStyles.small}`}
-                        onClick={() => addField(fieldKey)}
-                      >
-                        Добавить
-                      </button>
+                        className={styles.moveBtn}
+                        disabled={index === 0}
+                        onClick={() => setSelectedFields(moveInArray(selectedFields, index, index - 1))}
+                      >▲</button>
+                      <button
+                        className={styles.moveBtn}
+                        disabled={index === selectedFields.length - 1}
+                        onClick={() => setSelectedFields(moveInArray(selectedFields, index, index + 1))}
+                      >▼</button>
+                      <button
+                        className={styles.removeBtn}
+                        onClick={() => removeField(fieldKey)}
+                      >✕</button>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </>
-        )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-        <div className={modalStyles.buttons}>
-          <button className={buttonStyles.button} onClick={onClose}>
-            Отмена
-          </button>
-          <button
-            className={buttonStyles.button}
-            onClick={handleSave}
-            disabled={loading || allFieldKeys.length === 0}
-          >
-            {loading ? 'Сохранение...' : 'Сохранить'}
-          </button>
-        </div>
+          <div className={styles.availableSection}>
+            <h3 className={styles.sectionTitle}>Доступные поля</h3>
+            {availableFieldKeys.length === 0 ? (
+              <p className={styles.emptyHint}>Все поля уже выбраны.</p>
+            ) : (
+              <div className={styles.availableList}>
+                {availableFieldKeys.map(fieldKey => (
+                  <div key={fieldKey} className={styles.availableItem}>
+                    <span className={styles.fieldName}>{getFieldName(fieldKey)}</span>
+                    <span className={styles.fieldKey}>{fieldKey}</span>
+                    <button
+                      className={`${buttonStyles.button} ${buttonStyles.small}`}
+                      onClick={() => addField(fieldKey)}
+                    >
+                      Добавить
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      <div className={modalStyles.buttons}>
+        <button className={buttonStyles.button} onClick={onClose}>
+          Отмена
+        </button>
+        <button
+          className={buttonStyles.button}
+          onClick={handleSave}
+          disabled={loading || allFieldKeys.length === 0}
+        >
+          {loading ? 'Сохранение...' : 'Сохранить'}
+        </button>
       </div>
-    </div>
+    </ModalPortal>
   );
 };
 

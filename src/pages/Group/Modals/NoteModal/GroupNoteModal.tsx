@@ -5,6 +5,7 @@ import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import { GroupNote, CreateGroupNoteRequest } from '../../../../types/groupNotes';
+import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
 
 interface GroupNoteModalProps {
   isOpen: boolean;
@@ -83,126 +84,122 @@ const GroupNoteModal: React.FC<GroupNoteModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className={modalStyles.overlay} onClick={onClose}>
-      <div className={modalStyles.modal} onClick={e => e.stopPropagation()}>
-        <h2>{title}</h2>
-        <form onSubmit={handleSubmit}>
-          <div className={modalStyles.formGroup}>
-            <label>Заголовок</label>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      <h2>{title}</h2>
+      <form onSubmit={handleSubmit}>
+        <div className={modalStyles.formGroup}>
+          <label>Заголовок</label>
+          <input
+            type="text"
+            className={inputStyles.input}
+            value={header}
+            onChange={e => setHeader(e.target.value)}
+            placeholder="Введите заголовок заметки"
+            required
+            style={{ width: '100%' }}
+          />
+        </div>
+        
+        <div className={modalStyles.formGroup}>
+          <label>Краткое описание</label>
+          <input
+            type="text"
+            className={inputStyles.input}
+            value={shortDescription}
+            onChange={e => setShortDescription(e.target.value)}
+            placeholder="Краткое описание заметки"
+            style={{ width: '100%' }}
+          />
+        </div>
+        
+        <div className={modalStyles.formGroup}>
+          <label>Текст заметки (Markdown)</label>
+          <div data-color-mode={themeConfig.type === 'preset' && themeConfig.name === 'dark' ? 'dark' : 'light'}>
+            <MDEditor
+              value={body}
+              onChange={(val) => setBody(val || '')}
+              preview="edit"
+              height={300}
+            />
+          </div>
+        </div>
+        
+        <div className={modalStyles.formGroup}>
+          <label>Ключевые слова</label>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
             <input
               type="text"
               className={inputStyles.input}
-              value={header}
-              onChange={e => setHeader(e.target.value)}
-              placeholder="Введите заголовок заметки"
-              required
-              style={{ width: '100%' }}
+              value={keywordsInput}
+              onChange={e => setKeywordsInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Введите ключевое слово и нажмите Enter"
+              style={{ flex: 1 }}
             />
-          </div>
-          
-          <div className={modalStyles.formGroup}>
-            <label>Краткое описание</label>
-            <input
-              type="text"
-              className={inputStyles.input}
-              value={shortDescription}
-              onChange={e => setShortDescription(e.target.value)}
-              placeholder="Краткое описание заметки"
-              style={{ width: '100%' }}
-            />
-          </div>
-          
-          <div className={modalStyles.formGroup}>
-            <label>Текст заметки (Markdown)</label>
-            <div data-color-mode={themeConfig.type === 'preset' && themeConfig.name === 'dark' ? 'dark' : 'light'}>
-              <MDEditor
-                value={body}
-                onChange={(val) => setBody(val || '')}
-                preview="edit"
-                height={300}
-              />
-            </div>
-          </div>
-          
-          <div className={modalStyles.formGroup}>
-            <label>Ключевые слова</label>
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <input
-                type="text"
-                className={inputStyles.input}
-                value={keywordsInput}
-                onChange={e => setKeywordsInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Введите ключевое слово и нажмите Enter"
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className={buttonStyles.button}
-                onClick={handleAddKeyword}
-              >
-                Добавить
-              </button>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {keywords.map((keyword, idx) => (
-                <span
-                  key={idx}
-                  style={{
-                    backgroundColor: 'var(--accent-color)',
-                    color: 'white',
-                    padding: '0.25rem 0.5rem',
-                    borderRadius: 'var(--border-radius-sm)',
-                    fontSize: '0.8rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.25rem'
-                  }}
-                >
-                  {keyword}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveKeyword(keyword)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: 'white',
-                      cursor: 'pointer',
-                      padding: '0',
-                      fontSize: '1rem',
-                      lineHeight: '1'
-                    }}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          </div>
-          
-          <div className={modalStyles.buttons}>
             <button
               type="button"
               className={buttonStyles.button}
-              onClick={onClose}
-              style={{ backgroundColor: 'var(--text-secondary)' }}
+              onClick={handleAddKeyword}
             >
-              Отмена
-            </button>
-            <button
-              type="submit"
-              className={buttonStyles.button}
-              disabled={saving || !header.trim()}
-            >
-              {saving ? 'Сохранение...' : 'Сохранить'}
+              Добавить
             </button>
           </div>
-        </form>
-      </div>
-    </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+            {keywords.map((keyword, idx) => (
+              <span
+                key={idx}
+                style={{
+                  backgroundColor: 'var(--accent-color)',
+                  color: 'white',
+                  padding: '0.25rem 0.5rem',
+                  borderRadius: 'var(--border-radius-sm)',
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.25rem'
+                }}
+              >
+                {keyword}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveKeyword(keyword)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'white',
+                    cursor: 'pointer',
+                    padding: '0',
+                    fontSize: '1rem',
+                    lineHeight: '1'
+                  }}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        </div>
+        
+        <div className={modalStyles.buttons}>
+          <button
+            type="button"
+            className={buttonStyles.button}
+            onClick={onClose}
+            style={{ backgroundColor: 'var(--text-secondary)' }}
+          >
+            Отмена
+          </button>
+          <button
+            type="submit"
+            className={buttonStyles.button}
+            disabled={saving || !header.trim()}
+          >
+            {saving ? 'Сохранение...' : 'Сохранить'}
+          </button>
+        </div>
+      </form>
+    </ModalPortal>
   );
 };
 

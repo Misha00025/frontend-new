@@ -4,6 +4,7 @@ import { groupAPI } from '../../../services/api';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import modalStyles from '../../../styles/modal.module.css';
+import ModalPortal from '../../commons/ModalPortal/ModalPortal';
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -45,11 +46,10 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
     }
   };
 
-  if (!isOpen) return null;
 
   return (
-    <div className={modalStyles.overlay}>
-      <div className={modalStyles.modal}>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      
         <h2>Создать группу</h2>
         
         {error && <div className={modalStyles.error}>{error}</div>}
@@ -95,8 +95,8 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
             </button>
           </div>
         </form>
-      </div>
-    </div>
+
+  </ModalPortal>
   );
 };
 

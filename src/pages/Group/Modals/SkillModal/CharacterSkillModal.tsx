@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
+import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
 import selectStyles from '../../../../styles/select-list.module.css';
 import { GroupSkill } from '../../../../types/groupSkills';
 import { CharacterSkill } from '../../../../types/characterSkills';
@@ -92,11 +93,10 @@ const CharacterSkillModal: React.FC<CharacterSkillModalProps> = ({
     return attribute ? attribute.value : '-';
   };
 
-  if (!isOpen) return null;
 
   return (
-    <div className={modalStyles.overlay}>
-      <div className={modalStyles.modal}>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      
         <h2>{title}</h2>
         
         {error && <div className={modalStyles.error}>{error}</div>}
@@ -174,8 +174,8 @@ const CharacterSkillModal: React.FC<CharacterSkillModalProps> = ({
             Закрыть
           </button>
         </div>
-      </div>
-    </div>
+
+  </ModalPortal>
   );
 };
 

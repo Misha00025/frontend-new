@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
+import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
 import styles from './SchemaModal.module.css';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
 
@@ -89,11 +90,10 @@ const SchemaModal: React.FC<SchemaModalProps> = ({
     attr => !selectedAttributes.includes(attr)
   );
 
-  if (!isOpen) return null;
 
   return (
-    <div className={modalStyles.overlay}>
-      <div className={`${modalStyles.modal} ${styles.modal}`}>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      
         <h2>{title}</h2>
         
         {error && <div className={modalStyles.error}>{error}</div>}
@@ -200,8 +200,8 @@ const SchemaModal: React.FC<SchemaModalProps> = ({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+
+  </ModalPortal>
   );
 };
 

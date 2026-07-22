@@ -4,6 +4,7 @@ import { CreateCharacterRequest } from '../../../../../types/characters';
 import buttonStyles from '../../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../../styles/components/Input.module.css';
 import modalStyles from '../../../../../styles/modal.module.css';
+import ModalPortal from '../../../../../components/commons/ModalPortal/ModalPortal';
 
 interface CharacterModalProps {
   isOpen: boolean;
@@ -56,66 +57,62 @@ const CharacterModal: React.FC<CharacterModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className={modalStyles.overlay}>
-      <div className={modalStyles.modal}>
-        <h2>{title}</h2>
-        
-        {error && <div className={modalStyles.error}>{error}</div>}
-        
-        <form onSubmit={handleSubmit}>
-          <div className={modalStyles.formGroup}>
-            <label>Название персонажа:</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className={inputStyles.input}
-              required
-            />
-          </div>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      <h2>{title}</h2>
+      
+      {error && <div className={modalStyles.error}>{error}</div>}
+      
+      <form onSubmit={handleSubmit}>
+        <div className={modalStyles.formGroup}>
+          <label>Название персонажа:</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={inputStyles.input}
+            required
+          />
+        </div>
 
-          <div className={modalStyles.formGroup}>
-            <label>Описание персонажа:</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className={inputStyles.input}
-              rows={3}
-              required
-            />
-          </div>
+        <div className={modalStyles.formGroup}>
+          <label>Описание персонажа:</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className={inputStyles.input}
+            rows={3}
+            required
+          />
+        </div>
 
-          <div className={modalStyles.formGroup}>
-            <label>Шаблон персонажа:</label>
-            <select
-              value={templateId}
-              onChange={(e) => setTemplateId(parseInt(e.target.value))}
-              className={inputStyles.input}
-              required
-            >
-              <option value={0}>Выберите шаблон</option>
-              {templates.map(template => (
-                <option key={template.id} value={template.id}>
-                  {template.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className={modalStyles.formGroup}>
+          <label>Шаблон персонажа:</label>
+          <select
+            value={templateId}
+            onChange={(e) => setTemplateId(parseInt(e.target.value))}
+            className={inputStyles.input}
+            required
+          >
+            <option value={0}>Выберите шаблон</option>
+            {templates.map(template => (
+              <option key={template.id} value={template.id}>
+                {template.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          <div className={modalStyles.buttons}>
-            <button type="button" onClick={onClose} className={buttonStyles.button}>
-              Отмена
-            </button>
-            <button type="submit" className={buttonStyles.button} disabled={loading || templateId === 0}>
-              {loading ? 'Создание...' : 'Создать'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className={modalStyles.buttons}>
+          <button type="button" onClick={onClose} className={buttonStyles.button}>
+            Отмена
+          </button>
+          <button type="submit" className={buttonStyles.button} disabled={loading || templateId === 0}>
+            {loading ? 'Создание...' : 'Создать'}
+          </button>
+        </div>
+      </form>
+    </ModalPortal>
   );
 };
 

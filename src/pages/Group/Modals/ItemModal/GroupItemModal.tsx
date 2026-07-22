@@ -3,6 +3,7 @@ import { GroupItem, CreateGroupItemRequest, UpdateGroupItemRequest } from '../..
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
+import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
 import { SkillAttribute } from '../../../../types/groupSkills';
 import { generateKey } from '../../../../utils/generateKey';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
@@ -144,16 +145,16 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
               >
                 ×
               </button>
+
             </div>
         </div>
       );
     };
 
-  if (!isOpen) return null;
 
   return (
-    <div className={modalStyles.overlay}>
-      <div className={modalStyles.modal}>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      
         <h2>{title}</h2>
         
         {error && <div className={modalStyles.error}>{error}</div>}
@@ -252,9 +253,8 @@ const GroupItemModal: React.FC<GroupItemModalProps> = ({
             </button>
           </div>
         </form>
-        
-      </div>
-    </div>
+
+  </ModalPortal>
   );
 };
 

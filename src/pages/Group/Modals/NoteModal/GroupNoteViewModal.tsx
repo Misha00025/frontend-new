@@ -4,6 +4,7 @@ import { GroupNote } from '../../../../types/groupNotes';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
 import modalStyles from '../../../../styles/modal.module.css';
 import buttonStyles from '../../../../styles/components/Button.module.css';
+import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
 import { usePlatform } from '../../../../hooks/usePlatform';
 
 interface GroupNoteViewModalProps {
@@ -27,11 +28,9 @@ const GroupNoteViewModal: React.FC<GroupNoteViewModalProps> = ({
 
   if (!note) {
     return (
-      <div className={modalStyles.overlay} onClick={onClose}>
-        <div className={modalStyles.modal} onClick={e => e.stopPropagation()}>
-          <p>Загрузка заметки...</p>
-        </div>
-      </div>
+      <ModalPortal isOpen={!!note} onClose={onClose}>
+        <p>Загрузка заметки...</p>
+      </ModalPortal>
     );
   }
 
@@ -61,101 +60,92 @@ const GroupNoteViewModal: React.FC<GroupNoteViewModalProps> = ({
   } : {};
 
   return (
-    <div 
-      className={isMobile ? undefined : modalStyles.overlay} 
-      onClick={isMobile ? undefined : onClose}
-    >
-      <div 
-        style={isMobile ? modalStyle : undefined}
-        className={isMobile ? undefined : modalStyles.modal}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {isMobile && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
-            <button className={buttonStyles.button} onClick={onClose} type="button">
-              ✕ Закрыть
-            </button>
-          </div>
-        )}
-
-        <h2 style={{ margin: '0 0 0.5rem 0' }}>{note.header}</h2>
-        
-        {note.short_description && (
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-            {note.short_description}
-          </p>
-        )}
-
-        {note.body && (
-          <div style={{
-            padding: '1rem',
-            backgroundColor: 'var(--bg-secondary)',
-            borderRadius: 'var(--border-radius-md)',
-            marginBottom: '1rem',
-            overflow: 'auto',
-          }}>
-            <ReactMarkdown>{note.body}</ReactMarkdown>
-          </div>
-        )}
-
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between',
-          fontSize: '0.8rem',
-          color: 'var(--text-secondary)',
-          marginBottom: '0.5rem'
-        }}>
-          <span>Создано: {formatDate(note.created_at)}</span>
-          <span>Обновлено: {formatDate(note.updated_at)}</span>
+    <ModalPortal isOpen={!!note} onClose={onClose}>
+      {isMobile && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+          <button className={buttonStyles.button} onClick={onClose} type="button">
+            ✕ Закрыть
+          </button>
         </div>
+      )}
 
-        {note.keywords && note.keywords.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
-            {note.keywords.map((keyword, idx) => (
-              <span key={idx} style={{
-                backgroundColor: 'var(--accent-color)',
-                color: 'white',
-                padding: '0.25rem 0.5rem',
-                borderRadius: 'var(--border-radius-sm)',
-                fontSize: '0.8rem',
-              }}>
-                {keyword}
-              </span>
-            ))}
-          </div>
-        )}
+      <h2 style={{ margin: '0 0 0.5rem 0' }}>{note.header}</h2>
+      
+      {note.short_description && (
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+          {note.short_description}
+        </p>
+      )}
 
-        {isMobile && (
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+      {note.body && (
+        <div style={{
+          padding: '1rem',
+          backgroundColor: 'var(--bg-secondary)',
+          borderRadius: 'var(--border-radius-md)',
+          marginBottom: '1rem',
+          overflow: 'auto',
+        }}>
+          <ReactMarkdown>{note.body}</ReactMarkdown>
+        </div>
+      )}
+
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between',
+        fontSize: '0.8rem',
+        color: 'var(--text-secondary)',
+        marginBottom: '0.5rem'
+      }}>
+        <span>Создано: {formatDate(note.created_at)}</span>
+        <span>Обновлено: {formatDate(note.updated_at)}</span>
+      </div>
+
+      {note.keywords && note.keywords.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+          {note.keywords.map((keyword, idx) => (
+            <span key={idx} style={{
+              backgroundColor: 'var(--accent-color)',
+              color: 'white',
+              padding: '0.25rem 0.5rem',
+              borderRadius: 'var(--border-radius-sm)',
+              fontSize: '0.8rem',
+            }}>
+              {keyword}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {isMobile && (
+        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+          {canEdit && onEdit && (
+            <IconButton icon="edit" onClick={onEdit} title="Редактировать" size="medium" variant="primary" />
+          )}
+          {canDelete && onDelete && (
+            <IconButton icon="delete" onClick={onDelete} title="Удалить" size="medium" variant="danger" />
+          )}
+          <button type="button" className={buttonStyles.button} onClick={onClose} style={{ marginLeft: 'auto' }}>
+            Закрыть
+          </button>
+        </div>
+      )}
+
+      {!isMobile && (
+        <div className={modalStyles.buttons}>
+          <div style={{ display: 'flex', gap: '0.5rem', marginRight: 'auto' }}>
             {canEdit && onEdit && (
-              <IconButton icon="edit" onClick={onEdit} title="Редактировать" size="medium" variant="primary" />
+              <IconButton icon="edit" onClick={onEdit} title="Редактировать" size="small" variant="primary" />
             )}
             {canDelete && onDelete && (
-              <IconButton icon="delete" onClick={onDelete} title="Удалить" size="medium" variant="danger" />
+              <IconButton icon="delete" onClick={onDelete} title="Удалить" size="small" variant="danger" />
             )}
-            <button type="button" className={buttonStyles.button} onClick={onClose} style={{ marginLeft: 'auto' }}>
-              Закрыть
-            </button>
           </div>
-        )}
-
-        {!isMobile && (
-          <div className={modalStyles.buttons}>
-            <div style={{ display: 'flex', gap: '0.5rem', marginRight: 'auto' }}>
-              {canEdit && onEdit && (
-                <IconButton icon="edit" onClick={onEdit} title="Редактировать" size="small" variant="primary" />
-              )}
-              {canDelete && onDelete && (
-                <IconButton icon="delete" onClick={onDelete} title="Удалить" size="small" variant="danger" />
-              )}
-            </div>
-            <button type="button" className={buttonStyles.button} onClick={onClose}>
-              Закрыть
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+          <button type="button" className={buttonStyles.button} onClick={onClose}>
+            Закрыть
+          </button>
+        </div>
+      )}
+    </ModalPortal>
   );
 };
 

@@ -4,6 +4,7 @@ import { GroupItem } from '../../../../types/groupItems';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
+import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
 import styles from './CharacterItemModal.module.css';
 import uiStyles from '../../../../styles/ui.module.css';
 import selectStyles from '../../../../styles/select-list.module.css';
@@ -140,11 +141,10 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
     return attribute ? attribute.value : '-';
   };
 
-  if (!isOpen) return null;
 
   return (
-    <div className={modalStyles.overlay}>
-      <div className={modalStyles.modal}>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      
         <h2>{title}</h2>
         
         {error && <div className={modalStyles.error}>{error}</div>}
@@ -360,8 +360,8 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+
+  </ModalPortal>
   );
 };
 

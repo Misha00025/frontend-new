@@ -3,6 +3,7 @@ import buttonStyles from '../../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../../styles/components/Input.module.css';
 import modalStyles from '../../../../../styles/modal.module.css';
 import { TemplateCategory } from '../../../../../types/groupSchemas';
+import ModalPortal from '../../../../../components/commons/ModalPortal/ModalPortal';
 
 interface CategoryModalProps {
   isOpen: boolean;
@@ -37,36 +38,32 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
     });
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className={modalStyles.overlay}>
-      <div className={modalStyles.modal}>
-        <h2>{title}</h2>
-        
-        <form onSubmit={handleSubmit}>
-          <div className={modalStyles.formGroup}>
-            <label>Название категории:</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className={inputStyles.input}
-              required
-            />
-          </div>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      <h2>{title}</h2>
+      
+      <form onSubmit={handleSubmit}>
+        <div className={modalStyles.formGroup}>
+          <label>Название категории:</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className={inputStyles.input}
+            required
+          />
+        </div>
 
-          <div className={modalStyles.buttons}>
-            <button type="button" onClick={onClose} className={buttonStyles.button}>
-              Отмена
-            </button>
-            <button type="submit" className={buttonStyles.button}>
-              Сохранить
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className={modalStyles.buttons}>
+          <button type="button" onClick={onClose} className={buttonStyles.button}>
+            Отмена
+          </button>
+          <button type="submit" className={buttonStyles.button}>
+            Сохранить
+          </button>
+        </div>
+      </form>
+    </ModalPortal>
   );
 };
 

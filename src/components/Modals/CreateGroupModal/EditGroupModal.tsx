@@ -5,6 +5,7 @@ import { groupAPI, uploadAPI } from '../../../services/api';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import modalStyles from '../../../styles/modal.module.css';
+import ModalPortal from '../../commons/ModalPortal/ModalPortal';
 
 interface EditGroupModalProps {
   group: Group;
@@ -99,11 +100,10 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
     onClose();
   };
 
-  if (!isOpen) return null;
 
   return (
-    <div className={modalStyles.overlay}>
-      <div className={modalStyles.modal}>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      
         <h2>Редактировать группу</h2>
         
         {error && <div className={modalStyles.error}>{error}</div>}
@@ -186,8 +186,8 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+
+  </ModalPortal>
   );
 };
 

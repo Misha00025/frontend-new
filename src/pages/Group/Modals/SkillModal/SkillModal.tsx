@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
+import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
 import styles from './SkillModal.module.css';
 import MDEditor from '@uiw/react-md-editor';
 import { useTheme } from '../../../../contexts/ThemeContext';
@@ -281,11 +282,10 @@ const SkillModal: React.FC<SkillModalProps> = ({
     );
   };
 
-  if (!isOpen) return null;
 
   return (
-    <div className={modalStyles.overlay}>
-      <div className={modalStyles.modal}>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      
         <h2>{title}</h2>
         
         {error && <div className={modalStyles.error}>{error}</div>}
@@ -429,8 +429,8 @@ const SkillModal: React.FC<SkillModalProps> = ({
             </button>
           </div>
         </form>
-      </div>
-    </div>
+
+  </ModalPortal>
   );
 };
 

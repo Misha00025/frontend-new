@@ -4,6 +4,7 @@ import buttonStyles from '../../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../../styles/components/Input.module.css';
 import modalStyles from '../../../../../styles/modal.module.css';
 import uiStyles from '../../../../../styles/ui.module.css';
+import ModalPortal from '../../../../../components/commons/ModalPortal/ModalPortal';
 
 interface TemplateFieldModalProps {
   isOpen: boolean;
@@ -115,150 +116,146 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
     setMaxValue(result);
   }
 
-  if (!isOpen) return null;
-
   return (
-    <div className={modalStyles.overlay}>
-      <div className={modalStyles.modal}>
-        <h2>{title}</h2>
-        
-        {error && <div className={modalStyles.error}>{error}</div>}
-        
-        <form onSubmit={handleSubmit}>
+    <ModalPortal isOpen={isOpen} onClose={onClose}>
+      <h2>{title}</h2>
+      
+      {error && <div className={modalStyles.error}>{error}</div>}
+      
+      <form onSubmit={handleSubmit}>
 
-          {(fullEditMode &&
-            <>
-              <div className={modalStyles.formGroup}>
-                <label>Название поля:</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => { setName(e.target.value); setKey(generateFieldKey(e.target.value)) }}
-                  onBlur={handleGenerateKey}
-                  className={inputStyles.input}
-                  required
-                />
-              </div>
-              <div className={modalStyles.formGroup}>
-                <label>Ключ поля:</label>
-                <div className={uiStyles.keyInputGroup}>
-                  <input
-                    type="text"
-                    value={key}
-                    onChange={(e) => setKey(e.target.value)}
-                    className={inputStyles.input}
-                    required
-                  />
-                  <button 
-                    type="button" 
-                    onClick={handleGenerateKey}
-                    className={buttonStyles.button}
-                  >
-                    Сгенерировать
-                  </button>
-                </div>
-                <small className={modalStyles.helpText}>
-                  Ключ будет использоваться в системе (только латинские буквы, цифры и _)
-                </small>
-              </div>
-            </>
-          )}
-          <div className={modalStyles.formGroup}>
-            <label>Формула:</label>
-            <input
-              type="text"
-              value={formula}
-              onChange={(e) => setFormula(e.target.value)}
-              className={inputStyles.input}
-            />
-          </div>
-
-          {fullEditMode && <div className={modalStyles.formGroup}>
-            <label>Значение по умолчанию:</label>
-            <input
-              type="number"
-              value={value}
-              onChange={(e) => setValue(e.target.value === ''? '' : Number(e.target.value))}
-              onBlur={(e) => setValue(e.target.value === ''? 0 : Number(e.target.value))}
-              className={inputStyles.input}
-              required
-            />
-          </div>}
-
-          {fullEditMode &&
-            <>
-              {!isModifier && <div className={modalStyles.formGroup}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={isProperty}
-                    className={inputStyles.input}
-                    onChange={(e) => setIsProperty(e.target.checked)}
-                  />
-                  Поле с максимальным значением
-                </label>
-              </div>}
-
-              {!isProperty && <div className={modalStyles.formGroup}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={isModifier}
-                    className={inputStyles.input}
-                    onChange={(e) => setIsModifier(e.target.checked)}
-                  />
-                  Поле с модификатором
-                </label>
-              </div>}
-            </>
-          }
-
-          { isProperty && (
+        {(fullEditMode &&
+          <>
             <div className={modalStyles.formGroup}>
-              <label>Максимальное значение по умолчанию:</label>
+              <label>Название поля:</label>
               <input
-                type="number"
-                value={maxValue}
-                onChange={(e) => handleChangeMaxValue(e)}
-                onBlur={(e) => handleBlurMaxValue(e)}
+                type="text"
+                value={name}
+                onChange={(e) => { setName(e.target.value); setKey(generateFieldKey(e.target.value)) }}
+                onBlur={handleGenerateKey}
                 className={inputStyles.input}
                 required
               />
             </div>
-          )}
-
-          {isModifier && (
             <div className={modalStyles.formGroup}>
-              <label>Формула модификатора:</label>
-              <input
-                type='text'
-                value={modifierFormula}
-                onChange={(e) => setModifierFormula(e.target.value)}
-                className={inputStyles.input}
-              />
+              <label>Ключ поля:</label>
+              <div className={uiStyles.keyInputGroup}>
+                <input
+                  type="text"
+                  value={key}
+                  onChange={(e) => setKey(e.target.value)}
+                  className={inputStyles.input}
+                  required
+                />
+                <button 
+                  type="button" 
+                  onClick={handleGenerateKey}
+                  className={buttonStyles.button}
+                >
+                  Сгенерировать
+                </button>
+              </div>
+              <small className={modalStyles.helpText}>
+                Ключ будет использоваться в системе (только латинские буквы, цифры и _)
+              </small>
             </div>
-          )}
-          {fullEditMode && <div className={modalStyles.formGroup}>
-            <label>Описание поля:</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className={inputStyles.input}
-              rows={3}
-            />
-          </div>}
+          </>
+        )}
+        <div className={modalStyles.formGroup}>
+          <label>Формула:</label>
+          <input
+            type="text"
+            value={formula}
+            onChange={(e) => setFormula(e.target.value)}
+            className={inputStyles.input}
+          />
+        </div>
 
-          <div className={modalStyles.buttons}>
-            <button type="button" onClick={onClose} className={buttonStyles.button}>
-              Отмена
-            </button>
-            <button type="submit" className={buttonStyles.button}>
-              Сохранить
-            </button>
+        {fullEditMode && <div className={modalStyles.formGroup}>
+          <label>Значение по умолчанию:</label>
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => setValue(e.target.value === ''? '' : Number(e.target.value))}
+            onBlur={(e) => setValue(e.target.value === ''? 0 : Number(e.target.value))}
+            className={inputStyles.input}
+            required
+          />
+        </div>}
+
+        {fullEditMode &&
+          <>
+            {!isModifier && <div className={modalStyles.formGroup}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={isProperty}
+                  className={inputStyles.input}
+                  onChange={(e) => setIsProperty(e.target.checked)}
+                />
+                Поле с максимальным значением
+              </label>
+            </div>}
+
+            {!isProperty && <div className={modalStyles.formGroup}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={isModifier}
+                  className={inputStyles.input}
+                  onChange={(e) => setIsModifier(e.target.checked)}
+                />
+                Поле с модификатором
+              </label>
+            </div>}
+          </>
+        }
+
+        { isProperty && (
+          <div className={modalStyles.formGroup}>
+            <label>Максимальное значение по умолчанию:</label>
+            <input
+              type="number"
+              value={maxValue}
+              onChange={(e) => handleChangeMaxValue(e)}
+              onBlur={(e) => handleBlurMaxValue(e)}
+              className={inputStyles.input}
+              required
+            />
           </div>
-        </form>
-      </div>
-    </div>
+        )}
+
+        {isModifier && (
+          <div className={modalStyles.formGroup}>
+            <label>Формула модификатора:</label>
+            <input
+              type='text'
+              value={modifierFormula}
+              onChange={(e) => setModifierFormula(e.target.value)}
+              className={inputStyles.input}
+            />
+          </div>
+        )}
+        {fullEditMode && <div className={modalStyles.formGroup}>
+          <label>Описание поля:</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className={inputStyles.input}
+            rows={3}
+          />
+        </div>}
+
+        <div className={modalStyles.buttons}>
+          <button type="button" onClick={onClose} className={buttonStyles.button}>
+            Отмена
+          </button>
+          <button type="submit" className={buttonStyles.button}>
+            Сохранить
+          </button>
+        </div>
+      </form>
+    </ModalPortal>
   );
 };
 
