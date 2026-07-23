@@ -294,6 +294,8 @@ const GroupQuests: React.FC = () => {
             const quest = quests.find(q => q.id === questId);
             if (!quest) return;
 
+            await groupQuestsAPI.patchQuest(parseInt(groupId!), questId, questData);
+
             const updatedQuest = {
               ...quest,
               header: questData.header ?? quest.header,
@@ -303,8 +305,6 @@ const GroupQuests: React.FC = () => {
               objectives: questData.objectives ?? quest.objectives,
               assignedCharacters: questData.assignedCharacters ?? quest.assignedCharacters,
             };
-
-            await groupQuestsAPI.updateQuest(parseInt(groupId!), questId, questData);
 
             setQuests(prev => prev.map(q => q.id === questId ? updatedQuest : q));
             setViewingQuest(updatedQuest);
@@ -345,13 +345,8 @@ const GroupQuests: React.FC = () => {
             const newObjective = { key: newKey, description: '', status: 'pending' as const };
             const updatedObjectives = [...quest.objectives, newObjective];
 
-            await groupQuestsAPI.updateQuest(parseInt(groupId!), questId, {
-              header: quest.header,
-              description: quest.description,
-              reward: quest.reward,
-              status: quest.status,
+            await groupQuestsAPI.patchQuest(parseInt(groupId!), questId, {
               objectives: updatedObjectives,
-              assignedCharacters: quest.assignedCharacters,
             });
 
             const updatedQuest = { ...quest, objectives: updatedObjectives };
