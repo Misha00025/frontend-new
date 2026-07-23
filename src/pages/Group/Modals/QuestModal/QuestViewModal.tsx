@@ -7,7 +7,6 @@ import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal'
 import MDEditor from '@uiw/react-md-editor';
 import { useTheme } from '../../../../contexts/ThemeContext';
 import { usePlatform } from '../../../../hooks/usePlatform';
-import { generateKey } from '../../../../utils/generateKey';
 import type {
   QuestStatus,
   ObjectiveStatus,
@@ -16,26 +15,23 @@ import type {
   PatchGroupQuestRequest,
 } from '../../../../types/groupQuests';
 import viewStyles from './QuestViewModal.module.css';
+import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
 
 interface QuestViewModalProps {
   quest: GroupQuest | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (questData: PatchGroupQuestRequest) => Promise<void>;
   onObjectiveStatusChange: (questId: number, objectiveKey: string, status: ObjectiveStatus) => Promise<void>;
-  onEdit?: () => void;
+  onObjectiveUpdate?: (questId: number, objectiveKey: string, updates: Partial<QuestObjective>) => Promise<void>;
+  onObjectiveAdd?: (questId: number) => Promise<string | undefined>;
+  onDescriptionUpdate?: (questId: number, description: string) => Promise<void>;
+  onHeaderUpdate?: (questId: number, header: string) => Promise<void>;
+  onQuestUpdate?: (questId: number, questData: PatchGroupQuestRequest) => Promise<void>;
   onDelete?: () => void;
   canEdit?: boolean;
   canDelete?: boolean;
   characters?: Array<{ id: number; name: string }>;
 }
-
-const STATUS_OPTIONS: { value: QuestStatus; label: string }[] = [
-  { value: 'active', label: 'Активен' },
-  { value: 'completed', label: 'Завершён' },
-  { value: 'failed', label: 'Провален' },
-  { value: 'cancelled', label: 'Отменён' },
-];
 
 const OBJECTIVE_STATUS_OPTIONS: { value: ObjectiveStatus; label: string }[] = [
   { value: 'pending', label: 'В процессе' },
@@ -58,148 +54,197 @@ const STATUS_COLOR_MAP: Record<QuestStatus, string> = {
   cancelled: '#9e9e9e',
 };
 
+const STATUS_OPTIONS: { value: QuestStatus; label: string }[] = Object.entries(STATUS_LABEL_MAP).map(([value, label]) => ({
+  value: value as QuestStatus,
+  label,
+}));
+
 const QuestViewModal: React.FC<QuestViewModalProps> = ({
   quest,
   isOpen,
   onClose,
-  onSave,
   onObjectiveStatusChange,
-  onEdit,
+  onObjectiveUpdate,
+  onObjectiveAdd,
+  onDescriptionUpdate,
+  onHeaderUpdate,
+  onQuestUpdate,
   onDelete,
   canEdit = false,
   canDelete = false,
   characters,
 }) => {
-  const [mode, setMode] = useState<'view' | 'edit'>('view');
-
-  // edit mode state
-  const [status, setStatus] = useState<QuestStatus>('active');
-  const [header, setHeader] = useState('');
-  const [description, setDescription] = useState('');
-  const [reward, setReward] = useState<string[]>([]);
-  const [newReward, setNewReward] = useState('');
-  const [objectives, setObjectives] = useState<QuestObjective[]>([]);
-  const [assignedCharacters, setAssignedCharacters] = useState<number[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { themeConfig } = useTheme();
   const isMobile = usePlatform();
+
+  // Header editing
+  const [editingHeader, setEditingHeader] = useState(false);
+  const [editingHeaderValue, setEditingHeaderValue] = useState('');
+  const headerInputRef = useRef<HTMLInputElement>(null);
+
+  // Objective editing
+  const [editingObjectiveKey, setEditingObjectiveKey] = useState<string | null>(null);
+  const [editingObjectiveValue, setEditingObjectiveValue] = useState('');
+  const editInputRef = useRef<HTMLInputElement>(null);
+
+  // Description editing
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [editingDescriptionValue, setEditingDescriptionValue] = useState('');
+
+  // Description collapse
+  const [completedExpanded, setCompletedExpanded] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const descriptionRef = useRef<HTMLDivElement>(null);
+  const [descriptionOverflow, setDescriptionOverflow] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
+  const [charactersModalOpen, setCharactersModalOpen] = useState(false);
 
   useEffect(() => {
-    setMode('view');
-    setError(null);
-    setLoading(false);
+    setEditingHeader(false);
+    setEditingObjectiveKey(null);
+    setEditingDescription(false);
+    setCompletedExpanded(false);
+    setDescriptionExpanded(false);
   }, [isOpen, quest]);
 
   useEffect(() => {
-    if (mode === 'edit' && quest) {
-      setStatus(quest.status);
-      setHeader(quest.header);
-      setDescription(quest.description);
-      setReward([...quest.reward]);
-      setObjectives(quest.objectives.map(o => ({ ...o })));
-      setAssignedCharacters([...quest.assignedCharacters]);
-    } else if (mode === 'edit') {
-      setStatus('active');
-      setHeader('');
-      setDescription('');
-      setReward([]);
-      setObjectives([]);
-      setAssignedCharacters([]);
+    if (editingHeader && headerInputRef.current) {
+      headerInputRef.current.focus();
+      headerInputRef.current.select();
     }
-    setNewReward('');
-    setError(null);
-  }, [mode, quest]);
+  }, [editingHeader]);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!editorRef.current?.contains(e.target as Node)) return;
-      const isCtrl = e.ctrlKey || e.metaKey;
-      if (!isCtrl) return;
-      const keyMap: Record<string, string> = {
-        KeyB: 'b',
-        KeyI: 'i',
-        KeyK: 'k',
-        KeyL: 'l',
-      };
-      const key = keyMap[e.code];
-      if (key) {
-        e.preventDefault();
-        const newEvent = new KeyboardEvent('keydown', {
-          key,
-          code: e.code,
-          ctrlKey: true,
-          metaKey: e.metaKey,
-          bubbles: true,
-          cancelable: true,
-        });
-        e.target?.dispatchEvent(newEvent);
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const handleAddReward = () => {
-    const trimmed = newReward.trim();
-    if (!trimmed) return;
-    setReward(prev => [...prev, trimmed]);
-    setNewReward('');
-  };
-
-  const handleRemoveReward = (index: number) => {
-    setReward(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleAddObjective = () => {
-    const key = generateKey(`objective_${objectives.length}_${Date.now()}`);
-    setObjectives(prev => [
-      ...prev,
-      { key, description: '', status: 'pending' },
-    ]);
-  };
-
-  const handleRemoveObjective = (index: number) => {
-    setObjectives(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleObjectiveChange = (index: number, updates: Partial<QuestObjective>) => {
-    setObjectives(prev =>
-      prev.map((obj, i) => (i === index ? { ...obj, ...updates } : obj)),
-    );
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!header.trim()) {
-      setError('Заголовок обязателен');
-      return;
+    if (editingObjectiveKey && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.select();
     }
-    setLoading(true);
-    setError(null);
-    try {
-      const questData: PatchGroupQuestRequest = {
-        header: header.trim(),
-        description,
-        reward: reward.length > 0 ? reward : undefined,
-        status,
-        objectives: objectives.length > 0 ? objectives : undefined,
-        assignedCharacters: assignedCharacters.length > 0 ? assignedCharacters : undefined,
-      };
-      await onSave(questData);
-      onClose();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка сохранения');
-    } finally {
-      setLoading(false);
+  }, [editingObjectiveKey]);
+
+  useEffect(() => {
+    if (descriptionRef.current && !descriptionExpanded) {
+      const el = descriptionRef.current;
+      setDescriptionOverflow(el.scrollHeight > el.clientHeight + 2);
     }
-  };
+  }, [quest?.description, descriptionExpanded]);
 
   const themeMode =
     themeConfig.type === 'preset' && themeConfig.name === 'dark'
       ? 'dark'
       : 'light';
+
+  // Header handlers
+  const handleStartEditHeader = () => {
+    if (!quest) return;
+    setEditingHeaderValue(quest.header);
+    setEditingHeader(true);
+  };
+
+  const handleFinishEditHeader = () => {
+    if (editingHeader && quest && onHeaderUpdate && editingHeaderValue !== quest.header) {
+      onHeaderUpdate(quest.id, editingHeaderValue);
+    }
+    setEditingHeader(false);
+  };
+
+  // Objective handlers
+  const handleStartEditObjective = (key: string, description: string) => {
+    setEditingObjectiveKey(key);
+    setEditingObjectiveValue(description);
+  };
+
+  const handleFinishEditObjective = () => {
+    if (editingObjectiveKey && onObjectiveUpdate && quest) {
+      const objective = quest.objectives.find(o => o.key === editingObjectiveKey);
+      if (objective && editingObjectiveValue !== objective.description) {
+        onObjectiveUpdate(quest.id, editingObjectiveKey, { description: editingObjectiveValue });
+      }
+    }
+    setEditingObjectiveKey(null);
+    setEditingObjectiveValue('');
+  };
+
+  // Description handlers
+  const handleStartEditDescription = () => {
+    if (!quest) return;
+    setEditingDescriptionValue(quest.description);
+    setEditingDescription(true);
+  };
+
+  const handleSaveDescription = async () => {
+    if (quest && editingDescriptionValue !== quest.description) {
+      await onDescriptionUpdate?.(quest.id, editingDescriptionValue);
+    }
+    setEditingDescription(false);
+  };
+
+  const handleCancelDescription = () => {
+    setEditingDescription(false);
+  };
+
+  // Characters handlers
+  const handleToggleCharacter = async (charId: number) => {
+    if (!quest || !onQuestUpdate) return;
+    const newAssigned = quest.assignedCharacters.includes(charId)
+      ? quest.assignedCharacters.filter(id => id !== charId)
+      : [...quest.assignedCharacters, charId];
+    await onQuestUpdate(quest.id, {
+      header: quest.header,
+      description: quest.description,
+      reward: quest.reward,
+      status: quest.status,
+      objectives: quest.objectives,
+      assignedCharacters: newAssigned,
+    });
+  };
+
+  const renderObjective = (obj: QuestObjective) => (
+    <div
+      key={obj.key}
+      className={`${viewStyles.objectiveRow} ${
+        viewStyles[`objectiveStatus_${obj.status}`] || ''
+      } ${obj.status !== 'pending' ? viewStyles.objectiveCompact : ''} ${
+        obj.status === 'cancelled' ? viewStyles.objectiveCancelled : ''
+      }`}
+    >
+      {editingObjectiveKey === obj.key ? (
+        <input
+          ref={editInputRef}
+          type="text"
+          value={editingObjectiveValue}
+          onChange={e => setEditingObjectiveValue(e.target.value)}
+          onBlur={handleFinishEditObjective}
+          onKeyDown={e => {
+            if (e.key === 'Enter') { e.preventDefault(); handleFinishEditObjective(); }
+            if (e.key === 'Escape') { setEditingObjectiveKey(null); }
+          }}
+          className={inputStyles.input}
+          style={{ flex: 1 }}
+          onClick={e => e.stopPropagation()}
+        />
+      ) : (
+        <span
+          className={`${viewStyles.objectiveText} ${!obj.description ? viewStyles.objectivePlaceholder : ''}`}
+          onClick={() => handleStartEditObjective(obj.key, obj.description)}
+          style={{ cursor: 'pointer' }}
+          title="Нажмите чтобы изменить"
+        >
+          {obj.description || 'Введите описание цели...'}
+        </span>
+      )}
+      <select
+        value={obj.status}
+        onChange={e => onObjectiveStatusChange(quest!.id, obj.key, e.target.value as any)}
+        className={`${inputStyles.input} ${viewStyles.objectiveSelect}`}
+      >
+        {OBJECTIVE_STATUS_OPTIONS.map(opt => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
 
   if (!quest) {
     return (
@@ -209,278 +254,191 @@ const QuestViewModal: React.FC<QuestViewModalProps> = ({
     );
   }
 
-  if (mode === 'edit') {
-    return (
-      <ModalPortal isOpen={isOpen} onClose={onClose}>
-        <h2>{quest ? 'Редактирование квеста' : 'Создание квеста'}</h2>
-        <div className={modalStyles.modalBody}>
-          {error && <div className={modalStyles.error}>{error}</div>}
-          <form onSubmit={handleSubmit}>
-            <div className={modalStyles.formGroup}>
-              <label>Статус квеста:</label>
-              <select
-                value={status}
-                onChange={e => setStatus(e.target.value as QuestStatus)}
-                className={inputStyles.input}
-              >
-                {STATUS_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+  const sortedObjectives = [...quest.objectives].sort((a, b) => {
+    const order: Record<string, number> = { pending: 0, completed: 1, failed: 2, cancelled: 3 };
+    return (order[a.status] ?? 99) - (order[b.status] ?? 99);
+  });
 
-            <div className={modalStyles.formGroup}>
-              <label>Заголовок:</label>
-              <input
-                type="text"
-                value={header}
-                onChange={e => setHeader(e.target.value)}
-                className={inputStyles.input}
-                required
-                placeholder="Название квеста"
-              />
-            </div>
-
-            <div className={modalStyles.formGroup}>
-              <label>Описание:</label>
-              <div
-                ref={editorRef}
-                className={viewStyles.editorContainer}
-                data-color-mode={themeMode}
-              >
-                <MDEditor
-                  value={description}
-                  onChange={value => setDescription(value || '')}
-                  preview="edit"
-                  height={300}
-                  style={{ width: '100%' }}
-                  textareaProps={{
-                    lang: 'ru',
-                    spellCheck: true,
-                  }}
-                  previewOptions={{
-                    disallowedElements: ['script', 'style'],
-                  }}
-                />
-              </div>
-              <div className={viewStyles.markdownHint}>
-                Поддерживает Markdown: **жирный**, *курсив*, `код`, списки и многое другое.
-              </div>
-            </div>
-
-            <div className={viewStyles.section}>
-              <h3>Награды</h3>
-              <div className={viewStyles.rewardList}>
-                {reward.map((item, index) => (
-                  <span key={index} className={viewStyles.rewardTag}>
-                    {item}
-                    <button
-                      type="button"
-                      className={viewStyles.rewardRemove}
-                      onClick={() => handleRemoveReward(index)}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-              <div className={viewStyles.rewardInputRow}>
-                <input
-                  type="text"
-                  value={newReward}
-                  onChange={e => setNewReward(e.target.value)}
-                  className={inputStyles.input}
-                  placeholder="Введите награду"
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddReward();
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={handleAddReward}
-                  className={buttonStyles.button}
-                >
-                  Добавить награду
-                </button>
-              </div>
-            </div>
-
-            <div className={viewStyles.section}>
-              <h3>Цели</h3>
-              {objectives.map((obj, index) => (
-                <div key={obj.key} className={viewStyles.objectiveItem}>
-                  <div className={viewStyles.objectiveRow}>
-                    <input
-                      type="text"
-                      value={obj.description}
-                      onChange={e =>
-                        handleObjectiveChange(index, {
-                          description: e.target.value,
-                        })
-                      }
-                      className={inputStyles.input}
-                      placeholder="Описание цели"
-                      required
-                    />
-                    <select
-                      value={obj.status}
-                      onChange={e =>
-                        handleObjectiveChange(index, {
-                          status: e.target.value as ObjectiveStatus,
-                        })
-                      }
-                      className={inputStyles.input}
-                    >
-                      {OBJECTIVE_STATUS_OPTIONS.map(opt => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      type="button"
-                      className={viewStyles.removeBtn}
-                      onClick={() => handleRemoveObjective(index)}
-                    >
-                      ×
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={handleAddObjective}
-                className={buttonStyles.button}
-              >
-                Добавить цель
-              </button>
-            </div>
-
-            <div className={viewStyles.section}>
-              <h3>Назначенные персонажи</h3>
-              {!characters || characters.length === 0 ? (
-                <p className={viewStyles.noCharacters}>Нет доступных персонажей</p>
-              ) : (
-                <>
-                  <div className={viewStyles.characterTags}>
-                    {assignedCharacters.map(charId => {
-                      const char = characters?.find(c => c.id === charId);
-                      return (
-                        <span key={charId} className={viewStyles.rewardTag}>
-                          {char?.name || `ID: ${charId}`}
-                          <button
-                            type="button"
-                            className={viewStyles.rewardRemove}
-                            onClick={() => setAssignedCharacters(prev => prev.filter(id => id !== charId))}
-                          >
-                            ×
-                          </button>
-                        </span>
-                      );
-                    })}
-                  </div>
-                  <div className={viewStyles.rewardInputRow}>
-                    <select
-                      value=""
-                      onChange={e => {
-                        const val = parseInt(e.target.value);
-                        if (val && !assignedCharacters.includes(val)) {
-                          setAssignedCharacters(prev => [...prev, val]);
-                        }
-                      }}
-                      className={inputStyles.input}
-                    >
-                      <option value="">Выберите персонажа...</option>
-                      {characters
-                        .filter(char => !assignedCharacters.includes(char.id))
-                        .map(char => (
-                          <option key={char.id} value={char.id}>
-                            {char.name}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                </>
-              )}
-            </div>
-          </form>
-        </div>
-        <div className={modalStyles.buttons} style={isMobile ? { flexDirection: 'column' } : undefined}>
-          <button type="button" onClick={() => setMode('view')} className={buttonStyles.button} style={isMobile ? { width: '100%' } : undefined}>
-            Отмена
-          </button>
-          <button type="submit" onClick={handleSubmit} className={buttonStyles.button} disabled={loading} style={isMobile ? { width: '100%' } : undefined}>
-            {loading ? 'Сохранение...' : 'Сохранить'}
-          </button>
-        </div>
-      </ModalPortal>
-    );
-  }
+  const activeObjectives = sortedObjectives.filter(o => o.status === 'pending');
+  const completedObjectivesList = sortedObjectives.filter(o => o.status !== 'pending');
 
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       <div className={viewStyles.viewHeader}>
-        <h2 style={{ margin: 0 }}>{quest.header}</h2>
-        <span
-          className={viewStyles.viewStatusBadge}
-          style={{ backgroundColor: STATUS_COLOR_MAP[quest.status], color: '#fff' }}
-        >
-          {STATUS_LABEL_MAP[quest.status]}
-        </span>
+        {editingHeader ? (
+          <input
+            ref={headerInputRef}
+            type="text"
+            value={editingHeaderValue}
+            onChange={e => setEditingHeaderValue(e.target.value)}
+            onBlur={handleFinishEditHeader}
+            onKeyDown={e => {
+              if (e.key === 'Enter') { e.preventDefault(); handleFinishEditHeader(); }
+              if (e.key === 'Escape') { setEditingHeader(false); }
+            }}
+            className={inputStyles.input}
+            style={{ flex: 1, fontSize: '1.25rem', fontWeight: 700 }}
+          />
+        ) : (
+          <h2
+            style={{ margin: 0, cursor: canEdit ? 'pointer' : 'default' }}
+            onClick={() => canEdit && handleStartEditHeader()}
+            title={canEdit ? 'Нажмите чтобы изменить' : undefined}
+          >
+            {quest.header}
+          </h2>
+        )}
+        {canEdit ? (
+          <select
+            value={quest.status}
+            onChange={e => {
+              if (!quest || !onQuestUpdate) return;
+              const newStatus = e.target.value;
+              if (newStatus === quest.status) return;
+              onQuestUpdate(quest.id, {
+                header: quest.header,
+                description: quest.description,
+                reward: quest.reward,
+                status: newStatus as QuestStatus,
+                objectives: quest.objectives,
+                assignedCharacters: quest.assignedCharacters,
+              });
+            }}
+            className={inputStyles.input}
+            style={{ width: 'auto', padding: '0.25rem 0.5rem', fontSize: '0.85rem' }}
+          >
+            {STATUS_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <span
+            className={viewStyles.viewStatusBadge}
+            style={{
+              backgroundColor: STATUS_COLOR_MAP[quest.status],
+              color: '#fff',
+            }}
+          >
+            {STATUS_LABEL_MAP[quest.status]}
+          </span>
+        )}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.25rem' }}>
+          {canEdit && (
+            <IconButton icon="people" onClick={() => setCharactersModalOpen(true)} title="Персонажи" size="small" variant="primary" />
+          )}
+          {canDelete && onDelete && (
+            <IconButton icon="delete" onClick={() => {
+              if (window.confirm('Вы уверены, что хотите удалить квест?')) {
+                onDelete?.();
+              }
+            }} title="Удалить" size="small" variant="danger" />
+          )}
+        </div>
       </div>
 
       <div className={modalStyles.modalBody}>
-        {quest.description && (
-          <div className={viewStyles.descriptionBlock}>
-            <ReactMarkdown>{quest.description}</ReactMarkdown>
-          </div>
-        )}
-
-        {quest.objectives && quest.objectives.length > 0 && (
-          <div className={viewStyles.objectivesSection}>
-            {[...quest.objectives]
-              .sort((a, b) => {
-                const order: Record<string, number> = {
-                  pending: 0,
-                  completed: 1,
-                  failed: 2,
-                  cancelled: 3,
-                };
-                return (order[a.status] ?? 99) - (order[b.status] ?? 99);
-              })
-              .map(obj => (
-              <div
-                key={obj.key}
-                className={`${viewStyles.objectiveRow} ${
-                  viewStyles[`objectiveStatus_${obj.status}`] || ''
-                } ${obj.status !== 'pending' ? viewStyles.objectiveCompact : ''} ${
-                  obj.status === 'cancelled' ? viewStyles.objectiveCancelled : ''
-                }`}
-              >
-                <span className={viewStyles.objectiveText}>
-                  {obj.description}
-                </span>
-                <select
-                  value={obj.status}
-                  onChange={e => onObjectiveStatusChange(quest.id, obj.key, e.target.value as any)}
-                  className={`${inputStyles.input} ${viewStyles.objectiveSelect}`}
+        {/* Description */}
+        {!editingDescription && (
+          <div style={{ marginBottom: '1rem', position: 'relative' }}>
+            {quest.description ? (
+              <>
+                <div
+                  ref={descriptionRef}
+                  className={`${viewStyles.descriptionBlock} ${
+                    !descriptionExpanded ? viewStyles.descriptionCollapsed : viewStyles.descriptionExpanded
+                  }`}
                 >
-                  {OBJECTIVE_STATUS_OPTIONS.map(opt => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  <ReactMarkdown>{quest.description}</ReactMarkdown>
+                </div>
+                {canEdit && (
+                  <div className={viewStyles.descriptionEditBtnWrapper}>
+                    <IconButton icon="edit" onClick={handleStartEditDescription} title="Редактировать описание" size="small" variant="primary" />
+                  </div>
+                )}
+                {!descriptionExpanded && descriptionOverflow && (
+                  <div className={viewStyles.descriptionExpandPlate} onClick={() => setDescriptionExpanded(true)}>
+                    Показать полностью
+                  </div>
+                )}
+                {descriptionExpanded && (
+                  <div className={viewStyles.descriptionCollapseBtn} onClick={() => setDescriptionExpanded(false)}>
+                    Свернуть
+                  </div>
+                )}
+              </>
+            ) : canEdit ? (
+              <div
+                className={viewStyles.addDescriptionPlaceholder}
+                onClick={handleStartEditDescription}
+              >
+                <span className={viewStyles.addObjectiveIcon}>+</span>
+                <span>Добавить описание</span>
               </div>
-            ))}
+            ) : null}
           </div>
         )}
 
+        {editingDescription && (
+          <div style={{ marginBottom: '1rem' }}>
+            <div ref={editorRef} data-color-mode={themeMode}>
+              <MDEditor
+                value={editingDescriptionValue}
+                onChange={value => setEditingDescriptionValue(value || '')}
+                preview="edit"
+                height={120}
+                textareaProps={{ lang: 'ru', spellCheck: true }}
+                previewOptions={{ disallowedElements: ['script', 'style'] }}
+              />
+            </div>
+            <div className={modalStyles.buttons} style={isMobile ? { flexDirection: 'row' } : undefined}>
+<button type="button" onClick={handleCancelDescription} className={buttonStyles.button} style={isMobile ? { flex: 1, padding: '0.5rem', fontSize: '0.85rem' } : undefined}>
+  Отмена
+</button>
+<button type="button" onClick={handleSaveDescription} className={buttonStyles.button} style={isMobile ? { flex: 1, padding: '0.5rem', fontSize: '0.85rem' } : undefined}>
+  Сохранить
+</button>
+            </div>
+          </div>
+        )}
+
+        {/* Objectives */}
+        <div className={viewStyles.objectivesSection}>
+          {activeObjectives.map(obj => renderObjective(obj))}
+
+          {canEdit && (
+            <div
+              className={viewStyles.addObjectiveRow}
+              onClick={async () => {
+                const newKey = await onObjectiveAdd?.(quest.id);
+                if (newKey) {
+                  handleStartEditObjective(newKey, '');
+                }
+              }}
+            >
+              <span className={viewStyles.addObjectiveIcon}>+</span>
+              <span>Добавить цель</span>
+            </div>
+          )}
+
+          {completedObjectivesList.length > 0 && (
+            <>
+              <div
+                className={viewStyles.completedToggle}
+                onClick={() => setCompletedExpanded(!completedExpanded)}
+              >
+                <span>{completedExpanded ? '▼' : '▶'}</span>
+                <span>Завершённые и прочие ({completedObjectivesList.length})</span>
+              </div>
+              {completedExpanded && completedObjectivesList.map(obj => renderObjective(obj))}
+            </>
+          )}
+        </div>
+
+
+
+        {/* Reward - показываем если есть */}
         {quest.reward && quest.reward.length > 0 && (
           <div className={viewStyles.rewardsSection}>
             {quest.reward.map((item, idx) => (
@@ -493,57 +451,80 @@ const QuestViewModal: React.FC<QuestViewModalProps> = ({
       </div>
 
       {isMobile ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
-          {canEdit && (
-            <button
-              type="button"
-              className={buttonStyles.button}
-              style={{ width: '100%' }}
-              onClick={() => { if (onEdit) onEdit(); setMode('edit'); }}
-            >
-              ✏️ Редактировать
-            </button>
-          )}
-          {canDelete && onDelete && (
-            <button
-              type="button"
-              className={buttonStyles.button}
-              style={{ width: '100%' }}
-              onClick={onDelete}
-            >
-              🗑️ Удалить
-            </button>
-          )}
-          <button type="button" className={buttonStyles.button} style={{ width: '100%' }} onClick={onClose}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+          <button type="button" className={buttonStyles.button} style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem' }} onClick={onClose}>
             ✕ Закрыть
           </button>
         </div>
       ) : (
         <div className={modalStyles.buttons}>
-          <div style={{ display: 'flex', gap: '0.5rem', marginRight: 'auto' }}>
-            {canEdit && (
-              <button
-                type="button"
-                className={buttonStyles.button}
-                onClick={() => { if (onEdit) onEdit(); setMode('edit'); }}
-              >
-                Редактировать
-              </button>
-            )}
-            {canDelete && onDelete && (
-              <button
-                type="button"
-                className={buttonStyles.button}
-                onClick={onDelete}
-              >
-                Удалить
-              </button>
-            )}
-          </div>
           <button type="button" className={buttonStyles.button} onClick={onClose}>
             Закрыть
           </button>
         </div>
+      )}
+      {/* Mini modal for characters */}
+      {charactersModalOpen && (
+        <ModalPortal isOpen={charactersModalOpen} onClose={() => setCharactersModalOpen(false)}>
+          <h2 style={{ margin: 0 }}>Назначенные персонажи</h2>
+          <div className={modalStyles.modalBody} style={{ marginTop: '1rem' }}>
+            {!characters || characters.length === 0 ? (
+              <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>Нет доступных персонажей</p>
+            ) : (
+              <>
+                <div className={viewStyles.characterList}>
+                  {quest.assignedCharacters.length === 0 ? (
+                    <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic', padding: '0.5rem 0' }}>
+                      Персонажи не назначены
+                    </p>
+                  ) : (
+                    quest.assignedCharacters.map(charId => {
+                      const char = characters.find(c => c.id === charId);
+                      return (
+                        <div key={charId} className={viewStyles.characterListItem}>
+                          <span>{char?.name || `ID: ${charId}`}</span>
+                          <button
+                            type="button"
+                            className={viewStyles.characterRemoveBtn}
+                            onClick={() => handleToggleCharacter(charId)}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+                <div className={viewStyles.rewardInputRow}>
+                  <select
+                    value=""
+                    onChange={e => {
+                      const val = parseInt(e.target.value);
+                      if (val && !quest.assignedCharacters.includes(val)) {
+                        handleToggleCharacter(val);
+                      }
+                    }}
+                    className={inputStyles.input}
+                  >
+                    <option value="">Выберите персонажа...</option>
+                    {characters
+                      .filter(char => !quest.assignedCharacters.includes(char.id))
+                      .map(char => (
+                        <option key={char.id} value={char.id}>
+                          {char.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              </>
+            )}
+          </div>
+          <div className={modalStyles.buttons}>
+            <button type="button" className={buttonStyles.button} onClick={() => setCharactersModalOpen(false)}>
+              Закрыть
+            </button>
+          </div>
+        </ModalPortal>
       )}
     </ModalPortal>
   );

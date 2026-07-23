@@ -19,8 +19,50 @@
   padding: 1rem;
   background-color: var(--bg-secondary);
   border-radius: var(--border-radius-md);
-  margin-bottom: 1rem;
   overflow: auto;
+}
+
+.descriptionCollapsed {
+  max-height: 120px;
+  overflow: hidden;
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
+.descriptionExpanded {
+  border-radius: var(--border-radius-md);
+}
+
+.descriptionExpandPlate {
+  text-align: center;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  background-color: color-mix(in srgb, var(--bg-secondary) 20%, transparent);
+  border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+  user-select: none;
+  transition: background-color 0.15s ease;
+  /* border-top: 1px solid var(--border-color); */
+}
+
+.descriptionExpandPlate:hover {
+  background-color: color-mix(in srgb, var(--bg-secondary) 85%, transparent);
+}
+
+.descriptionCollapseBtn {
+  font-size: 0.85rem;
+  color: var(--accent-color);
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  padding: 0.25rem 0 0;
+}
+
+.descriptionCollapseBtn:hover {
+  text-decoration: underline;
 }
 
 .objectivesSection {
@@ -93,6 +135,7 @@
   min-width: 130px;
   flex-shrink: 0;
   font-size: 1rem;
+  padding: 0.35rem 0.5rem;
 }
 
 .rewardsSection {
@@ -175,16 +218,130 @@
   padding: 0.25rem;
 }
 
-.characterTags {
+.characterList {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 0.5rem;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.characterListItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius-sm);
+  font-size: 1rem;
+}
+
+.characterRemoveBtn {
+  background: none;
+  border: none;
+  color: var(--danger-color);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+
+.characterRemoveBtn:hover {
+  opacity: 1;
 }
 
 .noCharacters {
   color: var(--text-secondary);
   font-style: italic;
+}
+
+.completedToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.25rem;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary);
+  user-select: none;
+  transition: background-color 0.15s ease;
+}
+
+.completedToggle:hover {
+  background-color: var(--border-color);
+}
+
+.completedToggle span:first-child {
+  font-size: 0.7rem;
+  width: 12px;
+  text-align: center;
+}
+
+.addObjectiveRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border: 1px dashed var(--border-color);
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  user-select: none;
+}
+
+.addObjectiveRow:hover {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+  background-color: var(--bg-secondary);
+}
+
+.addObjectiveIcon {
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.objectivePlaceholder {
+  opacity: 0.4;
+  font-style: italic;
+}
+
+.addDescriptionPlaceholder {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: var(--border-radius-md);
+  border: 1px dashed var(--border-color);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  user-select: none;
+}
+
+.addDescriptionPlaceholder:hover {
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+  background-color: var(--bg-secondary);
+}
+
+.descriptionEditBtnWrapper {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+
+.descriptionEditBtnWrapper:hover {
+  opacity: 1;
 }
 
 @media (max-width: 768px) {
