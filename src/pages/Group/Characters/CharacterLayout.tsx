@@ -50,6 +50,7 @@ const CharacterLayout: React.FC = () => {
     { id: 'stats', label: 'Статы', path: 'stats' },
     { id: 'items', label: 'Инвентарь', path: 'items' },
     { id: 'skills', label: 'Способности', path: 'skills' },
+    { id: 'quests', label: 'Квесты', path: 'quests' },
     // { id: 'notes', label: 'Заметки', path: 'notes' },
   ];
 

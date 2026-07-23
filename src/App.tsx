@@ -20,6 +20,7 @@ import CharacterDashboard from './pages/Group/Characters/Character/CharacterDash
 import CharacterItems from './pages/Group/Characters/Character/CharacterItems';
 import CharacterSkills from './pages/Group/Characters/Character/CharacterSkills';
 import CharacterNotes from './pages/Group/Characters/Character/CharacterNotes';
+import CharacterQuests from './pages/Group/Characters/CharacterQuests';
 import GroupItems from './pages/Group/GroupItems';
 import GroupNotes from './pages/Group/GroupNotes';
 import GroupQuests from './pages/Group/GroupQuests';
@@ -90,6 +91,7 @@ const AppContent: React.FC = () => {
           <Route path="stats" element={<Character />} />
           <Route path="items" element={<CharacterItems />} />
           <Route path="skills" element={<CharacterSkills />} />
+          <Route path="quests" element={<CharacterQuests />} />
           <Route path="notes" element={<CharacterNotes />} />
         </Route>
         <Route path="/profile" element={<Profile />} />

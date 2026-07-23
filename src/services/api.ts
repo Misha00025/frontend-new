@@ -957,3 +957,22 @@ export const groupQuestsAPI = {
     if (!response.ok) throw new Error('Failed to delete quest');
   },
 };
+
+export const characterQuestsAPI = {
+  getCharacterQuests: async (groupId: number, characterId: number): Promise<GroupQuest[]> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/quests`);
+    if (!response.ok) throw new Error('Failed to fetch character quests');
+    const data: GroupQuestsResponse = await response.json();
+    return data.quests;
+  },
+
+  createCharacterQuest: async (groupId: number, characterId: number, questData: CreateGroupQuestRequest): Promise<GroupQuest> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/quests`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(questData),
+    });
+    if (!response.ok) throw new Error('Failed to create character quest');
+    return response.json();
+  },
+};
