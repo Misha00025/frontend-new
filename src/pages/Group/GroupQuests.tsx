@@ -10,7 +10,10 @@ import QuestCard from './Cards/QuestCard/QuestCard';
 import QuestViewModal from './Modals/QuestModal/QuestViewModal';
 import commonStyles from '../../styles/common.module.css';
 import buttonStyles from '../../styles/components/Button.module.css';
+import inputStyles from '../../styles/components/Input.module.css';
+import modalStyles from '../../styles/modal.module.css';
 import styles from '../../components/commons/Pages/ResourcePage/ResourcePage.module.css';
+import ModalPortal from '../../components/commons/ModalPortal/ModalPortal';
 
 const GroupQuests: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -24,6 +27,9 @@ const GroupQuests: React.FC = () => {
   const [groupUsersMap, setGroupUsersMap] = useState<Map<number, User>>(new Map());
   const [charUserMap, setCharUserMap] = useState<Map<number, number[]>>(new Map());
   const { canCreateQuests, canEditQuests, canDeleteQuests } = useActionPermissions();
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [newQuestHeader, setNewQuestHeader] = useState('');
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     if (groupId) {
@@ -107,48 +113,37 @@ const GroupQuests: React.FC = () => {
     setIsViewModalOpen(true);
   };
 
-  const handleCreate = () => {
-    setViewingQuest(null);
-    setIsViewModalOpen(true);
-  };
-
-  const handleSaveQuest = async (data: PatchGroupQuestRequest) => {
-    if (viewingQuest) {
-      await groupQuestsAPI.updateQuest(parseInt(groupId!), viewingQuest.id, data);
-    } else {
+  const handleCreateQuest = async () => {
+    if (!newQuestHeader.trim()) return;
+    setCreating(true);
+    try {
       await groupQuestsAPI.createQuest(parseInt(groupId!), {
-        header: data.header!,
-        description: data.description,
-        reward: data.reward,
-        status: data.status,
-        objectives: data.objectives,
-        assignedCharacters: data.assignedCharacters,
+        header: newQuestHeader.trim(),
+        description: '',
+        status: 'active',
+        reward: [],
+        objectives: [],
+        assignedCharacters: [],
       });
+      setCreateModalOpen(false);
+      setNewQuestHeader('');
+      loadQuests();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create quest');
+    } finally {
+      setCreating(false);
     }
-    setIsViewModalOpen(false);
-    setViewingQuest(null);
-    loadQuests();
   };
 
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
 
   return (
     <div className={commonStyles.container}>
-      <div className={styles.pageHeader}>
-        <div className={styles.headerButtons}>
-          {canCreateQuests && (
-            <button className={`${buttonStyles.button} ${styles.createButton}`} onClick={handleCreate} type="button">
-              <span className={styles.plusIcon}>+</span>
-              <span className={styles.createText}>Создать</span>
-            </button>
-          )}
-        </div>
-      </div>
 
       {error && <div style={{ color: 'var(--danger-color)', marginBottom: '1rem' }}>{error}</div>}
 
-      <div className={styles.headerControls}>
-        <div className={styles.searchContainer}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+        <div style={{ flex: 1 }}>
           <SearchBar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
@@ -156,6 +151,11 @@ const GroupQuests: React.FC = () => {
             onClear={() => setSearchTerm('')}
           />
         </div>
+        {canCreateQuests && (
+          <button className={buttonStyles.button} onClick={() => setCreateModalOpen(true)} type="button" style={{ whiteSpace: 'nowrap' }}>
+            + Создать квест
+          </button>
+        )}
       </div>
 
       <List layout="start-grid" gap="medium" gridSize="large">
@@ -188,7 +188,86 @@ const GroupQuests: React.FC = () => {
             setIsViewModalOpen(false);
             setViewingQuest(null);
           }}
-          onSave={handleSaveQuest}
+          onHeaderUpdate={async (questId, header) => {
+            const quest = quests.find(q => q.id === questId);
+            if (!quest) return;
+
+            await groupQuestsAPI.patchQuest(parseInt(groupId!), questId, { header });
+
+            const updatedQuest = { ...quest, header };
+            setQuests(prev => prev.map(q => q.id === questId ? updatedQuest : q));
+            setViewingQuest(updatedQuest);
+          }}
+          onQuestUpdate={async (questId, questData) => {
+            const quest = quests.find(q => q.id === questId);
+            if (!quest) return;
+
+            const updatedQuest = {
+              ...quest,
+              header: questData.header ?? quest.header,
+              description: questData.description ?? quest.description,
+              reward: questData.reward ?? quest.reward,
+              status: questData.status ?? quest.status,
+              objectives: questData.objectives ?? quest.objectives,
+              assignedCharacters: questData.assignedCharacters ?? quest.assignedCharacters,
+            };
+
+            await groupQuestsAPI.updateQuest(parseInt(groupId!), questId, questData);
+
+            setQuests(prev => prev.map(q => q.id === questId ? updatedQuest : q));
+            setViewingQuest(updatedQuest);
+          }}
+          onObjectiveUpdate={async (questId, objectiveKey, updates) => {
+            const quest = quests.find(q => q.id === questId);
+            if (!quest) return;
+
+            const updatedObjectives = quest.objectives.map(obj =>
+              obj.key === objectiveKey ? { ...obj, ...updates } : obj
+            );
+
+            await groupQuestsAPI.patchQuest(parseInt(groupId!), questId, {
+              objectives: updatedObjectives,
+            });
+
+            const updatedQuest = { ...quest, objectives: updatedObjectives };
+            setQuests(prev => prev.map(q => q.id === questId ? updatedQuest : q));
+            setViewingQuest(updatedQuest);
+          }}
+          onDescriptionUpdate={async (questId, description) => {
+            const quest = quests.find(q => q.id === questId);
+            if (!quest) return;
+
+            await groupQuestsAPI.patchQuest(parseInt(groupId!), questId, {
+              description,
+            });
+
+            const updatedQuest = { ...quest, description };
+            setQuests(prev => prev.map(q => q.id === questId ? updatedQuest : q));
+            setViewingQuest(updatedQuest);
+          }}
+          onObjectiveAdd={async (questId) => {
+            const quest = quests.find(q => q.id === questId);
+            if (!quest) return;
+
+            const newKey = `objective_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+            const newObjective = { key: newKey, description: '', status: 'pending' as const };
+            const updatedObjectives = [...quest.objectives, newObjective];
+
+            await groupQuestsAPI.updateQuest(parseInt(groupId!), questId, {
+              header: quest.header,
+              description: quest.description,
+              reward: quest.reward,
+              status: quest.status,
+              objectives: updatedObjectives,
+              assignedCharacters: quest.assignedCharacters,
+            });
+
+            const updatedQuest = { ...quest, objectives: updatedObjectives };
+            setQuests(prev => prev.map(q => q.id === questId ? updatedQuest : q));
+            setViewingQuest(updatedQuest);
+
+            return newKey;
+          }}
           onObjectiveStatusChange={async (questId, objectiveKey, newStatus) => {
             const quest = quests.find(q => q.id === questId);
             if (!quest) return;
@@ -222,6 +301,41 @@ const GroupQuests: React.FC = () => {
           canDelete={canDeleteQuests}
           characters={characters}
         />
+      )}
+
+      {createModalOpen && (
+        <ModalPortal isOpen={createModalOpen} onClose={() => { setCreateModalOpen(false); setNewQuestHeader(''); }}>
+          <h2 style={{ margin: 0 }}>Создание квеста</h2>
+          <div className={modalStyles.modalBody} style={{ marginTop: '1rem' }}>
+            <input
+              type="text"
+              value={newQuestHeader}
+              onChange={e => setNewQuestHeader(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleCreateQuest(); }}
+              className={inputStyles.input}
+              placeholder="Название квеста"
+              autoFocus
+              style={{ width: '100%', boxSizing: 'border-box' }}
+            />
+          </div>
+          <div className={modalStyles.buttons}>
+            <button
+              type="button"
+              className={buttonStyles.button}
+              onClick={() => { setCreateModalOpen(false); setNewQuestHeader(''); }}
+            >
+              Отмена
+            </button>
+            <button
+              type="button"
+              className={buttonStyles.button}
+              onClick={handleCreateQuest}
+              disabled={creating || !newQuestHeader.trim()}
+            >
+              {creating ? 'Создание...' : 'Создать'}
+            </button>
+          </div>
+        </ModalPortal>
       )}
     </div>
   );
