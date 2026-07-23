@@ -21,6 +21,9 @@ export const useActionPermissions = () => {
   const canManageCharacterUsers = isGroupAdmin;
   const canEditCharacterFields = canEditCharacter || isGroupAdmin;
   const canDeleteCharacterFields = canEditCharacter || isGroupAdmin;
+  const canCreateCharacterQuests = canEditCharacter || isGroupAdmin;
+  const canEditCharacterQuests = canEditCharacter || isGroupAdmin;
+  const canDeleteCharacterQuests = isGroupAdmin;
 
   return {
     canEditGroup,
@@ -39,6 +42,9 @@ export const useActionPermissions = () => {
     canDeleteThisCharacter,
     canManageCharacterUsers,
     canEditCharacterFields,
-    canDeleteCharacterFields
+    canDeleteCharacterFields,
+    canCreateCharacterQuests,
+    canEditCharacterQuests,
+    canDeleteCharacterQuests,
   };
 };
