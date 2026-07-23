@@ -13,7 +13,31 @@ import buttonStyles from '../../styles/components/Button.module.css';
 import inputStyles from '../../styles/components/Input.module.css';
 import modalStyles from '../../styles/modal.module.css';
 import styles from '../../components/commons/Pages/ResourcePage/ResourcePage.module.css';
+import collapsibleStyles from '../../components/commons/CollapsibleGroup/CollapsibleGroup.module.css';
 import ModalPortal from '../../components/commons/ModalPortal/ModalPortal';
+
+const CollapsibleSection: React.FC<{
+  title: string;
+  count: number;
+  defaultCollapsed: boolean;
+  children: React.ReactNode;
+}> = ({ title, count, defaultCollapsed, children }) => {
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
+
+  return (
+    <div>
+      <div className={collapsibleStyles.header} onClick={() => setCollapsed(!collapsed)}>
+        <span className={`${collapsibleStyles.caret} ${collapsed ? collapsibleStyles.caretCollapsed : ''}`}>▼</span>
+        <span className={collapsibleStyles.groupName}>{title} ({count})</span>
+      </div>
+      {!collapsed && (
+        <div className={collapsibleStyles.content}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const GroupQuests: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -158,27 +182,95 @@ const GroupQuests: React.FC = () => {
         )}
       </div>
 
-      <List layout="start-grid" gap="medium" gridSize="large">
-        {filteredQuests.map(quest => (
-          <QuestCard
-            key={quest.id}
-            quest={quest}
-            users={getQuestUsers(quest)}
-            onView={() => handleView(quest)}
-          />
-        ))}
-      </List>
+      {(() => {
+        const activeQuests = filteredQuests.filter(q => q.status === 'active');
+        const completedQuests = filteredQuests.filter(q => q.status === 'completed');
+        const failedQuests = filteredQuests.filter(q => q.status === 'failed');
+        const cancelledQuests = filteredQuests.filter(q => q.status === 'cancelled');
+        const hasAny = activeQuests.length > 0 || completedQuests.length > 0 || failedQuests.length > 0 || cancelledQuests.length > 0;
 
-      {filteredQuests.length === 0 && !loading && (
-        <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
-          <p>{searchTerm ? `По запросу "${searchTerm}" ничего не найдено` : 'Нет квестов'}</p>
-          {searchTerm && (
-            <button className={buttonStyles.button} onClick={() => setSearchTerm('')} type="button">
-              Очистить поиск
-            </button>
-          )}
-        </div>
-      )}
+        if (!hasAny && !loading) {
+          return (
+            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
+              <p>{searchTerm ? `По запросу "${searchTerm}" ничего не найдено` : 'Нет квестов'}</p>
+              {searchTerm && (
+                <button className={buttonStyles.button} onClick={() => setSearchTerm('')} type="button">
+                  Очистить поиск
+                </button>
+              )}
+            </div>
+          );
+        }
+
+        return (
+          <>
+            {/* Active — всегда развёрнута */}
+            <div>
+              <div className={collapsibleStyles.header} style={{ cursor: 'default' }}>
+                <span className={collapsibleStyles.caret}>▼</span>
+                <span className={collapsibleStyles.groupName}>Активные ({activeQuests.length})</span>
+              </div>
+              <div className={collapsibleStyles.content}>
+                <List layout="start-grid" gap="medium" gridSize="large">
+                  {activeQuests.map(quest => (
+                    <QuestCard
+                      key={quest.id}
+                      quest={quest}
+                      users={getQuestUsers(quest)}
+                      onView={() => handleView(quest)}
+                    />
+                  ))}
+                </List>
+              </div>
+            </div>
+
+            {completedQuests.length > 0 && (
+              <CollapsibleSection title="Завершённые" count={completedQuests.length} defaultCollapsed={true}>
+                <List layout="start-grid" gap="medium" gridSize="large">
+                  {completedQuests.map(quest => (
+                    <QuestCard
+                      key={quest.id}
+                      quest={quest}
+                      users={getQuestUsers(quest)}
+                      onView={() => handleView(quest)}
+                    />
+                  ))}
+                </List>
+              </CollapsibleSection>
+            )}
+
+            {failedQuests.length > 0 && (
+              <CollapsibleSection title="Проваленные" count={failedQuests.length} defaultCollapsed={true}>
+                <List layout="start-grid" gap="medium" gridSize="large">
+                  {failedQuests.map(quest => (
+                    <QuestCard
+                      key={quest.id}
+                      quest={quest}
+                      users={getQuestUsers(quest)}
+                      onView={() => handleView(quest)}
+                    />
+                  ))}
+                </List>
+              </CollapsibleSection>
+            )}
+
+            {cancelledQuests.length > 0 && (
+              <CollapsibleSection title="Отменённые" count={cancelledQuests.length} defaultCollapsed={true}>
+                <List layout="start-grid" gap="medium" gridSize="large">
+                  {cancelledQuests.map(quest => (
+                    <QuestCard
+                      key={quest.id}
+                      quest={quest}
+                      users={getQuestUsers(quest)}
+                      onView={() => handleView(quest)}
+                    />
+                  ))}
+                </List>
+              </CollapsibleSection>
+            )}
+          </>
+        );
+      })()}
 
       {isViewModalOpen && (
         <QuestViewModal
