@@ -49,7 +49,6 @@ const CharacterQuests: React.FC = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [newQuestHeader, setNewQuestHeader] = useState('');
   const [creating, setCreating] = useState(false);
-
   useEffect(() => {
     if (groupId && characterId) {
       loadQuests();

@@ -322,7 +322,7 @@ const QuestViewModal: React.FC<QuestViewModalProps> = ({
           </span>
         )}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.25rem' }}>
-          {canEdit && (
+          {canEdit && characters && (
             <IconButton icon="people" onClick={() => setCharactersModalOpen(true)} title="Персонажи" size="small" variant="primary" />
           )}
           {canDelete && onDelete && (
