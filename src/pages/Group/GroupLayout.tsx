@@ -38,6 +38,7 @@ const GroupLayout: React.FC = () => {
     { id: 'items', label: 'Предметы', path: 'items' },
     { id: 'skills', label: 'Книга способностей', path: 'skills' },
     { id: 'notes', label: 'Заметки', path: 'notes' },
+    { id: 'quests', label: 'Квесты', path: 'quests' },
     ...(isGroupAdmin ? [{ id: 'settings', label: 'Настройки', path: 'settings' }] : []),
   ];
 
