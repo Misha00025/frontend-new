@@ -12,7 +12,10 @@ export const useActionPermissions = () => {
   const canCreateItems = isGroupAdmin;
   const canEditItems = isGroupAdmin;
   const canDeleteItems = isGroupAdmin;
-  
+  const canCreateQuests = isGroupAdmin;
+  const canEditQuests = isGroupAdmin;
+  const canDeleteQuests = isGroupAdmin;
+
   const canEditThisCharacter = canEditCharacter || isGroupAdmin;
   const canDeleteThisCharacter = isGroupAdmin;
   const canManageCharacterUsers = isGroupAdmin;
@@ -29,6 +32,9 @@ export const useActionPermissions = () => {
     canCreateItems,
     canEditItems,
     canDeleteItems,
+    canCreateQuests,
+    canEditQuests,
+    canDeleteQuests,
     canEditThisCharacter,
     canDeleteThisCharacter,
     canManageCharacterUsers,

@@ -44,3 +44,11 @@
 .grid-large {
   grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
 }
+
+@media (max-width: 600px) {
+  .grid-small,
+  .grid-medium,
+  .grid-large {
+    grid-template-columns: 1fr;
+  }
+}

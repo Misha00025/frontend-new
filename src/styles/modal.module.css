@@ -182,4 +182,14 @@
     padding: 1rem;
     width: 95%;
   }
+
+  .buttons {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .buttons > * {
+    flex: 1;
+    min-width: 0;
+  }
 }

@@ -23,6 +23,9 @@ import {
   UpdateGroupItemRequest
 } from '../types/groupItems';
 import {
+  GroupQuest, GroupQuestsResponse, CreateGroupQuestRequest, PatchGroupQuestRequest
+} from '../types/groupQuests';
+import {
   CharacterItem,
   CharacterItemsResponse,
   CreateCharacterItemRequest,
@@ -900,5 +903,57 @@ export const characterLogAPI = {
       throw new Error('Failed to fetch character action log');
     }
     return response.json();
+  },
+};
+
+export const groupQuestsAPI = {
+  getQuests: async (groupId: number): Promise<GroupQuest[]> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/quests`);
+    if (!response.ok) throw new Error('Failed to fetch quests');
+    const data: GroupQuestsResponse = await response.json();
+    return data.quests;
+  },
+
+  getQuest: async (groupId: number, questId: number): Promise<GroupQuest> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/quests/${questId}`);
+    if (!response.ok) throw new Error('Failed to fetch quest');
+    return response.json();
+  },
+
+  createQuest: async (groupId: number, questData: CreateGroupQuestRequest): Promise<GroupQuest> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/quests`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(questData),
+    });
+    if (!response.ok) throw new Error('Failed to create quest');
+    return response.json();
+  },
+
+  patchQuest: async (groupId: number, questId: number, questData: PatchGroupQuestRequest): Promise<{ updated: boolean }> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/quests/${questId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(questData),
+    });
+    if (!response.ok) throw new Error('Failed to update quest');
+    return response.json();
+  },
+
+  updateQuest: async (groupId: number, questId: number, questData: PatchGroupQuestRequest): Promise<GroupQuest> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/quests/${questId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(questData),
+    });
+    if (!response.ok) throw new Error('Failed to update quest');
+    return response.json();
+  },
+
+  deleteQuest: async (groupId: number, questId: number): Promise<void> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/quests/${questId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete quest');
   },
 };

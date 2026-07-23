@@ -22,6 +22,7 @@ import CharacterSkills from './pages/Group/Characters/Character/CharacterSkills'
 import CharacterNotes from './pages/Group/Characters/Character/CharacterNotes';
 import GroupItems from './pages/Group/GroupItems';
 import GroupNotes from './pages/Group/GroupNotes';
+import GroupQuests from './pages/Group/GroupQuests';
 import Profile from './pages/Profile';
 import './styles/globals.css';
 import { PermissionsProvider } from './contexts/PermissionsContext';
@@ -81,6 +82,7 @@ const AppContent: React.FC = () => {
           <Route path="skills" element={<GroupSkills />} />
           <Route path="items" element={<GroupItems />} />
           <Route path="notes" element={<GroupNotes />} />
+          <Route path="quests" element={<GroupQuests />} />
         </Route>
         <Route path="/group/:groupId/character/:characterId" element={<CharacterLayout />}>
           <Route index element={<CharacterDashboard />} />
