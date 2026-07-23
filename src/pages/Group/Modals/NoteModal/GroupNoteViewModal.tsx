@@ -45,20 +45,6 @@ const GroupNoteViewModal: React.FC<GroupNoteViewModalProps> = ({
     });
   };
 
-  const modalStyle: React.CSSProperties = isMobile ? {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'var(--bg-primary)',
-    zIndex: 1000,
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '1rem',
-    overflow: 'auto',
-  } : {};
-
   return (
     <ModalPortal isOpen={!!note} onClose={onClose}>
       {isMobile && (

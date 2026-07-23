@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { GroupQuest, PatchGroupQuestRequest } from '../../types/groupQuests';
+import { GroupQuest } from '../../types/groupQuests';
 import { groupQuestsAPI, charactersAPI, groupUsersAPI, characterUsersAPI } from '../../services/api';
 import { User } from '../../types/groupUsers';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
@@ -12,7 +12,6 @@ import commonStyles from '../../styles/common.module.css';
 import buttonStyles from '../../styles/components/Button.module.css';
 import inputStyles from '../../styles/components/Input.module.css';
 import modalStyles from '../../styles/modal.module.css';
-import styles from '../../components/commons/Pages/ResourcePage/ResourcePage.module.css';
 import collapsibleStyles from '../../components/commons/CollapsibleGroup/CollapsibleGroup.module.css';
 import ModalPortal from '../../components/commons/ModalPortal/ModalPortal';
 
