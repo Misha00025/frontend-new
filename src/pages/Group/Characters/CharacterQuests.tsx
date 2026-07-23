@@ -54,6 +54,7 @@ const CharacterQuests: React.FC = () => {
     if (groupId && characterId) {
       loadQuests();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId, characterId]);
 
   const loadQuests = async () => {
