@@ -10,6 +10,7 @@ import {
   computeTextShadow,
   computeProgressFrom,
   computeProgressTo,
+  isLight,
 } from '../utils/color';
 
 interface ThemeContextType {
@@ -35,6 +36,13 @@ export const PRESET_COLORS: Record<PresetTheme, CustomColors> = {
   'sunset-dark': { bgPrimary: '#1a1a1a', textPrimary: '#f0ddd0', accentColor: '#d08040', progressFrom: '#e53935', progressTo: '#43a047' },
   'lavender-dark': { bgPrimary: '#1a1a1a', textPrimary: '#ddd0f0', accentColor: '#9060c0', progressFrom: '#e53935', progressTo: '#43a047' },
 };
+
+export function getEditorColorMode(config: ThemeConfig): 'dark' | 'light' {
+  if (config.type === 'preset') {
+    return !isLight(PRESET_COLORS[config.name].bgPrimary) ? 'dark' : 'light';
+  }
+  return !isLight(config.colors.bgPrimary) ? 'dark' : 'light';
+}
 
 function applyPreset(name: PresetTheme) {
   document.documentElement.setAttribute('data-theme', name);

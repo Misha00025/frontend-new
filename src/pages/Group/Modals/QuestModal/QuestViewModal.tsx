@@ -5,7 +5,7 @@ import inputStyles from '../../../../styles/components/Input.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
 import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
 import MDEditor from '@uiw/react-md-editor';
-import { useTheme } from '../../../../contexts/ThemeContext';
+import { useTheme, getEditorColorMode } from '../../../../contexts/ThemeContext';
 import { usePlatform } from '../../../../hooks/usePlatform';
 import type {
   QuestStatus,
@@ -128,10 +128,7 @@ const QuestViewModal: React.FC<QuestViewModalProps> = ({
     }
   }, [quest?.description, descriptionExpanded]);
 
-  const themeMode =
-    themeConfig.type === 'preset' && themeConfig.name === 'dark'
-      ? 'dark'
-      : 'light';
+  const themeMode = getEditorColorMode(themeConfig);
 
   // Header handlers
   const handleStartEditHeader = () => {

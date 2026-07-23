@@ -6,7 +6,7 @@ import modalStyles from '../../../../styles/modal.module.css';
 import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
 import styles from './SkillModal.module.css';
 import MDEditor from '@uiw/react-md-editor';
-import { useTheme } from '../../../../contexts/ThemeContext';
+import { useTheme, getEditorColorMode } from '../../../../contexts/ThemeContext';
 import { generateKey } from '../../../../utils/generateKey';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
 import { CreateGroupSkillRequest, GroupSkill, SkillAttribute, SkillAttributeDefinition, UpdateGroupSkillRequest } from '../../../../types/groupSkills';
@@ -305,7 +305,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
 
           <div className={modalStyles.formGroup}>
             <label>Описание:</label>
-            <div ref={editorRef} className={styles.editorContainer} data-color-mode={themeConfig.type === 'preset' && themeConfig.name === 'dark' ? 'dark' : 'light'}>
+            <div ref={editorRef} className={styles.editorContainer} data-color-mode={getEditorColorMode(themeConfig)}>
               <MDEditor
                 value={description}
                 onChange={(value) => setDescription(value || '')}

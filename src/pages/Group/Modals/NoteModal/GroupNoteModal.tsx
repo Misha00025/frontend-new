@@ -3,7 +3,7 @@ import MDEditor from '@uiw/react-md-editor';
 import modalStyles from '../../../../styles/modal.module.css';
 import buttonStyles from '../../../../styles/components/Button.module.css';
 import inputStyles from '../../../../styles/components/Input.module.css';
-import { useTheme } from '../../../../contexts/ThemeContext';
+import { useTheme, getEditorColorMode } from '../../../../contexts/ThemeContext';
 import { GroupNote, CreateGroupNoteRequest } from '../../../../types/groupNotes';
 import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
 
@@ -116,7 +116,7 @@ const GroupNoteModal: React.FC<GroupNoteModalProps> = ({
         
         <div className={modalStyles.formGroup}>
           <label>Текст заметки (Markdown)</label>
-          <div data-color-mode={themeConfig.type === 'preset' && themeConfig.name === 'dark' ? 'dark' : 'light'}>
+          <div data-color-mode={getEditorColorMode(themeConfig)}>
             <MDEditor
               value={body}
               onChange={(val) => setBody(val || '')}

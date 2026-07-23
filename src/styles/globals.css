@@ -232,3 +232,47 @@ html, body {
   --progress-bar-from: #e53935;
   --progress-bar-to: #43a047;
 }
+
+/* === Markdown Editor - тёмная тема === */
+[data-color-mode="dark"] .w-md-editor,
+[data-color-mode="dark"] .wmde-markdown,
+[data-color-mode="dark"] .wmde-markdown-var {
+  --color-canvas-default: var(--bg-primary) !important;
+  --color-canvas-subtle: var(--bg-secondary) !important;
+  --color-border-default: var(--border-color) !important;
+  --color-border-muted: var(--border-color) !important;
+  --color-fg-default: var(--text-primary) !important;
+  --color-fg-muted: var(--text-secondary) !important;
+  --color-fg-subtle: var(--text-secondary) !important;
+  --color-neutral-muted: rgba(128, 128, 128, 0.15) !important;
+  --color-accent-fg: var(--accent-color) !important;
+  --color-accent-emphasis: var(--accent-color) !important;
+  --color-prettylights-syntax-comment: var(--text-secondary) !important;
+  --color-prettylights-syntax-constant: var(--accent-color) !important;
+  --color-prettylights-syntax-entity: var(--accent-color) !important;
+  --color-prettylights-syntax-keyword: var(--danger-color) !important;
+  --color-prettylights-syntax-string: var(--accent-color) !important;
+  --color-prettylights-syntax-variable: var(--text-primary) !important;
+  --color-prettylights-syntax-markup-heading: var(--accent-color) !important;
+  --color-prettylights-syntax-markup-bold: var(--text-primary) !important;
+  --md-editor-background-color: var(--bg-primary) !important;
+  --md-editor-box-shadow-color: var(--border-color) !important;
+}
+
+/* === Markdown Editor - светлая тема === */
+[data-color-mode="light"] .w-md-editor,
+[data-color-mode="light"] .wmde-markdown,
+[data-color-mode="light"] .wmde-markdown-var {
+  --color-canvas-default: var(--bg-primary) !important;
+  --color-canvas-subtle: var(--bg-secondary) !important;
+  --color-border-default: var(--border-color) !important;
+  --color-border-muted: var(--border-color) !important;
+  --color-fg-default: var(--text-primary) !important;
+  --color-fg-muted: var(--text-secondary) !important;
+  --color-fg-subtle: var(--text-secondary) !important;
+  --color-neutral-muted: rgba(128, 128, 128, 0.15) !important;
+  --color-accent-fg: var(--accent-color) !important;
+  --color-accent-emphasis: var(--accent-color) !important;
+  --md-editor-background-color: var(--bg-primary) !important;
+  --md-editor-box-shadow-color: var(--border-color) !important;
+}
