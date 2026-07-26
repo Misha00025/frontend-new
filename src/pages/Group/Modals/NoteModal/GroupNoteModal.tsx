@@ -87,8 +87,8 @@ const GroupNoteModal: React.FC<GroupNoteModalProps> = ({
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       <h2>{title}</h2>
-      <div className={modalStyles.modalBody}>
       <form onSubmit={handleSubmit}>
+      <div className={modalStyles.modalBody}>
         <div className={modalStyles.formGroup}>
           <label>Заголовок</label>
           <input
@@ -182,7 +182,6 @@ const GroupNoteModal: React.FC<GroupNoteModalProps> = ({
           </div>
         </div>
         
-        </form>
         </div>
         <div className={modalStyles.buttons}>
           <button
@@ -201,6 +200,7 @@ const GroupNoteModal: React.FC<GroupNoteModalProps> = ({
             {saving ? 'Сохранение...' : 'Сохранить'}
           </button>
         </div>
+        </form>
     </ModalPortal>
   );
 };

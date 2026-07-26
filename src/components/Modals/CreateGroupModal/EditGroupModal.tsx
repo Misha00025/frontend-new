@@ -103,13 +103,13 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
-      
+        
         <h2>Редактировать группу</h2>
+        <form onSubmit={handleSubmit}>
         <div className={modalStyles.modalBody}>
         
         {error && <div className={modalStyles.error}>{error}</div>}
         
-        <form onSubmit={handleSubmit}>
           {/* Секция иконки группы */}
           <div className={modalStyles.formGroup}>
             <label>Иконка группы:</label>
@@ -169,7 +169,6 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
             <div className={modalStyles.readOnlyField}>{group.id}</div>
           </div>
           
-          </form>
           </div>
           <div className={modalStyles.buttons}>
             <button 
@@ -188,6 +187,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
               {loading ? 'Сохранение...' : 'Сохранить'}
             </button>
           </div>
+          </form>
 
   </ModalPortal>
   );

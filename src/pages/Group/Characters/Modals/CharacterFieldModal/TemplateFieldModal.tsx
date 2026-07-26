@@ -119,11 +119,11 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       <h2>{title}</h2>
+      <form onSubmit={handleSubmit}>
       <div className={modalStyles.modalBody}>
       
       {error && <div className={modalStyles.error}>{error}</div>}
       
-      <form onSubmit={handleSubmit}>
 
         {(fullEditMode &&
           <>
@@ -247,7 +247,6 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
           />
         </div>}
 
-        </form>
         </div>
         <div className={modalStyles.buttons}>
           <button type="button" onClick={onClose} className={buttonStyles.button}>
@@ -257,6 +256,7 @@ const TemplateFieldModal: React.FC<TemplateFieldModalProps> = ({
             Сохранить
           </button>
         </div>
+        </form>
     </ModalPortal>
   );
 };

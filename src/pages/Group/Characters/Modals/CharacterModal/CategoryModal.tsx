@@ -41,9 +41,8 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
       <h2>{title}</h2>
-      <div className={modalStyles.modalBody}>
-      
       <form onSubmit={handleSubmit}>
+      <div className={modalStyles.modalBody}>
         <div className={modalStyles.formGroup}>
           <label>Название категории:</label>
           <input
@@ -55,7 +54,6 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
           />
         </div>
 
-        </form>
         </div>
         <div className={modalStyles.buttons}>
           <button type="button" onClick={onClose} className={buttonStyles.button}>
@@ -65,6 +63,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
             Сохранить
           </button>
         </div>
+        </form>
     </ModalPortal>
   );
 };

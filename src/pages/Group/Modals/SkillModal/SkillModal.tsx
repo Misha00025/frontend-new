@@ -285,13 +285,13 @@ const SkillModal: React.FC<SkillModalProps> = ({
 
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
-      
+        
         <h2>{title}</h2>
+        <form onSubmit={handleSubmit}>
         <div className={modalStyles.modalBody}>
         
         {error && <div className={modalStyles.error}>{error}</div>}
         
-        <form onSubmit={handleSubmit}>
           <div className={modalStyles.formGroup}>
             <label>Название:</label>
             <input
@@ -421,7 +421,6 @@ const SkillModal: React.FC<SkillModalProps> = ({
               </div>
             </div>
           </div>
-          </form>
           </div>
           <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
@@ -431,6 +430,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
               {loading ? 'Сохранение...' : 'Сохранить'}
             </button>
           </div>
+          </form>
 
   </ModalPortal>
   );

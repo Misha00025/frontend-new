@@ -49,13 +49,13 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
 
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
-      
+        
         <h2>Создать группу</h2>
+        <form onSubmit={handleSubmit}>
         <div className={modalStyles.modalBody}>
         
         {error && <div className={modalStyles.error}>{error}</div>}
         
-        <form onSubmit={handleSubmit}>
           <div className={modalStyles.formGroup}>
             <label>Название группы:</label>
             <input
@@ -87,7 +87,6 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
             />
           </div>
           
-          </form>
           </div>
           <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
@@ -97,6 +96,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ isOpen, onClose, on
               {loading ? 'Создание...' : 'Создать'}
             </button>
           </div>
+          </form>
 
   </ModalPortal>
   );

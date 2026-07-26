@@ -21,6 +21,14 @@
   flex-direction: column;
 }
 
+.modal > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .modalBody {
   flex: 1;
   overflow-y: auto;

@@ -93,13 +93,13 @@ const SchemaModal: React.FC<SchemaModalProps> = ({
 
   return (
     <ModalPortal isOpen={isOpen} onClose={onClose}>
-      
+        
         <h2>{title}</h2>
+        <form onSubmit={handleSubmit}>
         <div className={modalStyles.modalBody}>
         
         {error && <div className={modalStyles.error}>{error}</div>}
         
-        <form onSubmit={handleSubmit}>
           <div className={styles.schemaSection}>
             <div className={styles.schemaHeader}>
               <h3>Иерархия группировки</h3>
@@ -192,7 +192,6 @@ const SchemaModal: React.FC<SchemaModalProps> = ({
             </div>
           </div>
 
-          </form>
           </div>
           <div className={modalStyles.buttons}>
             <button type="button" onClick={onClose} className={buttonStyles.button}>
@@ -202,6 +201,7 @@ const SchemaModal: React.FC<SchemaModalProps> = ({
               {loading ? 'Сохранение...' : 'Сохранить схему'}
             </button>
           </div>
+          </form>
 
   </ModalPortal>
   );
