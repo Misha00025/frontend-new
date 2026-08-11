@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Character as CharacterData } from '../../../../types/characters';
-import { charactersAPI, characterTemplatesAPI, groupAPI } from '../../../../services/api';
+import { charactersAPI, characterTemplatesAPI, groupAPI, characterCommandsAPI } from '../../../../services/api';
 import commonStyles from '../../../../styles/common.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
 import uiStyles from './Character.module.css';
@@ -62,36 +62,41 @@ const Character: React.FC = () => {
     if (!character) return;
 
     try {
-      const field = character.fields[fieldKey];
-      const updatedField = {
-        ...field,
-        value: Number(newValue)
-      };
-
-      const updateData: any = {
-        fields: {
-          [fieldKey]: updatedField
-        }
-      };
-
-      const updatedCharacter = await charactersAPI.updateCharacter(
-        parseInt(groupId!), 
-        parseInt(characterId!), 
-        updateData
-      );
-      setCharacter(updatedCharacter);
+      if (character.fields[fieldKey]) {
+        const result = await characterCommandsAPI.executeCommand(
+          Number(groupId),
+          Number(characterId),
+          {
+            type: 'UpdateField',
+            payload: { key: fieldKey, field: { ...character.fields[fieldKey], value: Number(newValue) } }
+          }
+        );
+        setCharacter(result);
+      } else {
+        const result = await characterCommandsAPI.executeCommand(
+          Number(groupId),
+          Number(characterId),
+          {
+            type: 'AddField',
+            payload: { key: fieldKey, field: { value: Number(newValue) } }
+          }
+        );
+        setCharacter(result);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update field value');
     }
   };
 
   const handleDeleteField = async (fieldKey: string) => {
-    const fields = { [fieldKey] : null }
-    try{
-      const updatedCharacter = await charactersAPI.updateCharacter(Number(groupId), Number(characterId), {fields: fields});
-      setCharacter(updatedCharacter)
-    }
-    catch(err){
+    try {
+      const result = await characterCommandsAPI.executeCommand(
+        Number(groupId),
+        Number(characterId),
+        { type: 'DeleteField', payload: { key: fieldKey } }
+      );
+      setCharacter(result);
+    } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete field');
     }
   }
@@ -113,13 +118,25 @@ const Character: React.FC = () => {
   };
 
   const handleSaveField = async (field: TemplateField, fieldKey: string) => {
-    const fields = { [fieldKey] : field }
-    try{
-      const updatedCharacter = await charactersAPI.updateCharacter(Number(groupId), Number(characterId), {fields: fields});
-      setCharacter(updatedCharacter)
-    }
-    catch(err){
-      setError(err instanceof Error ? err.message : 'Failed to delete field');
+    if (!character) return;
+    try {
+      if (character.fields[fieldKey]) {
+        const result = await characterCommandsAPI.executeCommand(
+          Number(groupId),
+          Number(characterId),
+          { type: 'UpdateField', payload: { key: fieldKey, field } }
+        );
+        setCharacter(result);
+      } else {
+        const result = await characterCommandsAPI.executeCommand(
+          Number(groupId),
+          Number(characterId),
+          { type: 'AddField', payload: { key: fieldKey, field } }
+        );
+        setCharacter(result);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save field');
     }
     
     setIsFieldModalOpen(false);

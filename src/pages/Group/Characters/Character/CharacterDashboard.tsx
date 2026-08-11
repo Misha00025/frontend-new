@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Character, CharacterField } from '../../../../types/characters';
 import { CharacterItem } from '../../../../types/characterItems';
 import { CharacterSkill } from '../../../../types/characterSkills';
-import { charactersAPI, characterItemsAPI, characterSkillsAPI } from '../../../../services/api';
+import { charactersAPI, characterCommandsAPI, characterItemsAPI, characterSkillsAPI } from '../../../../services/api';
 import commonStyles from '../../../../styles/common.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
 import buttonStyles from '../../../../styles/components/Button.module.css';
@@ -54,12 +54,14 @@ const CharacterDashboard: React.FC = () => {
     if (!character) return;
     try {
       const field = character.fields[fieldKey];
-      const updatedField: CharacterField = { ...field, value: Number(newValue) };
-      const updatedCharacter = await charactersAPI.updateCharacter(
+      const result = await characterCommandsAPI.executeCommand(
         Number(groupId), Number(characterId),
-        { fields: { [fieldKey]: updatedField } }
+        {
+          type: 'UpdateField',
+          payload: { key: fieldKey, field: { ...field, value: Number(newValue) } },
+        }
       );
-      setCharacter(updatedCharacter);
+      setCharacter(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update field');
     }
