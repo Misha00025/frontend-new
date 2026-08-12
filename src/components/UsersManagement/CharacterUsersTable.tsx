@@ -5,6 +5,7 @@ import { CharacterUser } from '../../types/characterUsers';
 import { User } from '../../types/groupUsers';
 import { charactersAPI, characterUsersAPI } from '../../services/api';
 import { useUserManagement } from '../../hooks/useUserManagement';
+import { useGroupUsers } from '../../contexts/GroupUsersContext';
 import UsersList from './UsersList';
 import buttonStyles from '../../styles/components/Button.module.css';
 import styles from './CharacterUsersTable.module.css';
@@ -26,6 +27,7 @@ const CharacterUsersTable: React.FC<CharacterUsersTableProps> = ({
   const [selectedUserIds, setSelectedUserIds] = useState<{[characterId: number]: number}>({});
   const [permissions, setPermissions] = useState<{[characterId: number]: boolean}>({});
   const { loading, error, success, executeOperation } = useUserManagement();
+  const { refreshCharacterUsers } = useGroupUsers();
 
   useEffect(() => {
     loadCharacters();
@@ -62,7 +64,10 @@ const CharacterUsersTable: React.FC<CharacterUsersTableProps> = ({
       () => characterUsersAPI.addUserToCharacter(groupId, characterId, userId, canWrite),
       `Игрок ${user.nickname} успешно добавлен персонажу`
     );
-    
+
+    // Обновляем общий контекст GroupUsersContext
+    await refreshCharacterUsers(characterId);
+
     // Обновляем данные
     const updatedUsers = await characterUsersAPI.getCharacterUsers(groupId, characterId);
     setCharacterUsers(prev => ({
@@ -81,6 +86,9 @@ const CharacterUsersTable: React.FC<CharacterUsersTableProps> = ({
       () => characterUsersAPI.removeUserFromCharacter(groupId, characterId, userId),
       'Игрок успешно удалён'
     );
+
+    // Обновляем общий контекст GroupUsersContext
+    await refreshCharacterUsers(characterId);
     
     // Обновляем данные
     const updatedUsers = await characterUsersAPI.getCharacterUsers(groupId, characterId);

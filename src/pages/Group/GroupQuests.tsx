@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupQuest } from '../../types/groupQuests';
-import { groupQuestsAPI, charactersAPI, groupUsersAPI, characterUsersAPI } from '../../services/api';
+import { groupQuestsAPI, charactersAPI } from '../../services/api';
 import { User } from '../../types/groupUsers';
+import { useGroupUsers } from '../../contexts/GroupUsersContext';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import List from '../../components/List/List';
 import SearchBar from '../../components/commons/Search/SearchBar';
@@ -47,9 +48,26 @@ const GroupQuests: React.FC = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [characters, setCharacters] = useState<Array<{ id: number; name: string }>>([]);
-  const [groupUsersMap, setGroupUsersMap] = useState<Map<number, User>>(new Map());
-  const [charUserMap, setCharUserMap] = useState<Map<number, number[]>>(new Map());
+  const { groupUsers, characterUsers, ensureCharacterUsers } = useGroupUsers();
   const { canCreateQuests, canEditQuests, canDeleteQuests } = useActionPermissions();
+
+  const groupUsersMap = useMemo(() => new Map(groupUsers.map(gu => [gu.user.id, gu.user])), [groupUsers]);
+
+  const allQuestCharIds = useMemo(() => Array.from(new Set(quests.flatMap(q => q.assignedCharacters))), [quests]);
+
+  const charUserMap = useMemo(() => {
+    const m = new Map<number, number[]>();
+    allQuestCharIds.forEach(cid => {
+      const users = characterUsers[cid];
+      if (users) m.set(cid, users.map(u => u.user.id));
+    });
+    return m;
+  }, [allQuestCharIds, characterUsers]);
+
+  useEffect(() => {
+    allQuestCharIds.forEach(ensureCharacterUsers);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allQuestCharIds]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [newQuestHeader, setNewQuestHeader] = useState('');
   const [creating, setCreating] = useState(false);
@@ -66,7 +84,6 @@ const GroupQuests: React.FC = () => {
       setLoading(true);
       const questsData = await groupQuestsAPI.getQuests(parseInt(groupId!));
       setQuests(questsData);
-      loadUserInfo(questsData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load quests');
     } finally {
@@ -80,33 +97,6 @@ const GroupQuests: React.FC = () => {
       setCharacters(chars.filter(c => c.name !== null).map(c => ({ id: c.id, name: c.name! })));
     } catch (err) {
       console.error('Failed to load characters for quest modal:', err);
-    }
-  };
-
-  const loadUserInfo = async (questsData: GroupQuest[]) => {
-    try {
-      const groupUsers = await groupUsersAPI.getGroupUsers(parseInt(groupId!));
-      const userMap = new Map(groupUsers.map(gu => [gu.user.id, gu.user]));
-      setGroupUsersMap(userMap);
-
-      const allCharIds = Array.from(new Set(questsData.flatMap(q => q.assignedCharacters)));
-      if (allCharIds.length === 0) {
-        return;
-      }
-
-      const charMap = new Map<number, number[]>();
-      await Promise.all(allCharIds.map(async (charId) => {
-        try {
-          const users = await characterUsersAPI.getCharacterUsers(parseInt(groupId!), charId);
-          charMap.set(charId, users.map(u => u.user.id));
-        } catch (err) {
-          console.error(`Failed to load users for character ${charId}:`, err);
-        }
-      }));
-
-      setCharUserMap(charMap);
-    } catch (err) {
-      console.error('Failed to load user info:', err);
     }
   };
 

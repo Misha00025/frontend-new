@@ -27,6 +27,7 @@ import GroupNotes from './pages/Group/GroupNotes';
 import GroupQuests from './pages/Group/GroupQuests';
 import Profile from './pages/Profile';
 import './styles/globals.css';
+import { GroupUsersProvider } from './contexts/GroupUsersContext';
 import { PermissionsProvider } from './contexts/PermissionsContext';
 import { SidebarProvider } from './contexts/SidebarContext';
 import GroupSkills from './pages/Group/GroupSkills';
@@ -124,11 +125,13 @@ const App: React.FC = () => {
         <GroupProvider>
           <VisitedProvider>
           <Router>
-            <PermissionsProvider>
-              <SidebarProvider>
-                <AppContent />
-              </SidebarProvider>
-            </PermissionsProvider>
+            <GroupUsersProvider>
+              <PermissionsProvider>
+                <SidebarProvider>
+                  <AppContent />
+                </SidebarProvider>
+              </PermissionsProvider>
+            </GroupUsersProvider>
           </Router>
           </VisitedProvider>
         </GroupProvider>

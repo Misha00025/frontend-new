@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { useLocation } from 'react-router-dom';
-import { groupUsersAPI } from '../services/api';
-import { characterUsersAPI } from '../services/api';
+import { getGroupAndCharacterIds } from '../utils/getGroupAndCharacterIds';
+import { useGroupUsers } from './GroupUsersContext';
 
 interface PermissionsContextType {
   isGroupAdmin: boolean;
@@ -15,62 +15,36 @@ const PermissionsContext = createContext<PermissionsContextType | undefined>(und
 
 export const PermissionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { accessToken } = useAuth();
-  const [isGroupAdmin, setIsGroupAdmin] = useState(false);
-  const [canEditCharacter, setCanEditCharacter] = useState(false);
-  const [canDeleteCharacter, setCanDeleteCharacter] = useState(false);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const { groupId, characterId } = getGroupAndCharacterIds(location.pathname);
+  const { groupUsers, characterUsers, groupUsersLoading, ensureGroupUsers, ensureCharacterUsers } = useGroupUsers();
+
+  const currentUserId = parseInt(localStorage.getItem('userId') || '0');
+  const isGroupAdmin = groupUsers.some(u => u.user.id === currentUserId && u.isAdmin);
+  const charUsers = characterId ? characterUsers[characterId] : undefined;
+  const currentCharUser = charUsers?.find(u => u.user.id === currentUserId);
+  const canEditCharacter = currentCharUser?.canWrite ?? false;
+  const canDeleteCharacter = isGroupAdmin;
 
   useEffect(() => {
-    const checkPermissions = async () => {
+    if (!accessToken || !groupId) {
+      setLoading(false);
+    } else if (groupUsers.length > 0 || !groupUsersLoading) {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken, groupId, groupUsers, groupUsersLoading]);
 
-      const pathParts = location.pathname.split('/').filter(part => part !== '');
-      let groupIdStr: string | undefined;
-      let characterIdStr: string | undefined;
-      
-      // Ищем groupId и characterId в пути
-      const groupIndex = pathParts.indexOf('group');
-      if (groupIndex !== -1 && pathParts.length > groupIndex + 1) {
-        groupIdStr = pathParts[groupIndex + 1];
-        
-        // Проверяем, есть ли characterId
-        const characterIndex = pathParts.indexOf('character');
-        if (characterIndex !== -1 && pathParts.length > characterIndex + 1) {
-          characterIdStr = pathParts[characterIndex + 1];
-        }
-      }
-      if (!accessToken || !groupIdStr) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const groupId = parseInt(groupIdStr);
-        
-        // Проверяем права администратора группы
-        const groupUsers = await groupUsersAPI.getGroupUsers(groupId);
-        
-        const currentUser = groupUsers.find(user => user.user.id.toString() === localStorage.getItem('userId'));
-        setIsGroupAdmin(currentUser?.isAdmin || false);
-
-        // Если есть characterId, проверяем права на редактирование персонажа
-        if (characterIdStr) {
-          const characterId = parseInt(characterIdStr);
-          const characterUsers = await characterUsersAPI.getCharacterUsers(groupId, characterId);
-          const currentCharacterUser = characterUsers.find(user => user.user.id === parseInt(localStorage.getItem('userId') || '0'));
-          
-          setCanEditCharacter(currentCharacterUser?.canWrite || false);
-          setCanDeleteCharacter(currentUser?.isAdmin || false); // Только администраторы могут удалять персонажей
-        }
-      } catch (error) {
-        console.error('Error checking permissions:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkPermissions();
-  }, [accessToken, location]);
+  useEffect(() => {
+    if (accessToken && groupId) {
+      ensureGroupUsers();
+    }
+    if (accessToken && characterId) {
+      ensureCharacterUsers(characterId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken, groupId, characterId]);
 
   return (
     <PermissionsContext.Provider value={{

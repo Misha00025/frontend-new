@@ -1,8 +1,8 @@
 // GroupUsers.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { GroupUser, User } from '../../types/groupUsers';
 import { groupUsersAPI } from '../../services/api';
+import { useGroupUsers } from '../../contexts/GroupUsersContext';
 import styles from '../../styles/common.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import UserSearch from '../../components/UsersManagement/UserSearch';
@@ -12,26 +12,22 @@ import CharacterUsersTable from '../../components/UsersManagement/CharacterUsers
 
 const GroupUsers: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
-  const [groupUsers, setGroupUsers] = useState<GroupUser[]>([]);
+  const { groupUsers, ensureGroupUsers, invalidateGroupUsers } = useGroupUsers();
   const { canManageGroupUsers } = useActionPermissions();
   const { loading, error, success, executeOperation } = useUserManagement();
 
   useEffect(() => {
     if (groupId) {
-      loadGroupUsers();
+      ensureGroupUsers();
     }
   }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const loadGroupUsers = async () => {
-    const users = await groupUsersAPI.getGroupUsers(parseInt(groupId!));
-    setGroupUsers(users);
-  };
-
-  const handleAddUser = async (user: User, isAdmin: boolean) => {
+  const handleAddUser = async (user: import('../../types/groupUsers').User, isAdmin: boolean) => {
     await executeOperation(
       () => groupUsersAPI.addUserToGroup(parseInt(groupId!), user.id, isAdmin),
       `Пользователь ${user.nickname} успешно добавлен в группу`
     );
+    invalidateGroupUsers();
   };
 
   const handleRemoveUser = async (userId: number) => {
@@ -39,6 +35,7 @@ const GroupUsers: React.FC = () => {
       () => groupUsersAPI.removeUserFromGroup(parseInt(groupId!), userId),
       `Пользователь успешно удален из группы`
     );
+    invalidateGroupUsers();
   };
 
   if (loading) return <div className={styles.container}>Загрузка...</div>;

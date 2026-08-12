@@ -7,17 +7,25 @@ jest.mock('./AuthContext', () => ({
   useAuth: jest.fn(),
 }));
 
-jest.mock('../services/api', () => ({
-  groupUsersAPI: {
-    getGroupUsers: jest.fn(),
-  },
-  characterUsersAPI: {
-    getCharacterUsers: jest.fn(),
-  },
+jest.mock('./GroupUsersContext', () => ({
+  useGroupUsers: jest.fn(),
 }));
 
 import { useAuth } from './AuthContext';
-import { groupUsersAPI, characterUsersAPI } from '../services/api';
+import { useGroupUsers } from './GroupUsersContext';
+
+const defaultMock = {
+  groupUsers: [],
+  groupUsersLoading: false,
+  characterUsers: {} as Record<number, any[]>,
+  ensureGroupUsers: jest.fn(),
+  ensureCharacterUsers: jest.fn(),
+  refreshGroupUsers: jest.fn(),
+  refreshCharacterUsers: jest.fn(),
+  invalidateGroupUsers: jest.fn(),
+  invalidateCharacterUsers: jest.fn(),
+  error: null,
+};
 
 const TestConsumer: React.FC = () => {
   const { isGroupAdmin, canEditCharacter, canDeleteCharacter, loading } = usePermissions();
@@ -31,14 +39,24 @@ const TestConsumer: React.FC = () => {
   );
 };
 
-const renderAtPath = (path: string) =>
-  render(
+const renderAtPath = (
+  path: string,
+  groupUsers: any[] = [],
+  characterUsers: Record<number, any[]> = {}
+) => {
+  (useGroupUsers as jest.Mock).mockReturnValue({
+    ...defaultMock,
+    groupUsers,
+    characterUsers,
+  });
+  return render(
     <MemoryRouter initialEntries={[path]}>
       <PermissionsProvider>
         <TestConsumer />
       </PermissionsProvider>
     </MemoryRouter>
   );
+};
 
 describe('PermissionsContext', () => {
   beforeEach(() => {
@@ -46,14 +64,13 @@ describe('PermissionsContext', () => {
     localStorage.clear();
     (useAuth as jest.Mock).mockReturnValue({ accessToken: 'token' });
     localStorage.setItem('userId', '1');
+    (useGroupUsers as jest.Mock).mockReturnValue(defaultMock);
   });
 
   it('устанавливает isGroupAdmin когда пользователь admin группы', async () => {
-    (groupUsersAPI.getGroupUsers as jest.Mock).mockResolvedValue([
+    renderAtPath('/group/5', [
       { user: { id: 1, nickname: 'me' }, isAdmin: true },
     ]);
-
-    renderAtPath('/group/5');
 
     await waitFor(() => {
       expect(screen.getByTestId('isGroupAdmin').textContent).toBe('true');
@@ -61,11 +78,9 @@ describe('PermissionsContext', () => {
   });
 
   it('isGroupAdmin=false когда пользователь не admin', async () => {
-    (groupUsersAPI.getGroupUsers as jest.Mock).mockResolvedValue([
+    renderAtPath('/group/5', [
       { user: { id: 1, nickname: 'me' }, isAdmin: false },
     ]);
-
-    renderAtPath('/group/5');
 
     await waitFor(() => {
       expect(screen.getByTestId('isGroupAdmin').textContent).toBe('false');
@@ -73,14 +88,11 @@ describe('PermissionsContext', () => {
   });
 
   it('устанавливает canEditCharacter когда пользователь canWrite', async () => {
-    (groupUsersAPI.getGroupUsers as jest.Mock).mockResolvedValue([
-      { user: { id: 1, nickname: 'me' }, isAdmin: false },
-    ]);
-    (characterUsersAPI.getCharacterUsers as jest.Mock).mockResolvedValue([
-      { user: { id: 1 }, canWrite: true },
-    ]);
-
-    renderAtPath('/group/5/character/10');
+    renderAtPath(
+      '/group/5/character/10',
+      [{ user: { id: 1, nickname: 'me' }, isAdmin: false }],
+      { 10: [{ user: { id: 1 }, canWrite: true }] }
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId('canEditCharacter').textContent).toBe('true');
@@ -88,14 +100,11 @@ describe('PermissionsContext', () => {
   });
 
   it('canEditCharacter=false когда canWrite=false', async () => {
-    (groupUsersAPI.getGroupUsers as jest.Mock).mockResolvedValue([
-      { user: { id: 1, nickname: 'me' }, isAdmin: false },
-    ]);
-    (characterUsersAPI.getCharacterUsers as jest.Mock).mockResolvedValue([
-      { user: { id: 1 }, canWrite: false },
-    ]);
-
-    renderAtPath('/group/5/character/10');
+    renderAtPath(
+      '/group/5/character/10',
+      [{ user: { id: 1, nickname: 'me' }, isAdmin: false }],
+      { 10: [{ user: { id: 1 }, canWrite: false }] }
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId('canEditCharacter').textContent).toBe('false');
@@ -103,14 +112,11 @@ describe('PermissionsContext', () => {
   });
 
   it('canDeleteCharacter=true когда пользователь admin группы', async () => {
-    (groupUsersAPI.getGroupUsers as jest.Mock).mockResolvedValue([
-      { user: { id: 1, nickname: 'me' }, isAdmin: true },
-    ]);
-    (characterUsersAPI.getCharacterUsers as jest.Mock).mockResolvedValue([
-      { user: { id: 1 }, canWrite: true },
-    ]);
-
-    renderAtPath('/group/5/character/10');
+    renderAtPath(
+      '/group/5/character/10',
+      [{ user: { id: 1, nickname: 'me' }, isAdmin: true }],
+      { 10: [{ user: { id: 1 }, canWrite: true }] }
+    );
 
     await waitFor(() => {
       expect(screen.getByTestId('canDeleteCharacter').textContent).toBe('true');
@@ -124,7 +130,7 @@ describe('PermissionsContext', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('isGroupAdmin').textContent).toBe('false');
-      expect(screen.getByTestId('canEditCharacter').textContent).toBe('false');
+      expect(screen.getByTestId('canDeleteCharacter').textContent).toBe('false');
     });
   });
 
@@ -136,10 +142,8 @@ describe('PermissionsContext', () => {
     });
   });
 
-  it('при ошибке API права сбрасываются в false', async () => {
-    (groupUsersAPI.getGroupUsers as jest.Mock).mockRejectedValue(new Error('API error'));
-
-    renderAtPath('/group/5');
+  it('при пустых данных права false', async () => {
+    renderAtPath('/group/5', [], {});
 
     await waitFor(() => {
       expect(screen.getByTestId('isGroupAdmin').textContent).toBe('false');
