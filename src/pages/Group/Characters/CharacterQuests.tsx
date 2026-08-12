@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupQuest } from '../../../types/groupQuests';
 import { groupQuestsAPI, characterQuestsAPI } from '../../../services/api';
+import { useCharacter } from '../../../contexts/CharacterContext';
 import { useActionPermissions } from '../../../hooks/useActionPermissions';
 import List from '../../../components/List/List';
 import SearchBar from '../../../components/commons/Search/SearchBar';
 import QuestCard from '../Cards/QuestCard/QuestCard';
 import QuestViewModal from '../Modals/QuestModal/QuestViewModal';
-import commonStyles from '../../../styles/common.module.css';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import inputStyles from '../../../styles/components/Input.module.css';
 import modalStyles from '../../../styles/modal.module.css';
@@ -39,8 +39,7 @@ const CollapsibleSection: React.FC<{
 
 const CharacterQuests: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const [quests, setQuests] = useState<GroupQuest[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { quests, setQuests } = useCharacter();
   const [error, setError] = useState<string | null>(null);
   const [viewingQuest, setViewingQuest] = useState<GroupQuest | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -49,22 +48,13 @@ const CharacterQuests: React.FC = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [newQuestHeader, setNewQuestHeader] = useState('');
   const [creating, setCreating] = useState(false);
-  useEffect(() => {
-    if (groupId && characterId) {
-      loadQuests();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupId, characterId]);
 
-  const loadQuests = async () => {
+  const refreshQuests = async () => {
     try {
-      setLoading(true);
-      const questsData = await characterQuestsAPI.getCharacterQuests(parseInt(groupId!), parseInt(characterId!));
-      setQuests(questsData);
+      const fresh = await characterQuestsAPI.getCharacterQuests(parseInt(groupId!), parseInt(characterId!));
+      setQuests(fresh);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load quests');
-    } finally {
-      setLoading(false);
+      setError(err instanceof Error ? err.message : 'Failed to refresh quests');
     }
   };
 
@@ -96,7 +86,7 @@ const CharacterQuests: React.FC = () => {
       });
       setCreateModalOpen(false);
       setNewQuestHeader('');
-      loadQuests();
+      await refreshQuests();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create quest');
     } finally {
@@ -104,10 +94,8 @@ const CharacterQuests: React.FC = () => {
     }
   };
 
-  if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
-
   return (
-    <div className={commonStyles.container}>
+    <div>
 
       {error && <div style={{ color: 'var(--danger-color)', marginBottom: '1rem' }}>{error}</div>}
 
@@ -134,7 +122,7 @@ const CharacterQuests: React.FC = () => {
         const cancelledQuests = filteredQuests.filter(q => q.status === 'cancelled');
         const hasAny = activeQuests.length > 0 || completedQuests.length > 0 || failedQuests.length > 0 || cancelledQuests.length > 0;
 
-        if (!hasAny && !loading) {
+        if (!hasAny) {
           return (
             <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
               <p>{searchTerm ? `По запросу "${searchTerm}" ничего не найдено` : 'Нет квестов'}</p>
@@ -318,7 +306,7 @@ const CharacterQuests: React.FC = () => {
               await groupQuestsAPI.deleteQuest(parseInt(groupId!), viewingQuest.id);
               setIsViewModalOpen(false);
               setViewingQuest(null);
-              loadQuests();
+              await refreshQuests();
             } catch (err) {
               setError(err instanceof Error ? err.message : 'Failed to delete quest');
             }

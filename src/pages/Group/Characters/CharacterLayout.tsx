@@ -1,49 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Outlet } from 'react-router-dom';
 import { usePlatform } from '../../../hooks/usePlatform';
-import { charactersAPI, groupAPI } from '../../../services/api';
-import { Character } from '../../../types/characters';
+import { groupAPI } from '../../../services/api';
 import { Group } from '../../../types/group';
 import PageLayout from '../../../components/commons/PageLayout/PageLayout';
 import PageHeader from '../../../components/commons/PageLayout/PageHeader';
-import ActionLogSidebar from '../../../components/commons/ActionLogSidebar/ActionLogSidebar';
 import { TabItem } from '../../../components/commons/PageLayout/TabBar';
 import { useVisited } from '../../../contexts/VisitedContext';
 import { useDashboardSettings } from '../../../hooks/useDashboardSettings';
 import { DashboardSettingsProvider, DashboardSettingsContextType } from '../../../contexts/DashboardSettingsContext';
+import { CharacterProvider, useCharacter } from '../../../contexts/CharacterContext';
 
-const CharacterLayout: React.FC = () => {
-  const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
+interface CharacterLayoutContentProps {
+  group: Group | null;
+  dashboardSettings: DashboardSettingsContextType;
+}
+
+const CharacterLayoutContent: React.FC<CharacterLayoutContentProps> = ({ group, dashboardSettings }) => {
+  const { character, loading, error } = useCharacter();
   const isMobile = usePlatform();
-
-  const [character, setCharacter] = useState<Character | null>(null);
-  const [group, setGroup] = useState<Group | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { visitCharacter } = useVisited();
-
-  useEffect(() => {
-    if (!groupId || !characterId) return;
-    
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const [charData, groupData] = await Promise.all([
-          charactersAPI.getCharacter(Number(groupId), Number(characterId)),
-          groupAPI.getGroup(Number(groupId)),
-        ]);
-        setCharacter(charData);
-        setGroup(groupData);
-        visitCharacter(Number(groupId), Number(characterId));
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load character');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupId, characterId]);
+  const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
 
   const characterTabs: TabItem[] = [
     { id: 'resources', label: 'Главная', path: 'resources' },
@@ -54,14 +30,11 @@ const CharacterLayout: React.FC = () => {
     // { id: 'notes', label: 'Заметки', path: 'notes' },
   ];
 
-  const dashboardSettings = useDashboardSettings(Number(groupId), Number(characterId));
-
-  if (loading) return <div>Загрузка...</div>;
+  if (loading || !group) return <div>Загрузка...</div>;
   if (error) return <div>Ошибка: {error}</div>;
-  if (!character || !group) return <div>Персонаж не найден</div>;
+  if (!character) return <div>Персонаж не найден</div>;
 
   return (
-    <>
     <PageLayout
       breadcrumbs={[
         { label: 'Главная', path: '/dashboard' },
@@ -83,8 +56,31 @@ const CharacterLayout: React.FC = () => {
         <Outlet />
       </DashboardSettingsProvider>
     </PageLayout>
-    <ActionLogSidebar groupId={Number(groupId)} characterId={Number(characterId)} />
-    </>
+  );
+};
+
+const CharacterLayout: React.FC = () => {
+  const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
+  const [group, setGroup] = useState<Group | null>(null);
+  const { visitCharacter } = useVisited();
+
+  useEffect(() => {
+    if (!groupId) return;
+    groupAPI.getGroup(Number(groupId)).then(setGroup).catch(() => setGroup(null));
+  }, [groupId]);
+
+  useEffect(() => {
+    if (!groupId || !characterId) return;
+    visitCharacter(Number(groupId), Number(characterId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupId, characterId]);
+
+  const dashboardSettings = useDashboardSettings(Number(groupId), Number(characterId));
+
+  return (
+    <CharacterProvider groupId={Number(groupId)} characterId={Number(characterId)}>
+      <CharacterLayoutContent group={group} dashboardSettings={dashboardSettings} />
+    </CharacterProvider>
   );
 };
 
