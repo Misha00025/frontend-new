@@ -2,7 +2,6 @@ import React, {
   createContext,
   useContext,
   useState,
-  useEffect,
   useCallback,
   useMemo,
 } from 'react';
@@ -28,11 +27,19 @@ export interface CharacterContextType {
   items: CharacterItem[];
   skills: GroupSkill[];
   quests: GroupQuest[];
-  loading: boolean;
+  characterLoading: boolean;
+  templateLoading: boolean;
+  itemsLoading: boolean;
+  skillsLoading: boolean;
+  questsLoading: boolean;
   error: string | null;
-  refetch: () => void;
-  setCharacter: (c: Character | null) => void;
-  setTemplate: (t: CharacterTemplate | null) => void;
+  refreshCharacter: () => Promise<void>;
+  refreshTemplate: () => Promise<void>;
+  refreshItems: () => Promise<void>;
+  refreshSkills: () => Promise<void>;
+  refreshQuests: () => Promise<void>;
+  setCharacter: React.Dispatch<React.SetStateAction<Character | null>>;
+  setTemplate: React.Dispatch<React.SetStateAction<CharacterTemplate | null>>;
   setItems: React.Dispatch<React.SetStateAction<CharacterItem[]>>;
   setSkills: React.Dispatch<React.SetStateAction<GroupSkill[]>>;
   setQuests: React.Dispatch<React.SetStateAction<GroupQuest[]>>;
@@ -59,65 +66,80 @@ const CharacterProvider: React.FC<CharacterProviderProps> = ({
   const [items, setItems] = useState<CharacterItem[]>([]);
   const [skills, setSkills] = useState<GroupSkill[]>([]);
   const [quests, setQuests] = useState<GroupQuest[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [characterLoading, setCharacterLoading] = useState(false);
+  const [templateLoading, setTemplateLoading] = useState(false);
+  const [itemsLoading, setItemsLoading] = useState(false);
+  const [skillsLoading, setSkillsLoading] = useState(false);
+  const [questsLoading, setQuestsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const refetch = useCallback(async () => {
-    let cancelled = false;
-
-    const setLoading_local = (v: boolean) => {
-      if (!cancelled) setLoading(v);
-    };
-    const setError_local = (v: string | null) => {
-      if (!cancelled) setError(v);
-    };
-
-    setLoading_local(true);
-    setError_local(null);
-
+  const refreshCharacter = useCallback(async () => {
+    setCharacterLoading(true);
     try {
       const charData = await charactersAPI.getCharacter(groupId, characterId);
-      if (cancelled) return;
-
       setCharacter(charData);
-
-      if (charData.templateId) {
-        const [template, templateSchema] = await Promise.all([
-          characterTemplatesAPI.getTemplate(groupId, charData.templateId),
-          groupAPI.getTemplateSchema(groupId),
-        ]);
-        if (cancelled) return;
-        setTemplate(template);
-        setTemplateSchema(templateSchema);
-      } else {
-        setTemplate(null);
-        setTemplateSchema(null);
-      }
-
-      const [items, skills, quests] = await Promise.all([
-        characterItemsAPI.getCharacterItems(groupId, characterId),
-        characterSkillsAPI.getCharacterSkills(groupId, characterId),
-        characterQuestsAPI.getCharacterQuests(groupId, characterId),
-      ]);
-      if (cancelled) return;
-
-      setItems(items);
-      setSkills(skills);
-      setQuests(quests);
-    } catch (err: unknown) {
-      if (cancelled) return;
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      setError_local(message);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load character');
     } finally {
-      if (cancelled) return;
-      setLoading_local(false);
+      setCharacterLoading(false);
     }
   }, [groupId, characterId]);
 
-  useEffect(() => {
-    refetch();
-    return () => {};
-  }, [refetch]);
+  const refreshTemplate = useCallback(async () => {
+    setTemplateLoading(true);
+    try {
+      const [templateData, schemaData] = await Promise.all([
+        characterTemplatesAPI.getTemplate(
+          groupId,
+          character?.templateId ?? 0,
+        ),
+        groupAPI.getTemplateSchema(groupId),
+      ]);
+      setTemplate(templateData);
+      setTemplateSchema(schemaData);
+    } catch (err) {
+      console.error('Failed to load template:', err);
+    } finally {
+      setTemplateLoading(false);
+    }
+  }, [groupId, character?.templateId]);
+
+  const refreshItems = useCallback(async () => {
+    setItemsLoading(true);
+    try {
+      const data = await characterItemsAPI.getCharacterItems(groupId, characterId);
+      setItems(data);
+    } catch (err) {
+      console.error('Failed to load items:', err);
+    } finally {
+      setItemsLoading(false);
+    }
+  }, [groupId, characterId]);
+
+  const refreshSkills = useCallback(async () => {
+    setSkillsLoading(true);
+    try {
+      const data = await characterSkillsAPI.getCharacterSkills(groupId, characterId);
+      setSkills(data);
+    } catch (err) {
+      console.error('Failed to load skills:', err);
+    } finally {
+      setSkillsLoading(false);
+    }
+  }, [groupId, characterId]);
+
+  const refreshQuests = useCallback(async () => {
+    setQuestsLoading(true);
+    try {
+      const data = await characterQuestsAPI.getCharacterQuests(groupId, characterId);
+      setQuests(data);
+    } catch (err) {
+      console.error('Failed to load quests:', err);
+    } finally {
+      setQuestsLoading(false);
+    }
+  }, [groupId, characterId]);
 
   const value = useMemo(
     () => ({
@@ -127,9 +149,17 @@ const CharacterProvider: React.FC<CharacterProviderProps> = ({
       items,
       skills,
       quests,
-      loading,
+      characterLoading,
+      templateLoading,
+      itemsLoading,
+      skillsLoading,
+      questsLoading,
       error,
-      refetch,
+      refreshCharacter,
+      refreshTemplate,
+      refreshItems,
+      refreshSkills,
+      refreshQuests,
       setCharacter,
       setTemplate,
       setItems,
@@ -143,9 +173,22 @@ const CharacterProvider: React.FC<CharacterProviderProps> = ({
       items,
       skills,
       quests,
-      loading,
+      characterLoading,
+      templateLoading,
+      itemsLoading,
+      skillsLoading,
+      questsLoading,
       error,
-      refetch,
+      refreshCharacter,
+      refreshTemplate,
+      refreshItems,
+      refreshSkills,
+      refreshQuests,
+      setCharacter,
+      setTemplate,
+      setItems,
+      setSkills,
+      setQuests,
     ],
   );
 

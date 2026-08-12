@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupQuest } from '../../../types/groupQuests';
 import { groupQuestsAPI, characterQuestsAPI } from '../../../services/api';
@@ -39,7 +39,7 @@ const CollapsibleSection: React.FC<{
 
 const CharacterQuests: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const { quests, setQuests } = useCharacter();
+  const { quests, setQuests, refreshQuests, questsLoading } = useCharacter();
   const [error, setError] = useState<string | null>(null);
   const [viewingQuest, setViewingQuest] = useState<GroupQuest | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -49,7 +49,7 @@ const CharacterQuests: React.FC = () => {
   const [newQuestHeader, setNewQuestHeader] = useState('');
   const [creating, setCreating] = useState(false);
 
-  const refreshQuests = async () => {
+  const localRefreshQuests = async () => {
     try {
       const fresh = await characterQuestsAPI.getCharacterQuests(parseInt(groupId!), parseInt(characterId!));
       setQuests(fresh);
@@ -57,6 +57,11 @@ const CharacterQuests: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to refresh quests');
     }
   };
+
+  useEffect(() => {
+    refreshQuests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filteredQuests = quests.filter(quest => {
     if (!searchTerm.trim()) return true;
@@ -86,13 +91,17 @@ const CharacterQuests: React.FC = () => {
       });
       setCreateModalOpen(false);
       setNewQuestHeader('');
-      await refreshQuests();
+      await localRefreshQuests();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create quest');
     } finally {
       setCreating(false);
     }
   };
+
+  if (questsLoading) {
+    return <div>Загрузка...</div>;
+  }
 
   return (
     <div>
@@ -306,7 +315,7 @@ const CharacterQuests: React.FC = () => {
               await groupQuestsAPI.deleteQuest(parseInt(groupId!), viewingQuest.id);
               setIsViewModalOpen(false);
               setViewingQuest(null);
-              await refreshQuests();
+              await localRefreshQuests();
             } catch (err) {
               setError(err instanceof Error ? err.message : 'Failed to delete quest');
             }

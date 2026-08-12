@@ -17,9 +17,14 @@ interface CharacterLayoutContentProps {
 }
 
 const CharacterLayoutContent: React.FC<CharacterLayoutContentProps> = ({ group, dashboardSettings }) => {
-  const { character, loading, error } = useCharacter();
+  const { character, characterLoading, error, refreshCharacter } = useCharacter();
   const isMobile = usePlatform();
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
+
+  useEffect(() => {
+    refreshCharacter();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const characterTabs: TabItem[] = [
     { id: 'resources', label: 'Главная', path: 'resources' },
@@ -30,7 +35,7 @@ const CharacterLayoutContent: React.FC<CharacterLayoutContentProps> = ({ group, 
     // { id: 'notes', label: 'Заметки', path: 'notes' },
   ];
 
-  if (loading || !group) return <div>Загрузка...</div>;
+  if (!group || (characterLoading && !character)) return <div>Загрузка...</div>;
   if (error) return <div>Ошибка: {error}</div>;
   if (!character) return <div>Персонаж не найден</div>;
 

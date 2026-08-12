@@ -30,7 +30,7 @@ const SkillCardWrapper: React.FC<{
 
 const CharacterSkills: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const { skills, setSkills } = useCharacter();
+  const { skills, setSkills, refreshSkills, skillsLoading } = useCharacter();
   const [error, setError] = useState<string | null>(null);
   const [groupSkills, setGroupSkills] = useState<GroupSkill[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,10 +45,11 @@ const CharacterSkills: React.FC = () => {
       loadSchema();
       loadGroupSkills();
       loadAttributes();
+      refreshSkills();
     }
   }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const refreshSkills = async () => {
+  const localRefreshSkills = async () => {
     try {
       const fresh = await characterSkillsAPI.getCharacterSkills(parseInt(groupId!), parseInt(characterId!));
       setSkills(fresh);
@@ -92,7 +93,7 @@ const CharacterSkills: React.FC = () => {
         parseInt(characterId!), 
         skillId
       );
-      await refreshSkills();
+      await localRefreshSkills();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add skill');
     }
@@ -107,7 +108,7 @@ const CharacterSkills: React.FC = () => {
         parseInt(characterId!), 
         skillId
       );
-      await refreshSkills();
+      await localRefreshSkills();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to remove skill');
     }
@@ -134,13 +135,13 @@ const CharacterSkills: React.FC = () => {
 
   const handleCreateSkill = async (skillData: any) => {
       await groupSkillsAPI.createSkill(parseInt(groupId!), skillData);
-      await refreshSkills();
+      await localRefreshSkills();
     };
   
   const handleUpdateSkill = async (skillData: any) => {
     if (!editingSkill) return;
     await groupSkillsAPI.updateSkill(parseInt(groupId!), editingSkill.id, skillData);
-    await refreshSkills();
+    await localRefreshSkills();
   };
 
   const handleEditSkill = (skill: GroupSkill) => {
@@ -160,6 +161,10 @@ const CharacterSkills: React.FC = () => {
     },
     groupByAttributes: schema,
   };
+
+  if (skillsLoading) {
+    return <div>Загрузка...</div>;
+  }
 
   return (
     <>

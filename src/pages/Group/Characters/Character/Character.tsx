@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { characterCommandsAPI } from '../../../../services/api';
 import commonStyles from '../../../../styles/common.module.css';
@@ -15,11 +15,17 @@ import { useCharacter } from '../../../../contexts/CharacterContext';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const { character, setCharacter, template, templateSchema } = useCharacter();
+  const { character, setCharacter, template, templateSchema, refreshCharacter, refreshTemplate, templateLoading } = useCharacter();
   const [error, setError] = useState<string | null>(null);
   const {canEditCharacterFields} = useActionPermissions();
   const [isFieldModalOpen, setIsFieldModalOpen] = useState(false);
   const [editingField, setEditingField] = useState<{ field: TemplateField | null; fieldKey: string }>({ field: null, fieldKey: '' });
+
+  useEffect(() => {
+    refreshCharacter();
+    refreshTemplate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleUpdateFieldValue = async (fieldKey: string, newValue: string) => {
     if (!character) return;
@@ -105,6 +111,10 @@ const Character: React.FC = () => {
     setIsFieldModalOpen(false);
     setEditingField({ field: null, fieldKey: '' });
   };
+
+  if (templateLoading) {
+    return <div className={commonStyles.container}>Загрузка шаблона...</div>;
+  }
 
   if (!character) return <div className={commonStyles.container}>Персонаж не найден</div>;
 

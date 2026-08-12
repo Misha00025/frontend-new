@@ -29,7 +29,7 @@ const ItemCardWrapper: React.FC<{
 
 const CharacterItems: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const { items, setItems } = useCharacter();
+  const { items, setItems, refreshItems, itemsLoading } = useCharacter();
   const [groupItems, setGroupItems] = useState<GroupItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [schema, setSchema] = useState<string[]>([]);
@@ -41,6 +41,7 @@ const CharacterItems: React.FC = () => {
     if (groupId && characterId) {
       loadSchema();
       loadGroupItems();
+      refreshItems();
     }
   }, [groupId, characterId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -124,6 +125,10 @@ const CharacterItems: React.FC = () => {
     },
     groupByAttributes: schema,
   };
+
+  if (itemsLoading) {
+    return <div>Загрузка...</div>;
+  }
 
   return (
     <>

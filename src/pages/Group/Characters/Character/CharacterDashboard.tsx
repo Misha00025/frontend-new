@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CharacterField } from '../../../../types/characters';
 import { CharacterItem } from '../../../../types/characterItems';
@@ -18,11 +18,18 @@ import styles from './CharacterDashboard.module.css';
 
 const CharacterDashboard: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const { character, setCharacter, items, skills, setItems } = useCharacter();
+  const { character, setCharacter, items, skills, setItems, refreshCharacter, refreshItems, refreshSkills, itemsLoading, skillsLoading } = useCharacter();
   const [error, setError] = useState<string | null>(null);
   const [isSortModalOpen, setIsSortModalOpen] = useState(false);
   const { canEditThisCharacter } = useActionPermissions();
   const { settings, toggleEquipped, togglePinnedSkill } = useDashboardSettingsContext();
+
+  useEffect(() => {
+    refreshCharacter();
+    refreshItems();
+    refreshSkills();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleUpdateField = async (fieldKey: string, newValue: string) => {
     if (!character) return;
@@ -76,6 +83,8 @@ const CharacterDashboard: React.FC = () => {
   return (
     <div className={commonStyles.container}>
       {error && <div className={modalStyles.error}>{error}</div>}
+
+      {(itemsLoading || skillsLoading) && <div className={styles.loading}>Загрузка...</div>}
 
       {!hasContent ? (
         <div className={styles.emptyState}>
