@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { GroupSkill } from '../../types/groupSkills';
 import { groupAPI, groupSkillsAPI } from '../../services/api';
+import { useGroupSchemas } from '../../contexts/GroupSchemasContext';
 import SkillCard from './Cards/SkillCard/SkillCard';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import ResourcePage from '../../components/commons/Pages/ResourcePage/ResourcePage';
@@ -33,27 +34,14 @@ const GroupSkills: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState<GroupSkill | null>(null);
   const { canEditGroup } = useActionPermissions();
-  const [schema, setSchema] = useState<string[]>([]);
+  const { skillsSchema, refreshSchemas } = useGroupSchemas();
   const [isSchemaModalOpen, setIsSchemaModalOpen] = useState(false);
   
   useEffect(() => {
     if (groupId) {
-      loadSchema();
       loadSkills();
     }
   }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
-  
-  
-  const loadSchema = async () => {
-    try {
-      const schemaData = await groupAPI.getSkillsSchema(parseInt(groupId!));
-      setSchema(schemaData.groupBy);
-    } catch (err) {
-      console.error('Failed to load schema:', err);
-      // При ошибке используем пустую схему
-      setSchema([]);
-    }
-  };
 
   const loadSkills = async () => {
     try {
@@ -107,7 +95,7 @@ const GroupSkills: React.FC = () => {
   const handleSaveSchema = async (newSchema: string[]) => {
     try {
       await groupAPI.updateSkillsSchema(parseInt(groupId!), newSchema);
-      setSchema(newSchema);
+      await refreshSchemas();
       setIsSchemaModalOpen(false);
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : 'Failed to save schema');
@@ -127,7 +115,7 @@ const GroupSkills: React.FC = () => {
     titles: {
       page: undefined,
     },
-    groupByAttributes: schema,
+    groupByAttributes: skillsSchema.groupBy,
   };
   
   return (
@@ -167,7 +155,7 @@ const GroupSkills: React.FC = () => {
           onClose={() => setIsSchemaModalOpen(false)}
           onSave={handleSaveSchema}
           availableAttributes={availableAttributes}
-          currentSchema={schema}
+          currentSchema={skillsSchema.groupBy}
           title="Настройка схемы группировки навыков"
         />
       </>

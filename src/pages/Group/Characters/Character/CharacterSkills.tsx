@@ -3,14 +3,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterSkill } from '../../../../types/characterSkills';
 import { GroupSkill, SkillAttributeDefinition } from '../../../../types/groupSkills';
-import { characterSkillsAPI, groupAPI, groupSkillsAPI } from '../../../../services/api';
+import { characterSkillsAPI, groupSkillsAPI } from '../../../../services/api';
 import SkillCard from '../../Cards/SkillCard/SkillCard';
-import commonStyles from '../../../../styles/common.module.css';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import ResourcePage from '../../../../components/commons/Pages/ResourcePage/ResourcePage';
 import CharacterSkillModal from '../../Modals/SkillModal/CharacterSkillModal';
 import SkillModal from '../../Modals/SkillModal/SkillModal';
 import { useCharacter } from '../../../../contexts/CharacterContext';
+import { useGroupSchemas } from '../../../../contexts/GroupSchemasContext';
 
 const SkillCardWrapper: React.FC<{
   item: CharacterSkill;
@@ -38,11 +38,10 @@ const CharacterSkills: React.FC = () => {
   const { canEditThisCharacter, canEditGroup } = useActionPermissions();
   const [attributes, setAttributes] = useState<SkillAttributeDefinition[]>([]);
   const [editingSkill, setEditingSkill] = useState<GroupSkill | null>(null);
-  const [schema, setSchema] = useState<string[]>([]);
+  const { skillsSchema } = useGroupSchemas();
 
   useEffect(() => {
     if (groupId) {
-      loadSchema();
       loadGroupSkills();
       loadAttributes();
       refreshSkills();
@@ -66,16 +65,6 @@ const CharacterSkills: React.FC = () => {
       console.error('Failed to load attributes:', err);
     }
   };
-
-  const loadSchema = async () => {
-      try {
-        const schemaData = await groupAPI.getSkillsSchema(parseInt(groupId!));
-        setSchema(schemaData.groupBy);
-      } catch (err) {
-        console.error('Failed to load schema:', err);
-        setSchema([]);
-      }
-    };
 
   const loadGroupSkills = async () => {
     try {
@@ -159,7 +148,7 @@ const CharacterSkills: React.FC = () => {
       page: undefined,
       create: 'Добавить'
     },
-    groupByAttributes: schema,
+    groupByAttributes: skillsSchema.groupBy,
   };
 
   if (skillsLoading) {

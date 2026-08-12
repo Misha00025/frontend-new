@@ -10,6 +10,7 @@ import inputStyles from '../../../../styles/components/Input.module.css'; // Д�
 import uiStyles from '../../../../styles/ui.module.css';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import { TemplateCategory, TemplateSchema } from '../../../../types/groupSchemas';
+import { useGroupSchemas } from '../../../../contexts/GroupSchemasContext';
 import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
 import { TemplateEditProvider } from '../../../../contexts/TemplateEditContext';
 import TemplatePreview from './TemplatePreview/TemplatePreview';
@@ -25,7 +26,7 @@ const CharacterTemplates: React.FC = () => {
   const [editingTemplate, setEditingTemplate] = useState<CharacterTemplate | null>(null);
   const [editingSchema, setEditingSchema] = useState<TemplateSchema | null>(null);
   
-  const [loading, setLoading] = useState(false);
+  const { template, templateSchema, loading, refreshSchemas } = useGroupSchemas();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
@@ -44,30 +45,17 @@ const CharacterTemplates: React.FC = () => {
 
   useEffect(() => {
     if (groupId) {
-      loadTemplate();
+      loadFromContext();
     }
     setCurrentCategoryKey(null);
   }, [groupId, editMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const loadTemplate = async () => {
-    try {
-      setLoading(true);
-      const templatesData = await characterTemplatesAPI.getTemplates(parseInt(groupId!));
-      if (templatesData.length > 0) {
-        setOriginalTemplate(templatesData[0]);
-        setEditingTemplate(templatesData[0]);
-      } else {
-        setOriginalTemplate(null);
-        setEditingTemplate(null);
-      }
-      const templateSchema = await groupAPI.getTemplateSchema(groupId ? Number(groupId) : 0);
-      setOriginalSchema(templateSchema);
-      setEditingSchema(templateSchema);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load template');
-    } finally {
-      setLoading(false);
-    }
+  const loadFromContext = () => {
+    setOriginalTemplate(template);
+    setEditingTemplate(template);
+    setOriginalSchema(templateSchema || { categories: [] });
+    setEditingSchema(templateSchema || { categories: [] });
+    setCurrentCategoryKey(null);
   };
 
   const handleCreateTemplate = async () => {
@@ -80,6 +68,7 @@ const CharacterTemplates: React.FC = () => {
       setOriginalTemplate(newTemplate);
       setEditingTemplate(newTemplate);
       setEditMode(true);
+      await refreshSchemas();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create template');
     }
@@ -124,6 +113,8 @@ const CharacterTemplates: React.FC = () => {
         Number(groupId), 
         editingSchema
       );
+
+      await refreshSchemas();
 
       // Обновляем оригинальные данные
       setOriginalTemplate(editingTemplate);

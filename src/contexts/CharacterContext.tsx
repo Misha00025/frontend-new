@@ -6,15 +6,11 @@ import React, {
   useMemo,
 } from 'react';
 import { Character } from '../types/characters';
-import { CharacterTemplate } from '../types/characterTemplates';
-import { TemplateSchema } from '../types/groupSchemas';
 import { CharacterItem } from '../types/characterItems';
 import { GroupSkill } from '../types/groupSkills';
 import { GroupQuest } from '../types/groupQuests';
 import {
   charactersAPI,
-  characterTemplatesAPI,
-  groupAPI,
   characterItemsAPI,
   characterSkillsAPI,
   characterQuestsAPI,
@@ -22,24 +18,19 @@ import {
 
 export interface CharacterContextType {
   character: Character | null;
-  template: CharacterTemplate | null;
-  templateSchema: TemplateSchema | null;
   items: CharacterItem[];
   skills: GroupSkill[];
   quests: GroupQuest[];
   characterLoading: boolean;
-  templateLoading: boolean;
   itemsLoading: boolean;
   skillsLoading: boolean;
   questsLoading: boolean;
   error: string | null;
   refreshCharacter: () => Promise<void>;
-  refreshTemplate: () => Promise<void>;
   refreshItems: () => Promise<void>;
   refreshSkills: () => Promise<void>;
   refreshQuests: () => Promise<void>;
   setCharacter: React.Dispatch<React.SetStateAction<Character | null>>;
-  setTemplate: React.Dispatch<React.SetStateAction<CharacterTemplate | null>>;
   setItems: React.Dispatch<React.SetStateAction<CharacterItem[]>>;
   setSkills: React.Dispatch<React.SetStateAction<GroupSkill[]>>;
   setQuests: React.Dispatch<React.SetStateAction<GroupQuest[]>>;
@@ -59,15 +50,10 @@ const CharacterProvider: React.FC<CharacterProviderProps> = ({
   children,
 }) => {
   const [character, setCharacter] = useState<Character | null>(null);
-  const [template, setTemplate] = useState<CharacterTemplate | null>(null);
-  const [templateSchema, setTemplateSchema] = useState<TemplateSchema | null>(
-    null,
-  );
   const [items, setItems] = useState<CharacterItem[]>([]);
   const [skills, setSkills] = useState<GroupSkill[]>([]);
   const [quests, setQuests] = useState<GroupQuest[]>([]);
   const [characterLoading, setCharacterLoading] = useState(false);
-  const [templateLoading, setTemplateLoading] = useState(false);
   const [itemsLoading, setItemsLoading] = useState(false);
   const [skillsLoading, setSkillsLoading] = useState(false);
   const [questsLoading, setQuestsLoading] = useState(false);
@@ -85,25 +71,6 @@ const CharacterProvider: React.FC<CharacterProviderProps> = ({
       setCharacterLoading(false);
     }
   }, [groupId, characterId]);
-
-  const refreshTemplate = useCallback(async () => {
-    setTemplateLoading(true);
-    try {
-      const [templateData, schemaData] = await Promise.all([
-        characterTemplatesAPI.getTemplate(
-          groupId,
-          character?.templateId ?? 0,
-        ),
-        groupAPI.getTemplateSchema(groupId),
-      ]);
-      setTemplate(templateData);
-      setTemplateSchema(schemaData);
-    } catch (err) {
-      console.error('Failed to load template:', err);
-    } finally {
-      setTemplateLoading(false);
-    }
-  }, [groupId, character?.templateId]);
 
   const refreshItems = useCallback(async () => {
     setItemsLoading(true);
@@ -144,48 +111,38 @@ const CharacterProvider: React.FC<CharacterProviderProps> = ({
   const value = useMemo(
     () => ({
       character,
-      template,
-      templateSchema,
       items,
       skills,
       quests,
       characterLoading,
-      templateLoading,
       itemsLoading,
       skillsLoading,
       questsLoading,
       error,
       refreshCharacter,
-      refreshTemplate,
       refreshItems,
       refreshSkills,
       refreshQuests,
       setCharacter,
-      setTemplate,
       setItems,
       setSkills,
       setQuests,
     }),
     [
       character,
-      template,
-      templateSchema,
       items,
       skills,
       quests,
       characterLoading,
-      templateLoading,
       itemsLoading,
       skillsLoading,
       questsLoading,
       error,
       refreshCharacter,
-      refreshTemplate,
       refreshItems,
       refreshSkills,
       refreshQuests,
       setCharacter,
-      setTemplate,
       setItems,
       setSkills,
       setQuests,

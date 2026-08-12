@@ -1,6 +1,7 @@
 // src/App.tsx
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation, useParams, Outlet } from 'react-router-dom';
+import { GroupSchemasProvider } from './contexts/GroupSchemasContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { GroupProvider } from './contexts/GroupContext';
@@ -30,6 +31,18 @@ import { PermissionsProvider } from './contexts/PermissionsContext';
 import { SidebarProvider } from './contexts/SidebarContext';
 import GroupSkills from './pages/Group/GroupSkills';
 import Login from './pages/Authorisation/Login';
+
+const GroupSchemasBoundary: React.FC = () => {
+  const { groupId } = useParams<{ groupId: string }>();
+  if (!groupId) {
+    return <Outlet />;
+  }
+  return (
+    <GroupSchemasProvider groupId={Number(groupId)}>
+      <Outlet />
+    </GroupSchemasProvider>
+  );
+};
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>;
@@ -74,25 +87,27 @@ const AppContent: React.FC = () => {
         <Route path="/complete-registration" element={<CompleteRegistration />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/groups" element={<Groups />} />
-        <Route path="/group/:groupId" element={<GroupLayout />}>
-          <Route index element={<Navigate to="characters" replace />} />
-          <Route path="characters" element={<Characters />} />
-          <Route path="settings" element={<GroupSettings />} />
-          <Route path="users" element={<GroupUsers />} />
-          <Route path="templates" element={<CharacterTemplates />} />
-          <Route path="skills" element={<GroupSkills />} />
-          <Route path="items" element={<GroupItems />} />
-          <Route path="notes" element={<GroupNotes />} />
-          <Route path="quests" element={<GroupQuests />} />
-        </Route>
-        <Route path="/group/:groupId/character/:characterId" element={<CharacterLayout />}>
-          <Route index element={<CharacterDashboard />} />
-          <Route path="resources" element={<CharacterDashboard />} />
-          <Route path="stats" element={<Character />} />
-          <Route path="items" element={<CharacterItems />} />
-          <Route path="skills" element={<CharacterSkills />} />
-          <Route path="quests" element={<CharacterQuests />} />
-          <Route path="notes" element={<CharacterNotes />} />
+        <Route path="/group/:groupId" element={<GroupSchemasBoundary />}>
+          <Route element={<GroupLayout />}>
+            <Route index element={<Navigate to="characters" replace />} />
+            <Route path="characters" element={<Characters />} />
+            <Route path="settings" element={<GroupSettings />} />
+            <Route path="users" element={<GroupUsers />} />
+            <Route path="templates" element={<CharacterTemplates />} />
+            <Route path="skills" element={<GroupSkills />} />
+            <Route path="items" element={<GroupItems />} />
+            <Route path="notes" element={<GroupNotes />} />
+            <Route path="quests" element={<GroupQuests />} />
+          </Route>
+          <Route path="character/:characterId" element={<CharacterLayout />}>
+            <Route index element={<CharacterDashboard />} />
+            <Route path="resources" element={<CharacterDashboard />} />
+            <Route path="stats" element={<Character />} />
+            <Route path="items" element={<CharacterItems />} />
+            <Route path="skills" element={<CharacterSkills />} />
+            <Route path="quests" element={<CharacterQuests />} />
+            <Route path="notes" element={<CharacterNotes />} />
+          </Route>
         </Route>
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Navigate to="/dashboard" replace />} />

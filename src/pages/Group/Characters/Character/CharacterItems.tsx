@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterItem, CreateCharacterItemRequest, UpdateCharacterItemRequest } from '../../../../types/characterItems';
 import { GroupItem } from '../../../../types/groupItems';
-import { characterItemsAPI, groupAPI } from '../../../../services/api';
+import { characterItemsAPI } from '../../../../services/api';
 import { groupItemsAPI } from '../../../../services/api';
 import CharacterItemModal from '../../Modals/ItemModal/CharacterItemModal';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import ResourcePage from '../../../../components/commons/Pages/ResourcePage/ResourcePage';
 import ItemCard from '../../Cards/ItemCard/ItemCard';
 import { useCharacter } from '../../../../contexts/CharacterContext';
+import { useGroupSchemas } from '../../../../contexts/GroupSchemasContext';
 
 const ItemCardWrapper: React.FC<{
   item: CharacterItem;
@@ -32,29 +33,17 @@ const CharacterItems: React.FC = () => {
   const { items, setItems, refreshItems, itemsLoading } = useCharacter();
   const [groupItems, setGroupItems] = useState<GroupItem[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [schema, setSchema] = useState<string[]>([]);
+  const { itemsSchema } = useGroupSchemas();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<CharacterItem | null>(null);
   const { canEditThisCharacter } = useActionPermissions();
 
   useEffect(() => {
     if (groupId && characterId) {
-      loadSchema();
       loadGroupItems();
       refreshItems();
     }
   }, [groupId, characterId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const loadSchema = async () => {
-      try {
-        const schemaData = await groupAPI.getItemsSchema(parseInt(groupId!));
-        setSchema(schemaData.groupBy);
-      } catch (err) {
-        console.error('Failed to load schema:', err);
-        // При ошибке используем пустую схему
-        setSchema([]);
-      }
-    };
 
   const loadGroupItems = async () => {
     try {
@@ -123,7 +112,7 @@ const CharacterItems: React.FC = () => {
       page: undefined,
       create: 'Добавить'
     },
-    groupByAttributes: schema,
+    groupByAttributes: itemsSchema.groupBy,
   };
 
   if (itemsLoading) {

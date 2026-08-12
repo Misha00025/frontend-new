@@ -12,10 +12,12 @@ import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import { TemplateEditContext, TemplateEditContextType } from '../../../../contexts/TemplateEditContext';
 import TemplateFieldModal from '../Modals/CharacterFieldModal/TemplateFieldModal';
 import { useCharacter } from '../../../../contexts/CharacterContext';
+import { useGroupSchemas } from '../../../../contexts/GroupSchemasContext';
 
 const Character: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const { character, setCharacter, template, templateSchema, refreshCharacter, refreshTemplate, templateLoading } = useCharacter();
+  const { character, setCharacter, refreshCharacter } = useCharacter();
+  const { template, templateSchema } = useGroupSchemas();
   const [error, setError] = useState<string | null>(null);
   const {canEditCharacterFields} = useActionPermissions();
   const [isFieldModalOpen, setIsFieldModalOpen] = useState(false);
@@ -23,7 +25,6 @@ const Character: React.FC = () => {
 
   useEffect(() => {
     refreshCharacter();
-    refreshTemplate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -111,10 +112,6 @@ const Character: React.FC = () => {
     setIsFieldModalOpen(false);
     setEditingField({ field: null, fieldKey: '' });
   };
-
-  if (templateLoading) {
-    return <div className={commonStyles.container}>Загрузка шаблона...</div>;
-  }
 
   if (!character) return <div className={commonStyles.container}>Персонаж не найден</div>;
 
