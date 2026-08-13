@@ -239,6 +239,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const res = await userSettingsAPI.getSettings(userId, ['theme']);
       const raw = res.settings.theme;
       if (raw === undefined || raw === null) {
+        await userSettingsAPI.updateSettings(userId, { theme: themeConfig });
         return;
       }
       const config = normalizeServerTheme(raw);
@@ -250,7 +251,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } finally {
       setThemeSyncing(false);
     }
-  }, [userId, setThemeConfig]);
+  }, [userId, setThemeConfig, themeConfig]);
 
   return (
     <ThemeContext.Provider value={{ themeConfig, setThemeConfig, setPreset, setCustomColors, getCurrentColors, pushThemeToServer, syncThemeFromServer, themeSyncing, themeSyncError }}>
