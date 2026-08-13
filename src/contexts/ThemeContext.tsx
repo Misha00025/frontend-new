@@ -183,21 +183,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     (async () => {
       try {
-        const localThemePresent =
-          localStorage.getItem('themeConfig') !== null ||
-          localStorage.getItem('theme') !== null;
-
         const res = await userSettingsAPI.getSettings(userId, ['theme']);
         const raw = res?.settings?.theme;
-        const serverThemePresent = raw !== undefined && raw !== null;
-
-        if (serverThemePresent && !localThemePresent) {
+        if (raw !== undefined && raw !== null) {
           const config = normalizeServerTheme(raw);
           if (config) setThemeConfig(config);
-        } else if (!serverThemePresent && localThemePresent) {
-          await userSettingsAPI.updateSettings(userId, { theme: themeConfig });
         }
-        // оба есть → не трогаем; оба пусты → не трогаем
       } catch (err) {
         console.warn('Theme auto-sync failed:', err);
       }
@@ -247,7 +238,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       const res = await userSettingsAPI.getSettings(userId, ['theme']);
       const raw = res.settings.theme;
-      if (raw === undefined || raw === null) return;
+      if (raw === undefined || raw === null) {
+        return;
+      }
       const config = normalizeServerTheme(raw);
       if (config) {
         setThemeConfig(config);

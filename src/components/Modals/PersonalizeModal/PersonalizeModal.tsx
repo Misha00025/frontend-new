@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTheme, PRESET_COLORS } from '../../../contexts/ThemeContext';
 import type { PresetTheme } from '../../../types/theme';
 import type { CustomColors } from '../../../types/theme';
@@ -17,17 +17,39 @@ const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) 
   const currentColors = getCurrentColors();
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const [customColors, setCustomColorsState] = useState<CustomColors>({ ...currentColors });
+  const pushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setCustomColorsState({ ...getCurrentColors() });
   }, [themeConfig, getCurrentColors]);
+
+  useEffect(() => () => {
+    if (pushTimerRef.current) clearTimeout(pushTimerRef.current);
+  }, []);
+
+  const scheduleThemePush = () => {
+    if (pushTimerRef.current) clearTimeout(pushTimerRef.current);
+    pushTimerRef.current = setTimeout(() => {
+      pushThemeToServer();
+    }, 400);
+  };
+
+  const applyPreset = (name: PresetTheme) => {
+    setPreset(name);
+    scheduleThemePush();
+  };
+
+  const applyCustomColors = (colors: CustomColors) => {
+    setCustomColors(colors);
+    scheduleThemePush();
+  };
   if (!isOpen) return null;
 
   const handleColorChange = (field: keyof CustomColors) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const newColors = { ...customColors, [field]: e.target.value };
     setCustomColorsState(newColors);
     // Live preview: сразу применяем кастомные цвета (вычисление дополнительных происходит в контексте)
-    setCustomColors(newColors);
+    applyCustomColors(newColors);
   };
 
   const handleHexChange = (field: keyof CustomColors) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +59,7 @@ const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) 
       setCustomColorsState(newColors);
       // Только если hex-цвет полный (6 символов после #) — сразу применяем
       if (/^#[0-9a-fA-F]{6}$/.test(val)) {
-        setCustomColors(newColors);
+        applyCustomColors(newColors);
       }
     }
   };
@@ -50,21 +72,11 @@ const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) 
     }
   };
 
-  const handleLoadFromServer = async () => {
+  const handleSync = async () => {
     setSyncMessage(null);
     try {
       await syncThemeFromServer();
-      setSyncMessage('Тема загружена с сервера');
-    } catch {
-      /* ошибка уже в themeSyncError */
-    }
-  };
-
-  const handlePushToServer = async () => {
-    setSyncMessage(null);
-    try {
-      await pushThemeToServer();
-      setSyncMessage('Тема сохранена на сервер');
+      setSyncMessage('Тема синхронизирована');
     } catch {
       /* ошибка уже в themeSyncError */
     }
@@ -80,7 +92,7 @@ const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) 
       <div
         key={name}
         className={`${styles.presetCard} ${isActive ? styles.presetCardActive : ''}`}
-        onClick={() => setPreset(name)}
+        onClick={() => applyPreset(name)}
       >
         <div
           className={styles.colorPreview}
@@ -186,13 +198,10 @@ const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) 
             {themeSyncError && <p style={{ margin: '4px 0', fontSize: '13px', color: 'var(--danger-color)' }}>{themeSyncError}</p>}
             {syncMessage && !themeSyncError && <p style={{ margin: '4px 0', fontSize: '13px', color: 'var(--text-primary, #6b7280)' }}>{syncMessage}</p>}
           </AdaptiveLayout.Full>
-          <button className={buttonStyles.button} onClick={handleLoadFromServer} disabled={themeSyncing}>
-            Загрузить тему с сервера
+          <button className={buttonStyles.button} onClick={handleSync} disabled={themeSyncing}>
+            Синхронизировать
           </button>
-          <button className={buttonStyles.button} onClick={handlePushToServer} disabled={themeSyncing}>
-            Сохранить тему на сервер
-          </button>
-          <button className={buttonStyles.button} onClick={() => setPreset('clean')}>
+          <button className={buttonStyles.button} onClick={() => applyPreset('clean')}>
             Сбросить
           </button>
           <button className={buttonStyles.button} onClick={onClose}>
