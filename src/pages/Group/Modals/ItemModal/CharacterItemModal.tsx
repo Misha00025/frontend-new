@@ -245,6 +245,19 @@ const CharacterItemModal: React.FC<CharacterItemModalProps> = ({
           <ItemCard item={selectedGroupItem} showActions={false} />
         )}
 
+        {editingItem && (
+          <div className={modalStyles.formGroup} style={{ marginTop: '1rem' }}>
+            <label>Количество:</label>
+            <EvaluatedInput
+              initialValue={amount === '' ? '' : amount.toString()}
+              onCommit={(value) => setAmount(value.trim() === '' ? 1 : Math.max(0, Number(value.trim())))}
+              className={inputStyles.input}
+              placeholder="Количество"
+              required
+            />
+          </div>
+        )}
+
       </div>
       <div className={modalStyles.buttons}>
         {creationMode === 'existing' && step === 'select' && !editingItem && (

@@ -16,6 +16,7 @@ import {
   UpdateCharacterRequest
 } from '../types/characters';
 import { CharacterUser, CharacterUsersResponse } from '../types/characterUsers';
+import { CharacterCommand, ExecuteCommandResult } from '../types/characterCommands';
 import {
   GroupItem,
   GroupItemsResponse,
@@ -863,15 +864,12 @@ export const characterEquipmentAPI = {
     return Array.isArray(data) ? data : (data?.items ?? []);
   },
 
-  patchEquipment: async (groupId: number, characterId: number, action: 'add' | 'remove', itemId: number): Promise<number[]> => {
-    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/equipment`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, itemId }),
-    });
-    if (!response.ok) throw new Error('Failed to update equipment');
-    const data = await response.json();
-    return Array.isArray(data) ? data : (data?.items ?? []);
+  equipItem: async (groupId: number, characterId: number, itemId: number): Promise<void> => {
+    await characterCommandsAPI.executeCommand(groupId, characterId, { type: 'EquipItem', payload: { itemId } });
+  },
+
+  unequipItem: async (groupId: number, characterId: number, itemId: number): Promise<void> => {
+    await characterCommandsAPI.executeCommand(groupId, characterId, { type: 'UnequipItem', payload: { itemId } });
   },
 
   putEquipment: async (groupId: number, characterId: number, itemIds: number[]): Promise<number[]> => {
@@ -973,6 +971,20 @@ export const characterQuestsAPI = {
       body: JSON.stringify(questData),
     });
     if (!response.ok) throw new Error('Failed to create character quest');
+    return response.json();
+  },
+};
+
+export const characterCommandsAPI = {
+  executeCommand: async (groupId: number, characterId: number, command: CharacterCommand): Promise<ExecuteCommandResult> => {
+    const response = await makeAuthenticatedRequest(`/groups/${groupId}/characters/${characterId}/commands`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(command),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to execute character command');
+    }
     return response.json();
   },
 };

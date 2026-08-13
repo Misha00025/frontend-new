@@ -25,6 +25,7 @@ export interface CharacterShort {
     description: string;
     formula?: string;
     modifier?: number;
+    modifierFormula?: string;
   }
   
   export interface CreateCharacterRequest {

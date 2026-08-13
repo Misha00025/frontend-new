@@ -3,13 +3,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterSkill } from '../../../../types/characterSkills';
 import { GroupSkill, SkillAttributeDefinition } from '../../../../types/groupSkills';
-import { characterSkillsAPI, groupAPI, groupSkillsAPI } from '../../../../services/api';
+import { characterSkillsAPI, groupSkillsAPI } from '../../../../services/api';
 import SkillCard from '../../Cards/SkillCard/SkillCard';
-import commonStyles from '../../../../styles/common.module.css';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import ResourcePage from '../../../../components/commons/Pages/ResourcePage/ResourcePage';
 import CharacterSkillModal from '../../Modals/SkillModal/CharacterSkillModal';
 import SkillModal from '../../Modals/SkillModal/SkillModal';
+import { useCharacter } from '../../../../contexts/CharacterContext';
+import { useGroupSchemas } from '../../../../contexts/GroupSchemasContext';
 
 const SkillCardWrapper: React.FC<{
   item: CharacterSkill;
@@ -29,25 +30,32 @@ const SkillCardWrapper: React.FC<{
 
 const CharacterSkills: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const [skills, setSkills] = useState<CharacterSkill[]>([]);
-  const [groupSkills, setGroupSkills] = useState<GroupSkill[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { skills, setSkills, refreshSkills, skillsLoading } = useCharacter();
   const [error, setError] = useState<string | null>(null);
+  const [groupSkills, setGroupSkills] = useState<GroupSkill[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
   const { canEditThisCharacter, canEditGroup } = useActionPermissions();
   const [attributes, setAttributes] = useState<SkillAttributeDefinition[]>([]);
   const [editingSkill, setEditingSkill] = useState<GroupSkill | null>(null);
-  const [schema, setSchema] = useState<string[]>([]); // Добавлено состояние для схемы
+  const { skillsSchema } = useGroupSchemas();
 
   useEffect(() => {
-    if (groupId && characterId) {
-      loadSchema();
-      loadSkills();
+    if (groupId) {
       loadGroupSkills();
       loadAttributes();
+      refreshSkills();
     }
-  }, [groupId, characterId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const localRefreshSkills = async () => {
+    try {
+      const fresh = await characterSkillsAPI.getCharacterSkills(parseInt(groupId!), parseInt(characterId!));
+      setSkills(fresh);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to refresh skills');
+    }
+  };
 
   const loadAttributes = async () => {
     try {
@@ -55,32 +63,6 @@ const CharacterSkills: React.FC = () => {
       setAttributes(attributesData);
     } catch (err) {
       console.error('Failed to load attributes:', err);
-    }
-  };
-
-  const loadSchema = async () => {
-      try {
-        const schemaData = await groupAPI.getSkillsSchema(parseInt(groupId!));
-        setSchema(schemaData.groupBy);
-      } catch (err) {
-        console.error('Failed to load schema:', err);
-        // При ошибке используем пустую схему
-        setSchema([]);
-      }
-    };
-
-  const loadSkills = async () => {
-    try {
-      setLoading(true);
-      const skillsData = await characterSkillsAPI.getCharacterSkills(
-        parseInt(groupId!), 
-        parseInt(characterId!)
-      );
-      setSkills(skillsData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load skills');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -100,7 +82,7 @@ const CharacterSkills: React.FC = () => {
         parseInt(characterId!), 
         skillId
       );
-      loadSkills();
+      await localRefreshSkills();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add skill');
     }
@@ -115,14 +97,12 @@ const CharacterSkills: React.FC = () => {
         parseInt(characterId!), 
         skillId
       );
-      loadSkills();
+      await localRefreshSkills();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to remove skill');
     }
   };
 
-
-  
   const getPossibleValuesForFilteredAttributes = useCallback(() => {
     const possibleValues: { [key: string]: string[] } = {};
     
@@ -144,16 +124,15 @@ const CharacterSkills: React.FC = () => {
 
   const handleCreateSkill = async (skillData: any) => {
       await groupSkillsAPI.createSkill(parseInt(groupId!), skillData);
-      loadSkills();
+      await localRefreshSkills();
     };
   
   const handleUpdateSkill = async (skillData: any) => {
     if (!editingSkill) return;
     await groupSkillsAPI.updateSkill(parseInt(groupId!), editingSkill.id, skillData);
-    loadSkills();
+    await localRefreshSkills();
   };
 
-  
   const handleEditSkill = (skill: GroupSkill) => {
     setEditingSkill(skill);
     setIsSkillModalOpen(true);
@@ -169,17 +148,19 @@ const CharacterSkills: React.FC = () => {
       page: undefined,
       create: 'Добавить'
     },
-    groupByAttributes: schema,
+    groupByAttributes: skillsSchema.groupBy,
   };
 
-  if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
+  if (skillsLoading) {
+    return <div>Загрузка...</div>;
+  }
 
   return (
     <>
       <ResourcePage
         config={config}
-        items={skills}
-        loading={loading}
+        items={skills as CharacterSkill[]}
+        loading={false}
         error={error}
         canCreate={canEditThisCharacter}
         canEdit={canEditThisCharacter}
@@ -195,7 +176,7 @@ const CharacterSkills: React.FC = () => {
           onClose={handleCloseModal}
           onAddSkill={handleAddSkill}
           groupSkills={groupSkills}
-          existingSkills={skills}
+          existingSkills={skills as CharacterSkill[]}
           title="Добавление способности персонажу"
         />
       )}

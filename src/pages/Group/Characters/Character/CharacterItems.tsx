@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterItem, CreateCharacterItemRequest, UpdateCharacterItemRequest } from '../../../../types/characterItems';
 import { GroupItem } from '../../../../types/groupItems';
-import { characterItemsAPI, groupAPI } from '../../../../services/api';
+import { characterItemsAPI } from '../../../../services/api';
 import { groupItemsAPI } from '../../../../services/api';
 import CharacterItemModal from '../../Modals/ItemModal/CharacterItemModal';
-import commonStyles from '../../../../styles/common.module.css';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import ResourcePage from '../../../../components/commons/Pages/ResourcePage/ResourcePage';
 import ItemCard from '../../Cards/ItemCard/ItemCard';
+import { useCharacter } from '../../../../contexts/CharacterContext';
+import { useGroupSchemas } from '../../../../contexts/GroupSchemasContext';
 
 const ItemCardWrapper: React.FC<{
   item: CharacterItem;
@@ -29,45 +30,20 @@ const ItemCardWrapper: React.FC<{
 
 const CharacterItems: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const [items, setItems] = useState<CharacterItem[]>([]);
+  const { items, setItems, refreshItems, itemsLoading } = useCharacter();
   const [groupItems, setGroupItems] = useState<GroupItem[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [schema, setSchema] = useState<string[]>([]); // Добавлено состояние для схемы
+  const { itemsSchema } = useGroupSchemas();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<CharacterItem | null>(null);
   const { canEditThisCharacter } = useActionPermissions();
 
   useEffect(() => {
     if (groupId && characterId) {
-      loadSchema();
-      loadItems();
       loadGroupItems();
+      refreshItems();
     }
   }, [groupId, characterId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const loadItems = async () => {
-    try {
-      setLoading(true);
-      const itemsData = await characterItemsAPI.getCharacterItems(parseInt(groupId!), parseInt(characterId!));
-      setItems(itemsData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load items');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadSchema = async () => {
-      try {
-        const schemaData = await groupAPI.getItemsSchema(parseInt(groupId!));
-        setSchema(schemaData.groupBy);
-      } catch (err) {
-        console.error('Failed to load schema:', err);
-        // При ошибке используем пустую схему
-        setSchema([]);
-      }
-    };
 
   const loadGroupItems = async () => {
     try {
@@ -85,13 +61,23 @@ const CharacterItems: React.FC = () => {
     else{
       await characterItemsAPI.createCharacterItem(parseInt(groupId!), parseInt(characterId!), itemData);
     }
-    loadItems();
+    try {
+      const fresh = await characterItemsAPI.getCharacterItems(parseInt(groupId!), parseInt(characterId!));
+      setItems(fresh);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to refresh items');
+    }
   };
 
   const handleUpdateItem = async (itemData: UpdateCharacterItemRequest) => {
     if (!editingItem) return;
     await characterItemsAPI.updateCharacterItem(parseInt(groupId!), parseInt(characterId!), editingItem.id, itemData);
-    loadItems();
+    try {
+      const fresh = await characterItemsAPI.getCharacterItems(parseInt(groupId!), parseInt(characterId!));
+      setItems(fresh);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to refresh items');
+    }
   };
 
   const handleDeleteItem = async (itemId: number) => {
@@ -99,7 +85,12 @@ const CharacterItems: React.FC = () => {
 
     try {
       await characterItemsAPI.deleteCharacterItem(parseInt(groupId!), parseInt(characterId!), itemId);
-      loadItems();
+      try {
+        const fresh = await characterItemsAPI.getCharacterItems(parseInt(groupId!), parseInt(characterId!));
+        setItems(fresh);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to refresh items');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete item');
     }
@@ -121,17 +112,19 @@ const CharacterItems: React.FC = () => {
       page: undefined,
       create: 'Добавить'
     },
-    groupByAttributes: schema,
+    groupByAttributes: itemsSchema.groupBy,
   };
 
-  if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
+  if (itemsLoading) {
+    return <div>Загрузка...</div>;
+  }
 
   return (
     <>
       <ResourcePage
         config={config}
         items={items}
-        loading={loading}
+        loading={false}
         error={error}
         canCreate={canEditThisCharacter}
         canEdit={canEditThisCharacter}

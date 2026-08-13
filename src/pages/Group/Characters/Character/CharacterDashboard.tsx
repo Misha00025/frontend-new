@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Character, CharacterField } from '../../../../types/characters';
+import { CharacterField } from '../../../../types/characters';
 import { CharacterItem } from '../../../../types/characterItems';
-import { CharacterSkill } from '../../../../types/characterSkills';
-import { charactersAPI, characterItemsAPI, characterSkillsAPI } from '../../../../services/api';
+import { GroupSkill } from '../../../../types/groupSkills';
+import { characterCommandsAPI, characterItemsAPI } from '../../../../services/api';
+import { useCharacter } from '../../../../contexts/CharacterContext';
 import commonStyles from '../../../../styles/common.module.css';
 import modalStyles from '../../../../styles/modal.module.css';
 import buttonStyles from '../../../../styles/components/Button.module.css';
@@ -17,49 +18,31 @@ import styles from './CharacterDashboard.module.css';
 
 const CharacterDashboard: React.FC = () => {
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
-  const [character, setCharacter] = useState<Character | null>(null);
-  const [items, setItems] = useState<CharacterItem[]>([]);
-  const [skills, setSkills] = useState<CharacterSkill[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { character, setCharacter, items, skills, setItems, refreshCharacter, refreshItems, refreshSkills, itemsLoading, skillsLoading } = useCharacter();
   const [error, setError] = useState<string | null>(null);
   const [isSortModalOpen, setIsSortModalOpen] = useState(false);
   const { canEditThisCharacter } = useActionPermissions();
   const { settings, toggleEquipped, togglePinnedSkill } = useDashboardSettingsContext();
 
   useEffect(() => {
-    if (groupId && characterId) {
-      loadData();
-    }
-  }, [groupId, characterId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [charData, itemsData, skillsData] = await Promise.all([
-        charactersAPI.getCharacter(Number(groupId), Number(characterId)),
-        characterItemsAPI.getCharacterItems(Number(groupId), Number(characterId)),
-        characterSkillsAPI.getCharacterSkills(Number(groupId), Number(characterId)),
-      ]);
-      setCharacter(charData);
-      setItems(itemsData);
-      setSkills(skillsData as CharacterSkill[]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
-    } finally {
-      setLoading(false);
-    }
-  };
+    refreshCharacter();
+    refreshItems();
+    refreshSkills();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleUpdateField = async (fieldKey: string, newValue: string) => {
     if (!character) return;
     try {
       const field = character.fields[fieldKey];
-      const updatedField: CharacterField = { ...field, value: Number(newValue) };
-      const updatedCharacter = await charactersAPI.updateCharacter(
+      const result = await characterCommandsAPI.executeCommand(
         Number(groupId), Number(characterId),
-        { fields: { [fieldKey]: updatedField } }
+        {
+          type: 'UpdateField',
+          payload: { key: fieldKey, field: { ...field, value: Number(newValue) } },
+        }
       );
-      setCharacter(updatedCharacter);
+      setCharacter(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update field');
     }
@@ -93,15 +76,15 @@ const CharacterDashboard: React.FC = () => {
 
   const pinnedSkills = settings.pinnedSkills
     .map(id => skills.find(skill => skill.id === id))
-    .filter((skill): skill is CharacterSkill => skill !== undefined);
+    .filter((skill): skill is GroupSkill => skill !== undefined);
 
   const hasContent = resourceFields.length > 0 || resourceItems.length > 0 || equippedItems.length > 0 || pinnedSkills.length > 0;
-
-  if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
 
   return (
     <div className={commonStyles.container}>
       {error && <div className={modalStyles.error}>{error}</div>}
+
+      {(itemsLoading || skillsLoading) && <div className={styles.loading}>Загрузка...</div>}
 
       {!hasContent ? (
         <div className={styles.emptyState}>

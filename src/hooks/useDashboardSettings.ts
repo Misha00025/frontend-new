@@ -106,18 +106,30 @@ export function useDashboardSettings(groupId: number, characterId: number) {
   }, [groupId, characterId]);
 
   const toggleEquipped = useCallback(async (itemId: number) => {
-    const isCurrentlyEquipped = settings.equipped.includes(itemId);
-    const action: 'add' | 'remove' = isCurrentlyEquipped ? 'remove' : 'add';
+    const wasEquipped = settings.equipped.includes(itemId);
+    const nextEquipped = wasEquipped
+      ? settings.equipped.filter(id => id !== itemId)
+      : [...settings.equipped, itemId];
+
+    setSettings(prev => {
+      const next = { ...prev, equipped: nextEquipped };
+      localStorage.setItem(STORAGE_KEY(groupId, characterId), JSON.stringify(next));
+      return next;
+    });
 
     try {
-      const updatedEquipment = await characterEquipmentAPI.patchEquipment(groupId, characterId, action, itemId);
+      if (wasEquipped) {
+        await characterEquipmentAPI.unequipItem(groupId, characterId, itemId);
+      } else {
+        await characterEquipmentAPI.equipItem(groupId, characterId, itemId);
+      }
+    } catch (err) {
+      console.error('Failed to update equipment:', err);
       setSettings(prev => {
-        const next = { ...prev, equipped: updatedEquipment };
+        const next = { ...prev, equipped: settings.equipped };
         localStorage.setItem(STORAGE_KEY(groupId, characterId), JSON.stringify(next));
         return next;
       });
-    } catch (err) {
-      console.error('Failed to update equipment:', err);
     }
   }, [groupId, characterId, settings.equipped]);
 

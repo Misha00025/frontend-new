@@ -7,7 +7,8 @@ jest.mock('../services/api', () => ({
   },
   characterEquipmentAPI: {
     getEquipment: jest.fn(),
-    patchEquipment: jest.fn(),
+    equipItem: jest.fn(),
+    unequipItem: jest.fn(),
     putEquipment: jest.fn(),
   },
 }));
@@ -88,10 +89,9 @@ describe('useDashboardSettings', () => {
     expect(result.current.settings.items).not.toContain(7);
   });
 
-  it('toggleEquipped вызывает patchEquipment и обновляет equipped', async () => {
+  it('toggleEquipped вызывает equipItem и оптимистично обновляет equipped', async () => {
     mockGroupAPI.getCharacterResources.mockResolvedValue([]);
     mockEquipmentAPI.getEquipment.mockResolvedValue([]);
-    mockEquipmentAPI.patchEquipment.mockResolvedValue([1, 2, 3]);
 
     const { result } = renderHook(() => useDashboardSettings(groupId, characterId));
 
@@ -101,8 +101,24 @@ describe('useDashboardSettings', () => {
       await result.current.toggleEquipped(1);
     });
 
-    expect(mockEquipmentAPI.patchEquipment).toHaveBeenCalledWith(groupId, characterId, 'add', 1);
-    expect(result.current.settings.equipped).toEqual([1, 2, 3]);
+    expect(mockEquipmentAPI.equipItem).toHaveBeenCalledWith(groupId, characterId, 1);
+    expect(result.current.settings.equipped).toEqual([1]);
+  });
+
+  it('toggleEquipped вызывает unequipItem когда предмет уже экипирован', async () => {
+    mockGroupAPI.getCharacterResources.mockResolvedValue([]);
+    mockEquipmentAPI.getEquipment.mockResolvedValue([1]);
+
+    const { result } = renderHook(() => useDashboardSettings(groupId, characterId));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.toggleEquipped(1);
+    });
+
+    expect(mockEquipmentAPI.unequipItem).toHaveBeenCalledWith(groupId, characterId, 1);
+    expect(result.current.settings.equipped).toEqual([]);
   });
 
   it('togglePinnedSkill добавляет и убирает скилл', async () => {

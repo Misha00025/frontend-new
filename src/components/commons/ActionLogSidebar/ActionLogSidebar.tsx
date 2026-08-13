@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { charactersAPI, characterItemsAPI, characterSkillsAPI, characterLogAPI, groupUsersAPI } from '../../../services/api';
+import { charactersAPI, characterItemsAPI, characterSkillsAPI, characterLogAPI, groupUsersAPI, groupItemsAPI } from '../../../services/api';
 import { ActionLogEntry, ActionLogResponse } from '../../../types/actionLog';
 import { GroupUser } from '../../../types/groupUsers';
 import styles from './ActionLogSidebar.module.css';
@@ -12,10 +12,12 @@ interface ActionLogSidebarProps {
 const PAGE_SIZE = 50;
 
 const ACTION_LABELS: Record<string, { label: string; icon: string }> = {
-  field_change: { label: 'Поле', icon: '📝' },
-  item_change: { label: 'Предмет', icon: '🎒' },
-  skill_change: { label: 'Способность', icon: '⚡' },
-  equipment_change: { label: 'Экипировка', icon: '🛡️' },
+  AddField: { label: 'Поле', icon: '📝' },
+  UpdateField: { label: 'Поле', icon: '📝' },
+  DeleteField: { label: 'Поле', icon: '📝' },
+  EquipItem: { label: 'Экипировка', icon: '🛡️' },
+  UnequipItem: { label: 'Экипировка', icon: '🛡️' },
+  UpdateItem: { label: 'Предмет', icon: '🎒' },
 };
 
 function formatTimestamp(ts: string): string {
@@ -36,28 +38,23 @@ function getDetailsText(
   entry: ActionLogEntry,
   fieldNames: Map<string, string>,
   itemNames: Map<number, string>,
-  skillNames: Map<number, string>
+  _skillNames: Map<number, string>
 ): string {
   const { details } = entry;
-  const newValue = details.oldValue + details.delta;
+  const oldValue = details.oldValue ?? 0;
+  const delta = details.delta ?? 0;
+  const newValue = oldValue + delta;
 
   let displayKey: string;
-  switch (entry.actionType) {
-    case 'field_change':
-      displayKey = fieldNames.get(details.key) || details.key;
-      break;
-    case 'item_change':
-    case 'equipment_change':
-      displayKey = itemNames.get(Number(details.key)) || `#${details.key}`;
-      break;
-    case 'skill_change':
-      displayKey = skillNames.get(Number(details.key)) || `#${details.key}`;
-      break;
-    default:
-      displayKey = details.key;
+  if (entry.actionType === 'AddField' || entry.actionType === 'UpdateField' || entry.actionType === 'DeleteField') {
+    displayKey = fieldNames.get(details!.key!) || details!.key!;
+  } else if (entry.actionType === 'EquipItem' || entry.actionType === 'UnequipItem' || entry.actionType === 'UpdateItem') {
+    displayKey = itemNames.get(Number(details!.itemId!)) || `#${details!.itemId}`;
+  } else {
+    displayKey = details.key || '';
   }
 
-  return `${displayKey}: ${details.oldValue} → ${newValue}`;
+  return `${displayKey}: ${oldValue} → ${newValue}`;
 }
 
 const ActionLogSidebar: React.FC<ActionLogSidebarProps> = ({ groupId, characterId }) => {
@@ -123,10 +120,11 @@ const ActionLogSidebar: React.FC<ActionLogSidebarProps> = ({ groupId, characterI
   useEffect(() => {
     const fetchNames = async () => {
       try {
-        const [charData, itemsData, skillsData] = await Promise.all([
+        const [charData, itemsData, skillsData, groupItems] = await Promise.all([
           charactersAPI.getCharacter(groupId, characterId),
           characterItemsAPI.getCharacterItems(groupId, characterId),
           characterSkillsAPI.getCharacterSkills(groupId, characterId),
+          groupItemsAPI.getItems(groupId),
         ]);
         const fMap = new Map<string, string>();
         Object.entries(charData.fields || {}).forEach(([key, field]: [string, any]) => {
@@ -134,6 +132,7 @@ const ActionLogSidebar: React.FC<ActionLogSidebarProps> = ({ groupId, characterI
         });
         setFieldNames(fMap);
         const iMap = new Map<number, string>();
+        groupItems.forEach((item: any) => iMap.set(item.id, item.name));
         itemsData.forEach((item: any) => iMap.set(item.id, item.name));
         setItemNames(iMap);
         const sMap = new Map<number, string>();
@@ -204,12 +203,12 @@ const ActionLogSidebar: React.FC<ActionLogSidebarProps> = ({ groupId, characterI
                 <div className={styles.entryList}>
                   {entries.map((entry, idx) => {
                     const meta = ACTION_LABELS[entry.actionType] || { label: entry.actionType, icon: '❓' };
-                    const deltaClass = entry.details.delta > 0
+                    const deltaClass = (entry.details.delta ?? 0) > 0
                       ? styles.entryPositive
-                      : entry.details.delta < 0
+                      : (entry.details.delta ?? 0) < 0
                       ? styles.entryNegative
                       : '';
-                    const deltaDisplay = getDeltaDisplay(entry.details.delta);
+                    const deltaDisplay = getDeltaDisplay(entry.details.delta ?? 0);
 
                     return (
                       <div key={`${entry.timestamp}-${idx}`} className={`${styles.entry} ${deltaClass}`}>
