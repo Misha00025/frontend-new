@@ -21,7 +21,7 @@ interface ThemeContextType {
   setPreset: (name: PresetTheme) => void;
   setCustomColors: (colors: CustomColors) => void;
   getCurrentColors: () => CustomColors;
-  pushThemeToServer: () => Promise<void>;
+  pushThemeToServer: (config?: ThemeConfig) => Promise<void>;
   syncThemeFromServer: () => Promise<void>;
   themeSyncing: boolean;
   themeSyncError: string | null;
@@ -218,12 +218,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return themeConfig.colors;
   }, [themeConfig]);
 
-  const pushThemeToServer = useCallback(async () => {
+  const pushThemeToServer = useCallback(async (config?: ThemeConfig) => {
     if (!userId) return;
     setThemeSyncing(true);
     setThemeSyncError(null);
     try {
-      await userSettingsAPI.updateSettings(userId, { theme: themeConfig });
+      await userSettingsAPI.updateSettings(userId, { theme: config ?? themeConfig });
     } catch (e) {
       setThemeSyncError(e instanceof Error ? e.message : 'Failed to push theme to server');
     } finally {

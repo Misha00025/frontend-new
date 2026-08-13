@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme, PRESET_COLORS } from '../../../contexts/ThemeContext';
-import type { PresetTheme } from '../../../types/theme';
+import type { PresetTheme, ThemeConfig } from '../../../types/theme';
 import type { CustomColors } from '../../../types/theme';
 import { PRESET_LABELS } from '../../../types/theme';
 import buttonStyles from '../../../styles/components/Button.module.css';
@@ -27,21 +27,23 @@ const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) 
     if (pushTimerRef.current) clearTimeout(pushTimerRef.current);
   }, []);
 
-  const scheduleThemePush = () => {
+  const scheduleThemePush = (config: ThemeConfig) => {
     if (pushTimerRef.current) clearTimeout(pushTimerRef.current);
     pushTimerRef.current = setTimeout(() => {
-      pushThemeToServer();
+      pushThemeToServer(config);
     }, 400);
   };
 
   const applyPreset = (name: PresetTheme) => {
+    const config: ThemeConfig = { type: 'preset', name };
     setPreset(name);
-    scheduleThemePush();
+    scheduleThemePush(config);
   };
 
   const applyCustomColors = (colors: CustomColors) => {
+    const config: ThemeConfig = { type: 'custom', colors };
     setCustomColors(colors);
-    scheduleThemePush();
+    scheduleThemePush(config);
   };
   if (!isOpen) return null;
 
