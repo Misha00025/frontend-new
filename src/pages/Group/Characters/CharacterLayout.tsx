@@ -10,6 +10,7 @@ import { useVisited } from '../../../contexts/VisitedContext';
 import { useDashboardSettings } from '../../../hooks/useDashboardSettings';
 import { DashboardSettingsProvider, DashboardSettingsContextType } from '../../../contexts/DashboardSettingsContext';
 import { CharacterProvider, useCharacter } from '../../../contexts/CharacterContext';
+import ActionLogSidebar from '../../../components/commons/ActionLogSidebar/ActionLogSidebar';
 
 interface CharacterLayoutContentProps {
   group: Group | null;
@@ -59,6 +60,7 @@ const CharacterLayoutContent: React.FC<CharacterLayoutContentProps> = ({ group, 
     >
       <DashboardSettingsProvider value={dashboardSettings as DashboardSettingsContextType}>
         <Outlet />
+        <ActionLogSidebar groupId={Number(groupId)} characterId={Number(characterId)} />
       </DashboardSettingsProvider>
     </PageLayout>
   );
