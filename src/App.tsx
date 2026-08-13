@@ -120,8 +120,8 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
         <GroupProvider>
           <VisitedProvider>
           <Router>
@@ -135,8 +135,8 @@ const App: React.FC = () => {
           </Router>
           </VisitedProvider>
         </GroupProvider>
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 

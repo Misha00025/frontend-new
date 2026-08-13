@@ -171,19 +171,8 @@
 
 /* Buttons row */
 .buttons {
-  display: flex;
-  gap: 0.75rem;
   margin-top: 1rem;
-}
-
-.buttons button {
-  flex: 1 1 0;
   width: 100%;
-  min-width: 0;
-  padding: 0.6rem 0.75rem;
-  white-space: nowrap;
-  text-align: center;
-  font-size: 0.85rem;
 }
 
 /* Mobile: fullscreen */
@@ -235,12 +224,10 @@
 }
 
 .progressRow {
-  display: flex;
-  gap: 1rem;
+  margin-top: 0.5rem;
 }
 
 .progressItem {
-  flex: 1;
   display: flex;
   align-items: center;
   gap: 0.5rem;

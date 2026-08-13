@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import type { ThemeConfig, PresetTheme, CustomColors } from '../types/theme';
 import { DEFAULT_THEME } from '../types/theme';
 import {
@@ -12,6 +12,8 @@ import {
   computeProgressTo,
   isLight,
 } from '../utils/color';
+import { useAuth } from './AuthContext';
+import { userSettingsAPI } from '../services/api';
 
 interface ThemeContextType {
   themeConfig: ThemeConfig;
@@ -19,6 +21,10 @@ interface ThemeContextType {
   setPreset: (name: PresetTheme) => void;
   setCustomColors: (colors: CustomColors) => void;
   getCurrentColors: () => CustomColors;
+  pushThemeToServer: () => Promise<void>;
+  syncThemeFromServer: () => Promise<void>;
+  themeSyncing: boolean;
+  themeSyncError: string | null;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -115,16 +121,89 @@ function readConfigFromStorage(): ThemeConfig {
   return DEFAULT_THEME;
 }
 
+function normalizeServerTheme(val: unknown): ThemeConfig | null {
+  if (val === null || val === undefined) return null;
+
+  // Старый формат: просто строка 'light' или 'dark' (или другой пресет)
+  if (typeof val === 'string') {
+    if (val === 'light') return { type: 'preset', name: 'clean' };
+    if (val === 'dark') return { type: 'preset', name: 'dark' };
+    return { type: 'preset', name: val as PresetTheme };
+  }
+
+  if (typeof val === 'object') {
+    const obj = val as Record<string, unknown>;
+    if (obj.type === 'preset') {
+      const name = obj.name as string | undefined;
+      if (name === 'light') return { type: 'preset', name: 'clean' };
+      if (name && typeof name === 'string') return { type: 'preset', name: name as PresetTheme };
+      return null;
+    }
+    if (obj.type === 'custom') {
+      const c = obj.colors as Record<string, unknown> | undefined;
+      if (c && typeof c === 'object') {
+        return {
+          type: 'custom',
+          colors: {
+            bgPrimary: (typeof c.bgPrimary === 'string' && c.bgPrimary) || PRESET_COLORS['clean'].bgPrimary,
+            textPrimary: (typeof c.textPrimary === 'string' && c.textPrimary) || PRESET_COLORS['clean'].textPrimary,
+            accentColor: (typeof c.accentColor === 'string' && c.accentColor) || PRESET_COLORS['clean'].accentColor,
+            progressFrom: (typeof c.progressFrom === 'string' && c.progressFrom) || PRESET_COLORS['clean'].progressFrom,
+            progressTo: (typeof c.progressTo === 'string' && c.progressTo) || PRESET_COLORS['clean'].progressTo,
+          } as CustomColors,
+        };
+      }
+      return null;
+    }
+  }
+
+  return null;
+}
+
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [themeConfig, setThemeConfigState] = useState<ThemeConfig>(() => {
     const config = readConfigFromStorage();
     return config;
   });
 
+  const { userId } = useAuth();
+  const [themeSyncing, setThemeSyncing] = useState(false);
+  const [themeSyncError, setThemeSyncError] = useState<string | null>(null);
+  const autoSyncedUserIdRef = useRef<number | null>(null);
+
   // Применяем тему при монтировании и при изменении
   useEffect(() => {
     applyConfig(themeConfig);
   }, [themeConfig]);
+
+  // Авто-реконсиляция темы с сервером при появлении userId
+  useEffect(() => {
+    if (!userId || autoSyncedUserIdRef.current === userId) return;
+    autoSyncedUserIdRef.current = userId;
+
+    (async () => {
+      try {
+        const localThemePresent =
+          localStorage.getItem('themeConfig') !== null ||
+          localStorage.getItem('theme') !== null;
+
+        const res = await userSettingsAPI.getSettings(userId, ['theme']);
+        const raw = res?.settings?.theme;
+        const serverThemePresent = raw !== undefined && raw !== null;
+
+        if (serverThemePresent && !localThemePresent) {
+          const config = normalizeServerTheme(raw);
+          if (config) setThemeConfig(config);
+        } else if (!serverThemePresent && localThemePresent) {
+          await userSettingsAPI.updateSettings(userId, { theme: themeConfig });
+        }
+        // оба есть → не трогаем; оба пусты → не трогаем
+      } catch (err) {
+        console.warn('Theme auto-sync failed:', err);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   const setThemeConfig = useCallback((config: ThemeConfig) => {
     localStorage.setItem('themeConfig', JSON.stringify(config));
@@ -148,8 +227,40 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return themeConfig.colors;
   }, [themeConfig]);
 
+  const pushThemeToServer = useCallback(async () => {
+    if (!userId) return;
+    setThemeSyncing(true);
+    setThemeSyncError(null);
+    try {
+      await userSettingsAPI.updateSettings(userId, { theme: themeConfig });
+    } catch (e) {
+      setThemeSyncError(e instanceof Error ? e.message : 'Failed to push theme to server');
+    } finally {
+      setThemeSyncing(false);
+    }
+  }, [userId, themeConfig]);
+
+  const syncThemeFromServer = useCallback(async () => {
+    if (!userId) return;
+    setThemeSyncing(true);
+    setThemeSyncError(null);
+    try {
+      const res = await userSettingsAPI.getSettings(userId, ['theme']);
+      const raw = res.settings.theme;
+      if (raw === undefined || raw === null) return;
+      const config = normalizeServerTheme(raw);
+      if (config) {
+        setThemeConfig(config);
+      }
+    } catch (e) {
+      setThemeSyncError(e instanceof Error ? e.message : 'Failed to sync theme from server');
+    } finally {
+      setThemeSyncing(false);
+    }
+  }, [userId, setThemeConfig]);
+
   return (
-    <ThemeContext.Provider value={{ themeConfig, setThemeConfig, setPreset, setCustomColors, getCurrentColors }}>
+    <ThemeContext.Provider value={{ themeConfig, setThemeConfig, setPreset, setCustomColors, getCurrentColors, pushThemeToServer, syncThemeFromServer, themeSyncing, themeSyncError }}>
       {children}
     </ThemeContext.Provider>
   );

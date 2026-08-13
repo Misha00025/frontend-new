@@ -5,6 +5,7 @@ import type { CustomColors } from '../../../types/theme';
 import { PRESET_LABELS } from '../../../types/theme';
 import buttonStyles from '../../../styles/components/Button.module.css';
 import styles from './PersonalizeModal.module.css';
+import AdaptiveLayout from '../../../components/commons/AdaptiveLayout/AdaptiveLayout';
 
 interface PersonalizeModalProps {
   isOpen: boolean;
@@ -12,10 +13,10 @@ interface PersonalizeModalProps {
 }
 
 const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) => {
-  const { themeConfig, setPreset, setCustomColors, getCurrentColors } = useTheme();
+  const { themeConfig, setPreset, setCustomColors, getCurrentColors, pushThemeToServer, syncThemeFromServer, themeSyncing, themeSyncError } = useTheme();
   const currentColors = getCurrentColors();
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const [customColors, setCustomColorsState] = useState<CustomColors>({ ...currentColors });
-
 
   useEffect(() => {
     setCustomColorsState({ ...getCurrentColors() });
@@ -49,6 +50,25 @@ const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) 
     }
   };
 
+  const handleLoadFromServer = async () => {
+    setSyncMessage(null);
+    try {
+      await syncThemeFromServer();
+      setSyncMessage('Тема загружена с сервера');
+    } catch {
+      /* ошибка уже в themeSyncError */
+    }
+  };
+
+  const handlePushToServer = async () => {
+    setSyncMessage(null);
+    try {
+      await pushThemeToServer();
+      setSyncMessage('Тема сохранена на сервер');
+    } catch {
+      /* ошибка уже в themeSyncError */
+    }
+  };
 
   const lightPresets: PresetTheme[] = ['clean', 'forest', 'ocean', 'sunset', 'lavender'];
   const darkPresets: PresetTheme[] = ['dark', 'forest-dark', 'ocean-dark', 'sunset-dark', 'lavender-dark'];
@@ -124,7 +144,7 @@ const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) 
           })}
 
           <h3 className={styles.progressTitle}>Шкала прогресса</h3>
-          <div className={styles.progressRow}>
+          <AdaptiveLayout className={styles.progressRow} gap={16}>
             <div className={styles.progressItem}>
               <label htmlFor="custom-progressFrom">От</label>
               <input
@@ -157,20 +177,28 @@ const PersonalizeModal: React.FC<PersonalizeModalProps> = ({ isOpen, onClose }) 
                 onBlur={handleHexBlur('progressTo')}
               />
             </div>
-          </div>
+          </AdaptiveLayout>
         </div>
 
-        <div className={styles.buttons}>
-          <button
-            className={buttonStyles.button}
-            onClick={() => setPreset('clean')}
-          >
+        <AdaptiveLayout className={styles.buttons}>
+          <AdaptiveLayout.Full>
+            {themeSyncing && <p style={{ margin: '4px 0', fontSize: '13px', color: 'var(--text-primary, #6b7280)' }}>Синхронизация...</p>}
+            {themeSyncError && <p style={{ margin: '4px 0', fontSize: '13px', color: 'var(--danger-color)' }}>{themeSyncError}</p>}
+            {syncMessage && !themeSyncError && <p style={{ margin: '4px 0', fontSize: '13px', color: 'var(--text-primary, #6b7280)' }}>{syncMessage}</p>}
+          </AdaptiveLayout.Full>
+          <button className={buttonStyles.button} onClick={handleLoadFromServer} disabled={themeSyncing}>
+            Загрузить тему с сервера
+          </button>
+          <button className={buttonStyles.button} onClick={handlePushToServer} disabled={themeSyncing}>
+            Сохранить тему на сервер
+          </button>
+          <button className={buttonStyles.button} onClick={() => setPreset('clean')}>
             Сбросить
           </button>
           <button className={buttonStyles.button} onClick={onClose}>
             Закрыть
           </button>
-        </div>
+        </AdaptiveLayout>
       </div>
     </div>
   );

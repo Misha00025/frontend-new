@@ -36,6 +36,7 @@ import { GroupNote, CreateGroupNoteRequest, UpdateGroupNoteRequest } from '../ty
 import { CreateGroupSkillRequest, CreateSkillAttributeRequest, GroupSkill, GroupSkillsResponse, SkillAttributeDefinition, SkillAttributesResponse, UpdateGroupSkillRequest } from '../types/groupSkills';
 import { GroupSchema, TemplateSchema } from '../types/groupSchemas';
 import { ActionLogResponse } from '../types/actionLog';
+import { UserSettingsResponse, UserSettingsValue } from '../types/userSettings';
 
 
 export const authAPI = {
@@ -984,6 +985,34 @@ export const characterCommandsAPI = {
     });
     if (!response.ok) {
       throw new Error('Failed to execute character command');
+    }
+    return response.json();
+  },
+};
+
+export const userSettingsAPI = {
+  getSettings: async (userId: number, keys?: string[]): Promise<UserSettingsResponse> => {
+    const query = new URLSearchParams();
+    if (keys && keys.length > 0) query.set('keys', keys.join(','));
+    const qs = query.toString();
+    const endpoint = `/users/${userId}/settings${qs ? `?${qs}` : ''}`;
+    const response = await makeAuthenticatedRequest(endpoint);
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error?.detail || 'Failed to fetch user settings');
+    }
+    return response.json();
+  },
+
+  updateSettings: async (userId: number, settings: Record<string, UserSettingsValue>): Promise<UserSettingsResponse> => {
+    const response = await makeAuthenticatedRequest(`/users/${userId}/settings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error?.detail || 'Failed to update user settings');
     }
     return response.json();
   },
