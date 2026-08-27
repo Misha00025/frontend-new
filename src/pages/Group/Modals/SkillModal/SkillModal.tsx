@@ -277,7 +277,7 @@ const SkillModal: React.FC<SkillModalProps> = ({
         }
         className={inputStyles.input}
         placeholder="Значение"
-        required
+        required={!isNew}
       />
     );
   };

@@ -1,7 +1,7 @@
 // GroupSkills.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { GroupSkill } from '../../types/groupSkills';
+import { GroupSkill, SkillAttributeDefinition } from '../../types/groupSkills';
 import { groupAPI, groupSkillsAPI } from '../../services/api';
 import { useGroupSchemas } from '../../contexts/GroupSchemasContext';
 import SkillCard from './Cards/SkillCard/SkillCard';
@@ -36,12 +36,23 @@ const GroupSkills: React.FC = () => {
   const { canEditGroup } = useActionPermissions();
   const { skillsSchema, refreshSchemas } = useGroupSchemas();
   const [isSchemaModalOpen, setIsSchemaModalOpen] = useState(false);
+  const [attributes, setAttributes] = useState<SkillAttributeDefinition[]>([]);
   
   useEffect(() => {
     if (groupId) {
       loadSkills();
+      loadAttributes();
     }
   }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadAttributes = async () => {
+    try {
+      const attributesData = await groupSkillsAPI.getSkillAttributes(parseInt(groupId!));
+      setAttributes(attributesData);
+    } catch (err) {
+      console.error('Failed to load attributes:', err);
+    }
+  };
 
   const loadSkills = async () => {
     try {
@@ -146,7 +157,7 @@ const GroupSkills: React.FC = () => {
           onSave={handleSaveSkill}
           editingSkill={editingSkill}
           title={editingSkill ? 'Редактирование навыка' : 'Создание навыка'}
-          availableAttributes={[]}
+          availableAttributes={attributes}
           possibleValuesForFilteredAttributes={{}}
         />
         
