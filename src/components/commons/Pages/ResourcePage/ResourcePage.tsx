@@ -24,6 +24,7 @@ export interface ResourcePageConfig<T> {
   };
   
   groupByAttributes?: string[];
+  groupsInitiallyCollapsed?: boolean;
 }
 
 interface ResourcePageProps<T extends { 
@@ -44,6 +45,7 @@ interface ResourcePageProps<T extends {
   onConfigureSchema?: () => void;
   onEdit?: (item: T) => void;
   onDelete?: (id: number) => void;
+  expandedItemId?: number | null;
 }
 
 const ResourcePage = <T extends { 
@@ -59,11 +61,12 @@ const ResourcePage = <T extends {
   canCreate,
   canEdit,
   canDelete,
-  canConfigureSchema = false,
+   canConfigureSchema = false,
   onCreate,
   onConfigureSchema,
   onEdit,
   onDelete,
+  expandedItemId,
 }: ResourcePageProps<T>) => {
   const isMobile = usePlatform();
   const [searchTerm, setSearchTerm] = useState('');
@@ -159,6 +162,8 @@ const ResourcePage = <T extends {
               onEdit={canEdit ? onEdit : undefined}
               onDelete={canDelete ? onDelete : undefined}
               showActions={canEdit || canDelete}
+              defaultCollapsed={config.groupsInitiallyCollapsed ?? false}
+              expandedItemId={expandedItemId}
             />
           ))}
           

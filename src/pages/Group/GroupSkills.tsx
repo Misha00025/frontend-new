@@ -37,6 +37,7 @@ const GroupSkills: React.FC = () => {
   const { skillsSchema, refreshSchemas } = useGroupSchemas();
   const [isSchemaModalOpen, setIsSchemaModalOpen] = useState(false);
   const [attributes, setAttributes] = useState<SkillAttributeDefinition[]>([]);
+  const [lastUpdatedSkillId, setLastUpdatedSkillId] = useState<number | null>(null);
   
   useEffect(() => {
     if (groupId) {
@@ -44,6 +45,18 @@ const GroupSkills: React.FC = () => {
       loadAttributes();
     }
   }, [groupId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (lastUpdatedSkillId == null) return;
+    const timer = setTimeout(() => {
+      const el = document.getElementById(`skill-${lastUpdatedSkillId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setLastUpdatedSkillId(null);
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [lastUpdatedSkillId, skills]);
 
   const loadAttributes = async () => {
     try {
@@ -87,16 +100,35 @@ const GroupSkills: React.FC = () => {
     }
   };
   
+  const availableAttributes = Array.from(
+    new Set(
+      skills.flatMap(skill =>
+        skill.attributes?.map(attr => attr.name) || []
+      )
+    )
+  ).sort();
+
+  const config = {
+    ItemComponent: SkillCardWrapper,
+    titles: {
+      page: undefined,
+    },
+    groupByAttributes: skillsSchema.groupBy,
+    groupsInitiallyCollapsed: true,
+  };
+
   const handleSaveSkill = async (skillData: any) => {
+    let savedSkill: GroupSkill;
     if (editingSkill) {
-      await groupSkillsAPI.updateSkill(parseInt(groupId!), editingSkill.id, skillData);
+      savedSkill = await groupSkillsAPI.updateSkill(parseInt(groupId!), editingSkill.id, skillData);
     } else {
-      await groupSkillsAPI.createSkill(parseInt(groupId!), skillData);
+      savedSkill = await groupSkillsAPI.createSkill(parseInt(groupId!), skillData);
     }
-    
+
     setIsModalOpen(false);
     setEditingSkill(null);
-    loadSkills();
+    await loadSkills();
+    setLastUpdatedSkillId(savedSkill.id);
   };
 
   const handleConfigureSchema = () => {
@@ -113,22 +145,6 @@ const GroupSkills: React.FC = () => {
     }
   };
 
-  const availableAttributes = Array.from(
-    new Set(
-      skills.flatMap(skill => 
-        skill.attributes?.map(attr => attr.name) || []
-      )
-    )
-  ).sort();
-  
-  const config = {
-    ItemComponent: SkillCardWrapper,
-    titles: {
-      page: undefined,
-    },
-    groupByAttributes: skillsSchema.groupBy,
-  };
-  
   return (
     <>
       <ResourcePage
@@ -144,6 +160,7 @@ const GroupSkills: React.FC = () => {
         onCreate={handleCreate}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        expandedItemId={lastUpdatedSkillId}
       />
       
       {canEditGroup && (

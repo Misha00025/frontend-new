@@ -1,5 +1,5 @@
 // src/components/common/CollapsibleGroup/CollapsibleGroup.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import List from '../../../components/List/List';
 import styles from './CollapsibleGroup.module.css';
 
@@ -24,6 +24,7 @@ interface CollapsibleGroupProps<T> {
   onDelete?: (id: number) => void;
   showActions?: boolean;
   defaultCollapsed?: boolean;
+  expandedItemId?: number | null;
 }
 
 const CollapsibleGroup = <T extends { id: number }>({
@@ -35,10 +36,9 @@ const CollapsibleGroup = <T extends { id: number }>({
   onDelete,
   showActions,
   defaultCollapsed = false,
+  expandedItemId,
 }: CollapsibleGroupProps<T>) => {
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
-  
-  // Вычисляем общее количество элементов в группе (включая подгруппы)
+  // helpers before hooks
   const calculateTotalItems = (g: Group<T>): number => {
     let total = g.items.length;
     g.children.forEach(child => {
@@ -46,8 +46,26 @@ const CollapsibleGroup = <T extends { id: number }>({
     });
     return total;
   };
-  
+
+  const containsExpandedItem = (g: Group<T>, targetId: number | null | undefined): boolean => {
+    if (targetId == null) return false;
+    if (g.items.some(item => item.id === targetId)) return true;
+    return g.children.some(child => containsExpandedItem(child, targetId));
+  };
+
   const totalItems = calculateTotalItems(group);
+
+  const groupContainsExpandedItem = containsExpandedItem(group, expandedItemId);
+
+  const initialCollapsed = groupContainsExpandedItem ? false : defaultCollapsed;
+
+  const [isCollapsed, setIsCollapsed] = useState(initialCollapsed);
+
+  useEffect(() => {
+    if (groupContainsExpandedItem) {
+      setIsCollapsed(false);
+    }
+  }, [expandedItemId, groupContainsExpandedItem]);
   
   return (
     <div className={styles.container}>
@@ -100,7 +118,8 @@ const CollapsibleGroup = <T extends { id: number }>({
               onEdit={onEdit}
               onDelete={onDelete}
               showActions={showActions}
-              defaultCollapsed={level > 0} // Подгруппы по умолчанию свернуты
+              defaultCollapsed={defaultCollapsed || level > 0}
+              expandedItemId={expandedItemId}
             />
           ))}
         </div>
