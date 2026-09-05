@@ -2,11 +2,11 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation, useParams, Outlet } from 'react-router-dom';
 import { GroupSchemasProvider } from './contexts/GroupSchemasContext';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider, useAuth } from '@tdn/shared/auth/AuthContext';
+import { ThemeProvider } from '@tdn/shared/theme/ThemeContext';
 import { GroupProvider } from './contexts/GroupContext';
 import { VisitedProvider } from './contexts/VisitedContext';
-import { useProfile } from './hooks/useProfile';
+import { useProfile } from '@tdn/shared/auth/useProfile';
 import CompleteRegistration from './pages/Authorisation/CompleteRegistration';
 import Dashboard from './pages/Dashboard';
 import Groups from './pages/Groups';
@@ -26,10 +26,10 @@ import GroupItems from './pages/Group/GroupItems';
 import GroupNotes from './pages/Group/GroupNotes';
 import GroupQuests from './pages/Group/GroupQuests';
 import Profile from './pages/Profile';
-import './styles/globals.css';
+import '@tdn/shared/styles/globals.css';
 import { GroupUsersProvider } from './contexts/GroupUsersContext';
 import { PermissionsProvider } from './contexts/PermissionsContext';
-import { SidebarProvider } from './contexts/SidebarContext';
+import { SidebarProvider } from '@tdn/shared/ui/SidebarContext';
 import GroupSkills from './pages/Group/GroupSkills';
 import Login from './pages/Authorisation/Login';
 

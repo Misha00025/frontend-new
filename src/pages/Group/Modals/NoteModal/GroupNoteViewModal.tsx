@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { GroupNote } from '../../../../types/groupNotes';
-import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
-import modalStyles from '../../../../styles/modal.module.css';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
+import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
 import { usePlatform } from '../../../../hooks/usePlatform';
 
 interface GroupNoteViewModalProps {

@@ -1,5 +1,5 @@
 .row {
-  composes: row from '../../../../../styles/character-table.module.css';
+  composes: row from '@tdn/shared/styles/character-table.module.css';
 }
 
 .row[draggable="true"]:hover {
@@ -12,7 +12,7 @@
 }
 
 .nameCell {
-  composes: nameCell from '../../../../../styles/character-table.module.css';
+  composes: nameCell from '@tdn/shared/styles/character-table.module.css';
 }
 
 .nameContent {
@@ -23,11 +23,11 @@
 }
 
 .fieldName {
-  composes: fieldName from '../../../../../styles/character-table.module.css';
+  composes: fieldName from '@tdn/shared/styles/character-table.module.css';
 }
 
 .valueCell {
-  composes: valueCell from '../../../../../styles/character-table.module.css';
+  composes: valueCell from '@tdn/shared/styles/character-table.module.css';
 }
 
 .value {
@@ -35,22 +35,22 @@
 }
 
 .editableValue {
-  composes: editableValue from '../../../../../styles/character-table.module.css';
+  composes: editableValue from '@tdn/shared/styles/character-table.module.css';
 }
 
 .editInput {
-  composes: editInput from '../../../../../styles/character-table.module.css';
+  composes: editInput from '@tdn/shared/styles/character-table.module.css';
 }
 
 .progressContainer {
-  composes: progressContainer from '../../../../../styles/character-table.module.css';
+  composes: progressContainer from '@tdn/shared/styles/character-table.module.css';
 }
 
 .progressBar {
-  composes: progressBar from '../../../../../styles/character-table.module.css';
+  composes: progressBar from '@tdn/shared/styles/character-table.module.css';
 }
 
 .progressText {
-  composes: progressText from '../../../../../styles/character-table.module.css';
+  composes: progressText from '@tdn/shared/styles/character-table.module.css';
 }
 

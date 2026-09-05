@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import type { ThemeConfig, PresetTheme, CustomColors } from '../types/theme';
-import { DEFAULT_THEME } from '../types/theme';
+import type { ThemeConfig, PresetTheme, CustomColors } from './types';
+import { DEFAULT_THEME } from './types';
 import {
   computeBgSecondary,
   computeTextSecondary,
@@ -11,9 +11,9 @@ import {
   computeProgressFrom,
   computeProgressTo,
   isLight,
-} from '../utils/color';
-import { useAuth } from './AuthContext';
-import { userSettingsAPI } from '../services/api';
+} from './color';
+import { useAuth } from '../auth/AuthContext';
+import { userSettingsAPI } from '../auth/api';
 
 interface ThemeContextType {
   themeConfig: ThemeConfig;

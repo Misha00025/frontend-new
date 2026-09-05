@@ -1,7 +1,7 @@
 import React from 'react';
 import { GroupQuest } from '../../../../types/groupQuests';
 import { User } from '../../../../types/groupUsers';
-import cardStyles from '../../../../styles/card-item.module.css';
+import cardStyles from '@tdn/shared/styles/card-item.module.css';
 import styles from './QuestCard.module.css';
 
 interface QuestCardProps {

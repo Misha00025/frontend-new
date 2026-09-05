@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { CharacterTemplate } from '../../../../types/characterTemplates';
 import { groupAPI } from '../../../../services/api';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import modalStyles from '../../../../styles/modal.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
 import styles from './CharacterResourcesModal.module.css';
-import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
 
 interface CharacterResourcesModalProps {
   isOpen: boolean;

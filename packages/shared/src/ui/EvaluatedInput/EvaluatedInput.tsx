@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { evaluateExpression } from '../../../utils/evaluateExpression';
+import { evaluateExpression } from '../../utils/evaluateExpression';
 
 interface EvaluatedInputProps {
   initialValue: string;

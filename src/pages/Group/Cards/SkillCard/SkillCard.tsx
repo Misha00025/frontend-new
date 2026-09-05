@@ -1,8 +1,8 @@
 // components/Cards/SkillCard.tsx
 import React, { useState, useContext } from 'react';
 import { GroupSkill } from '../../../../types/groupSkills';
-import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
-import cardStyles from '../../../../styles/card-item.module.css';
+import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
+import cardStyles from '@tdn/shared/styles/card-item.module.css';
 import ReactMarkdown from 'react-markdown';
 import { DashboardSettingsContext } from '../../../../contexts/DashboardSettingsContext';
 

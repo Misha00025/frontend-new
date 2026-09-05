@@ -6,9 +6,9 @@ import { useGroup } from '../../contexts/GroupContext';
 import { useVisited } from '../../contexts/VisitedContext';
 import { usePlatform } from '../../hooks/usePlatform';
 import { usePermissions } from '../../contexts/PermissionsContext';
-import PageLayout from '../../components/commons/PageLayout/PageLayout';
-import PageHeader from '../../components/commons/PageLayout/PageHeader';
-import { TabItem } from '../../components/commons/PageLayout/TabBar';
+import PageLayout from '@tdn/shared/ui/PageLayout/PageLayout';
+import PageHeader from '@tdn/shared/ui/PageLayout/PageHeader';
+import { TabItem } from '@tdn/shared/ui/PageLayout/TabBar';
 
 const GroupLayout: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();

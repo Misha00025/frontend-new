@@ -1,13 +1,13 @@
 // src/pages/CompleteRegistration.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@tdn/shared/auth/useAuth';
 import { userAPI } from '../../services/api';
-import buttonStyles from '../../styles/components/Button.module.css';
-import inputStyles from '../../styles/components/Input.module.css';
-import commonStyles from '../../styles/common.module.css';
-import modalStyles from '../../styles/modal.module.css';
-import { useProfile } from '../../hooks/useProfile';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import commonStyles from '@tdn/shared/styles/common.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import { useProfile } from '@tdn/shared/auth/useProfile';
 
 const CompleteRegistration: React.FC = () => {
   const [nickname, setNickname] = useState('');

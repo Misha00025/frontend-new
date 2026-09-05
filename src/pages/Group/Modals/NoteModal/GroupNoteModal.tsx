@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import MDEditor from '@uiw/react-md-editor';
-import modalStyles from '../../../../styles/modal.module.css';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import inputStyles from '../../../../styles/components/Input.module.css';
-import { useTheme, getEditorColorMode } from '../../../../contexts/ThemeContext';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import { useTheme, getEditorColorMode } from '@tdn/shared/theme/ThemeContext';
 import { GroupNote, CreateGroupNoteRequest } from '../../../../types/groupNotes';
-import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
 
 interface GroupNoteModalProps {
   isOpen: boolean;

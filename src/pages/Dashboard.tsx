@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import GlobalSidebar from '../components/commons/GlobalSidebar/GlobalSidebar';
+import GlobalSidebar from '@tdn/shared/ui/GlobalSidebar/GlobalSidebar';
 import { useVisited } from '../contexts/VisitedContext';
 import { groupAPI, charactersAPI } from '../services/api';
 import { Group } from '../types/group';
 import { Character } from '../types/characters';
-import styles from '../styles/common.module.css';
-import buttonStyles from '../styles/components/Button.module.css';
+import styles from '@tdn/shared/styles/common.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import dashStyles from './Dashboard.module.css';
 
 const Dashboard: React.FC = () => {

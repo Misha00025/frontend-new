@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { User } from '../../types/groupUsers';
-import buttonStyles from '../../styles/components/Button.module.css';
-import inputStyles from '../../styles/components/Input.module.css';
-import styles from '../../styles/common.module.css';
-import stylesUi from '../../styles/ui.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import styles from '@tdn/shared/styles/common.module.css';
+import stylesUi from '@tdn/shared/styles/ui.module.css';
 
 interface UserSearchProps {
   onSearch: (nickname: string) => Promise<User[]>;

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { CreateGroupRequest, Group } from '../../../types/group';
 import { groupAPI } from '../../../services/api';
-import buttonStyles from '../../../styles/components/Button.module.css';
-import inputStyles from '../../../styles/components/Input.module.css';
-import modalStyles from '../../../styles/modal.module.css';
-import ModalPortal from '../../commons/ModalPortal/ModalPortal';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
 
 interface CreateGroupModalProps {
   isOpen: boolean;

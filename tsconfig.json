@@ -19,7 +19,12 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vite/client", "vitest/globals"]
+    "types": ["vite/client", "vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "@tdn/shared": ["packages/shared/src/index.ts"],
+      "@tdn/shared/*": ["packages/shared/src/*"]
+    }
   },
   "include": [
     "src",

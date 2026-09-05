@@ -1,10 +1,10 @@
 // components/Modals/SchemaModal/SchemaModal.tsx
 import React, { useState, useEffect } from 'react';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import modalStyles from '../../../../styles/modal.module.css';
-import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
 import styles from './SchemaModal.module.css';
-import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
+import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
 
 interface SchemaModalProps {
   isOpen: boolean;

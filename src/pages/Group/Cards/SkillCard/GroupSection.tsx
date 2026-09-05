@@ -1,7 +1,7 @@
 // components/GroupSection/GroupSection.tsx
 import React, { useState } from 'react';
 import { GroupSkill, SkillGroup } from '../../../../types/groupSkills';
-import List from '../../../../components/List/List';
+import List from '@tdn/shared/ui/List/List';
 import SkillCard from './SkillCard';
 
 interface GroupSectionProps {

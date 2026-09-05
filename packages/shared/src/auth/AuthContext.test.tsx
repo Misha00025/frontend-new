@@ -3,7 +3,7 @@ import type { Mock, Mocked } from 'vitest';
 import { render, screen, act, waitFor } from '@testing-library/react';
 import { AuthProvider, useAuth } from './AuthContext';
 
-vi.mock('../services/api', () => ({
+vi.mock('./api', () => ({
   authAPI: {
     login: vi.fn(),
     register: vi.fn(),
@@ -11,7 +11,7 @@ vi.mock('../services/api', () => ({
   makeAuthenticatedRequest: vi.fn(),
 }));
 
-vi.mock('../services/tokenManager', () => ({
+vi.mock('./tokenManager', () => ({
   __esModule: true,
   default: {
     ensureToken: vi.fn(),
@@ -21,8 +21,8 @@ vi.mock('../services/tokenManager', () => ({
   },
 }));
 
-import { authAPI, makeAuthenticatedRequest } from '../services/api';
-import tokenManager from '../services/tokenManager';
+import { authAPI, makeAuthenticatedRequest } from './api';
+import tokenManager from './tokenManager';
 
 const createMockResponse = (status: number, body: Record<string, unknown>) =>
   Promise.resolve({

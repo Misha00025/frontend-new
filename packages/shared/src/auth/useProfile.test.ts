@@ -2,11 +2,11 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import type { Mock, Mocked } from 'vitest';
 import { useProfile } from './useProfile';
 
-vi.mock('../services/api', () => ({
+vi.mock('./api', () => ({
   makeAuthenticatedRequest: vi.fn(),
 }));
 
-import { makeAuthenticatedRequest } from '../services/api';
+import { makeAuthenticatedRequest } from './api';
 
 const createMockResponse = (status: number, body: Record<string, unknown>) =>
   Promise.resolve({

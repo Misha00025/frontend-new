@@ -3,15 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { CharacterTemplate, TemplateField, UpdateTemplateRequest } from '../../../../types/characterTemplates';
 import { characterTemplatesAPI, groupAPI } from '../../../../services/api';
-import commonStyles from '../../../../styles/common.module.css';
-import modalStyles from '../../../../styles/modal.module.css';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import inputStyles from '../../../../styles/components/Input.module.css'; // Добавляем импорт стилей для input
-import uiStyles from '../../../../styles/ui.module.css';
+import commonStyles from '@tdn/shared/styles/common.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css'; // Добавляем импорт стилей для input
+import uiStyles from '@tdn/shared/styles/ui.module.css';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import { TemplateCategory, TemplateSchema } from '../../../../types/groupSchemas';
 import { useGroupSchemas } from '../../../../contexts/GroupSchemasContext';
-import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
+import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
 import { TemplateEditProvider } from '../../../../contexts/TemplateEditContext';
 import TemplatePreview from './TemplatePreview/TemplatePreview';
 import CategoryModal from '../Modals/CharacterModal/CategoryModal';

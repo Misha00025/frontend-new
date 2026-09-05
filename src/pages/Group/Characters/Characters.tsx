@@ -4,10 +4,10 @@ import { CharacterShort } from '../../../types/characters';
 import { CharacterTemplate } from '../../../types/characterTemplates';
 import { charactersAPI, characterTemplatesAPI } from '../../../services/api';
 import CharacterModal from './Modals/CharacterModal/CharacterModal';
-import buttonStyles from '../../../styles/components/Button.module.css';
-import commonStyles from '../../../styles/common.module.css';
-import modalStyles from '../../../styles/modal.module.css';
-import List from '../../../components/List/List';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import commonStyles from '@tdn/shared/styles/common.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import List from '@tdn/shared/ui/List/List';
 import CharacterCard from '../Cards/CharacterCard/CharacterCard';
 import { useActionPermissions } from '../../../hooks/useActionPermissions';
 

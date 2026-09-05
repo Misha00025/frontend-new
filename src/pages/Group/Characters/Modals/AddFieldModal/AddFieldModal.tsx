@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { TemplateField } from '../../../../../types/characterTemplates';
-import buttonStyles from '../../../../../styles/components/Button.module.css';
-import modalStyles from '../../../../../styles/modal.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
 import styles from './AddFieldModal.module.css';
-import IconButton from '../../../../../components/commons/Buttons/IconButton/IconButton';
+import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
 
 interface AddFieldModalProps {
   isOpen: boolean;

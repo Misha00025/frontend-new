@@ -1,6 +1,6 @@
 import React from 'react';
 import { CharacterShort } from '../../../../types/characters';
-import buttonStyles from '../../../../styles/components/Button.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import styles from './CharacterCard.module.css';
 
 interface CharacterCardProps {

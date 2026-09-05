@@ -28,7 +28,7 @@
 }
 
 .categoryTitle {
-  composes: sectionTitle from '../../../../../styles/character-table.module.css';
+  composes: sectionTitle from '@tdn/shared/styles/character-table.module.css';
   margin-top: 0;
   margin-bottom: 1.5rem;
   position: relative;
@@ -52,7 +52,7 @@
 }
 
 .table {
-  composes: table from '../../../../../styles/character-table.module.css';
+  composes: table from '@tdn/shared/styles/character-table.module.css';
 }
 
 .dragging {

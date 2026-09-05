@@ -5,11 +5,11 @@ import { useGroup } from '../../contexts/GroupContext';
 import { usePermissions } from '../../contexts/PermissionsContext';
 import { groupAPI, characterTemplatesAPI } from '../../services/api';
 import { CharacterTemplate } from '../../types/characterTemplates';
-import commonStyles from '../../styles/common.module.css';
-import buttonStyles from '../../styles/components/Button.module.css';
+import commonStyles from '@tdn/shared/styles/common.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import styles from './GroupSettings.module.css';
 import GroupEditModal from '../../components/Modals/CreateGroupModal/EditGroupModal';
-import List from '../../components/List/List';
+import List from '@tdn/shared/ui/List/List';
 import { usePlatform } from '../../hooks/usePlatform';
 import CharacterResourcesModal from './Modals/ResourcesModal/CharacterResourcesModal';
 

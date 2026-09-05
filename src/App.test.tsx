@@ -11,7 +11,7 @@ vi.mock('@uiw/react-md-editor', () => ({
   default: () => null,
 }));
 
-vi.mock('./contexts/AuthContext', () => ({
+vi.mock('@tdn/shared/auth/AuthContext', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useAuth: () => ({
     accessToken: 'mock-token',
@@ -34,7 +34,7 @@ vi.mock('./contexts/PermissionsContext', () => ({
   PermissionsProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-vi.mock('./contexts/SidebarContext', () => ({
+vi.mock('@tdn/shared/ui/SidebarContext', () => ({
   SidebarProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 

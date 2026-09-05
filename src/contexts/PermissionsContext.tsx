@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from '@tdn/shared/auth/AuthContext';
 import { useLocation } from 'react-router-dom';
-import { getGroupAndCharacterIds } from '../utils/getGroupAndCharacterIds';
+import { getGroupAndCharacterIds } from '@tdn/shared/utils/getGroupAndCharacterIds';
 import { useGroupUsers } from './GroupUsersContext';
 
 interface PermissionsContextType {

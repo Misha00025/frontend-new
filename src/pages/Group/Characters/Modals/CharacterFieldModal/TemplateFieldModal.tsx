@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { TemplateField } from '../../../../../types/characterTemplates';
-import buttonStyles from '../../../../../styles/components/Button.module.css';
-import inputStyles from '../../../../../styles/components/Input.module.css';
-import modalStyles from '../../../../../styles/modal.module.css';
-import uiStyles from '../../../../../styles/ui.module.css';
-import ModalPortal from '../../../../../components/commons/ModalPortal/ModalPortal';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import uiStyles from '@tdn/shared/styles/ui.module.css';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
 
 interface TemplateFieldModalProps {
   isOpen: boolean;

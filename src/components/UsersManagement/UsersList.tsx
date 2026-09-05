@@ -1,8 +1,8 @@
 import React from 'react';
 import { User } from '../../types/groupUsers';
-import stylesUi from '../../styles/ui.module.css';
-import IconButton from '../commons/Buttons/IconButton/IconButton';
-import List from '../List/List';
+import stylesUi from '@tdn/shared/styles/ui.module.css';
+import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
+import List from '@tdn/shared/ui/List/List';
 
 interface UsersListProps {
   users: {

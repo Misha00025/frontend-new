@@ -1,11 +1,11 @@
 // components/Modals/SkillAttributesModal.tsx
 import React, { useState, useEffect } from 'react';
 import { SkillAttributeDefinition } from '../../../../types/groupSkills';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import inputStyles from '../../../../styles/components/Input.module.css';
-import modalStyles from '../../../../styles/modal.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
 import styles from './SkillAttributesModal.module.css';
-import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
+import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
 
 interface SkillAttributesModalProps {
   isOpen: boolean;

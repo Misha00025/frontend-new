@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import SkillModal from './SkillModal';
 import type { GroupSkill } from '../../../../types/groupSkills';
 
-vi.mock('../../../../components/commons/ModalPortal/ModalPortal', () => {
+vi.mock('@tdn/shared/ui/ModalPortal/ModalPortal', () => {
   const ModalPortal = ({ children, isOpen }: { isOpen: boolean; children: React.ReactNode }) =>
     isOpen ? <div data-testid="modal-content">{children}</div> : null;
   return { __esModule: true, default: ModalPortal };
@@ -18,7 +18,7 @@ vi.mock('@uiw/react-md-editor', () => ({
     />
   ),
 }));
-vi.mock('../../../../contexts/ThemeContext', () => ({
+vi.mock('@tdn/shared/theme/ThemeContext', () => ({
   useTheme: () => ({
     themeConfig: { type: 'preset', name: 'clean' },
     setThemeConfig: vi.fn(),

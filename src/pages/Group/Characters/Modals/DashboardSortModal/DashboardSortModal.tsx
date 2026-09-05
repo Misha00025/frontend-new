@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Character } from '../../../../../types/characters';
 import { CharacterItem } from '../../../../../types/characterItems';
 import { CharacterSkill } from '../../../../../types/characterSkills';
-import buttonStyles from '../../../../../styles/components/Button.module.css';
-import modalStyles from '../../../../../styles/modal.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
 import { useDashboardSettingsContext } from '../../../../../contexts/DashboardSettingsContext';
 import styles from './DashboardSortModal.module.css';
-import ModalPortal from '../../../../../components/commons/ModalPortal/ModalPortal';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
 
 interface DashboardSortModalProps {
   isOpen: boolean;

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useTheme, PRESET_COLORS } from '../../../contexts/ThemeContext';
-import type { PresetTheme, ThemeConfig } from '../../../types/theme';
-import type { CustomColors } from '../../../types/theme';
-import { PRESET_LABELS } from '../../../types/theme';
-import buttonStyles from '../../../styles/components/Button.module.css';
+import { useTheme, PRESET_COLORS } from '../../theme/ThemeContext';
+import type { PresetTheme, ThemeConfig } from '../../theme/types';
+import type { CustomColors } from '../../theme/types';
+import { PRESET_LABELS } from '../../theme/types';
+import buttonStyles from '../../styles/components/Button.module.css';
 import styles from './PersonalizeModal.module.css';
-import AdaptiveLayout from '../../../components/commons/AdaptiveLayout/AdaptiveLayout';
+import AdaptiveLayout from '../AdaptiveLayout/AdaptiveLayout';
 
 interface PersonalizeModalProps {
   isOpen: boolean;

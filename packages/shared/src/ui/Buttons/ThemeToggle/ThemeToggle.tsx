@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useTheme } from '../../../../contexts/ThemeContext';
-import PersonalizeModal from '../../../Modals/PersonalizeModal/PersonalizeModal';
+import { useTheme } from '../../../theme/ThemeContext';
+import PersonalizeModal from '../../PersonalizeModal/PersonalizeModal';
 import styles from './ThemeToggle.module.css';
 
 const ThemeToggle: React.FC = () => {

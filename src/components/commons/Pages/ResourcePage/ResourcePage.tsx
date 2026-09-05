@@ -1,11 +1,11 @@
 // ResourcePage.tsx
 import React, { useState, useMemo } from 'react';
-import List from '../../../../components/List/List';
-import SearchBar from '../../../../components/commons/Search/SearchBar';
-import CollapsibleGroup from '../../CollapsibleGroup/CollapsibleGroup';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import commonStyles from '../../../../styles/common.module.css';
-import modalStyles from '../../../../styles/modal.module.css';
+import List from '@tdn/shared/ui/List/List';
+import SearchBar from '@tdn/shared/ui/Search/SearchBar';
+import CollapsibleGroup from '@tdn/shared/ui/CollapsibleGroup/CollapsibleGroup';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import commonStyles from '@tdn/shared/styles/common.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
 import styles from './ResourcePage.module.css';
 import { usePlatform } from '../../../../hooks/usePlatform';
 import { Group, groupByAttributes } from '../../../../utils/groupByAttributes';

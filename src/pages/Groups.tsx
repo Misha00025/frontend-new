@@ -5,10 +5,10 @@ import { groupAPI } from '../services/api';
 import { useGroup } from '../contexts/GroupContext';
 import CreateGroupModal from '../components/Modals/CreateGroupModal/CreateGroupModal';
 import GroupCard from '../components/Cards/GroupCard';
-import GlobalSidebar from '../components/commons/GlobalSidebar/GlobalSidebar';
-import List from '../components/List/List';
-import buttonStyles from '../styles/components/Button.module.css';
-import commonStyles from '../styles/common.module.css';
+import GlobalSidebar from '@tdn/shared/ui/GlobalSidebar/GlobalSidebar';
+import List from '@tdn/shared/ui/List/List';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import commonStyles from '@tdn/shared/styles/common.module.css';
 
 const Groups: React.FC = () => {
   const [groups, setGroups] = useState<Group[]>([]);

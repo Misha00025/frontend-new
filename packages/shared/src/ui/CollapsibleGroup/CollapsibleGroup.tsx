@@ -1,6 +1,6 @@
 // src/components/common/CollapsibleGroup/CollapsibleGroup.tsx
 import React, { useState, useEffect } from 'react';
-import List from '../../../components/List/List';
+import List from '../List/List';
 import styles from './CollapsibleGroup.module.css';
 
 interface Group<T> {

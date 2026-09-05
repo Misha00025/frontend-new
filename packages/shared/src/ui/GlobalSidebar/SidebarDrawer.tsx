@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useSidebar } from '../../../contexts/SidebarContext';
-import { useAuth } from '../../../hooks/useAuth';
+import { useSidebar } from '../SidebarContext';
+import { useAuth } from '../../auth/useAuth';
 import ThemeToggle from '../Buttons/ThemeToggle/ThemeToggle';
-import type { NavItem } from '../../../types/navigation';
+import type { NavItem } from '../navigation';
 import styles from './GlobalSidebar.module.css';
 
 const navItems: NavItem[] = [

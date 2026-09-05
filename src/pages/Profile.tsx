@@ -1,11 +1,11 @@
 // Profile.tsx
 import React, { useEffect, useState } from 'react';
-import { useProfile } from '../hooks/useProfile';
-import GlobalSidebar from '../components/commons/GlobalSidebar/GlobalSidebar';
-import buttonStyles from '../styles/components/Button.module.css';
-import inputStyles from '../styles/components/Input.module.css';
-import styles from '../styles/common.module.css';
-import { useAuth } from '../contexts/AuthContext';
+import { useProfile } from '@tdn/shared/auth/useProfile';
+import GlobalSidebar from '@tdn/shared/ui/GlobalSidebar/GlobalSidebar';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import styles from '@tdn/shared/styles/common.module.css';
+import { useAuth } from '@tdn/shared/auth/AuthContext';
 import { uploadAPI, userAPI } from '../services/api';
 
 const Profile: React.FC = () => {

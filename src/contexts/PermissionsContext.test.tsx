@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { PermissionsProvider, usePermissions } from './PermissionsContext';
 
-vi.mock('./AuthContext', () => ({
+vi.mock('@tdn/shared/auth/AuthContext', () => ({
   useAuth: vi.fn(),
 }));
 
@@ -12,7 +12,7 @@ vi.mock('./GroupUsersContext', () => ({
   useGroupUsers: vi.fn(),
 }));
 
-import { useAuth } from './AuthContext';
+import { useAuth } from '@tdn/shared/auth/AuthContext';
 import { useGroupUsers } from './GroupUsersContext';
 
 const defaultMock = {

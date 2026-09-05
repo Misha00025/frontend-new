@@ -7,7 +7,7 @@ import { charactersAPI, characterUsersAPI } from '../../services/api';
 import { useUserManagement } from '../../hooks/useUserManagement';
 import { useGroupUsers } from '../../contexts/GroupUsersContext';
 import UsersList from './UsersList';
-import buttonStyles from '../../styles/components/Button.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import styles from './CharacterUsersTable.module.css';
 
 interface CharacterUsersTableProps {

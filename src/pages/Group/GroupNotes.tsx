@@ -6,10 +6,10 @@ import { useActionPermissions } from '../../hooks/useActionPermissions';
 import NoteCard from './Cards/NoteCard/NoteCard';
 import GroupNoteModal from './Modals/NoteModal/GroupNoteModal';
 import GroupNoteViewModal from './Modals/NoteModal/GroupNoteViewModal';
-import List from '../../components/List/List';
-import SearchBar from '../../components/commons/Search/SearchBar';
-import commonStyles from '../../styles/common.module.css';
-import buttonStyles from '../../styles/components/Button.module.css';
+import List from '@tdn/shared/ui/List/List';
+import SearchBar from '@tdn/shared/ui/Search/SearchBar';
+import commonStyles from '@tdn/shared/styles/common.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import styles from '../../components/commons/Pages/ResourcePage/ResourcePage.module.css';
 
 const GroupNotes: React.FC = () => {

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { GroupItem, CreateGroupItemRequest, UpdateGroupItemRequest } from '../../../../types/groupItems';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import inputStyles from '../../../../styles/components/Input.module.css';
-import modalStyles from '../../../../styles/modal.module.css';
-import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
 import { SkillAttribute } from '../../../../types/groupSkills';
-import { generateKey } from '../../../../utils/generateKey';
-import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
-import EvaluatedInput from '../../../../components/commons/EvaluatedInput/EvaluatedInput';
+import { generateKey } from '@tdn/shared/utils/generateKey';
+import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
+import EvaluatedInput from '@tdn/shared/ui/EvaluatedInput/EvaluatedInput';
 
 interface GroupItemModalProps {
   isOpen: boolean;

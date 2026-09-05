@@ -1,6 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import modalStyles from '../../../styles/modal.module.css';
+import modalStyles from '../../styles/modal.module.css';
 
 interface ModalPortalProps {
   isOpen: boolean;

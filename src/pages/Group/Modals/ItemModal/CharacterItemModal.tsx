@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { CharacterItem, CreateCharacterItemRequest, UpdateCharacterItemRequest } from '../../../../types/characterItems';
 import { GroupItem } from '../../../../types/groupItems';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import inputStyles from '../../../../styles/components/Input.module.css';
-import modalStyles from '../../../../styles/modal.module.css';
-import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
-import uiStyles from '../../../../styles/ui.module.css';
-import EvaluatedInput from '../../../../components/commons/EvaluatedInput/EvaluatedInput';
-import SearchBar from '../../../../components/commons/Search/SearchBar';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
+import uiStyles from '@tdn/shared/styles/ui.module.css';
+import EvaluatedInput from '@tdn/shared/ui/EvaluatedInput/EvaluatedInput';
+import SearchBar from '@tdn/shared/ui/Search/SearchBar';
 import ItemCard from '../../Cards/ItemCard/ItemCard';
 
 interface CharacterItemModalProps {

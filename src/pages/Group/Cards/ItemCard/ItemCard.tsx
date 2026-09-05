@@ -2,9 +2,9 @@ import React, { useState, useContext } from 'react';
 import { GroupItem } from '../../../../types/groupItems';
 import { CharacterItem } from '../../../../types/characterItems';
 import styles from './ItemCard.module.css';
-import cardStyles from '../../../../styles/card-item.module.css';
+import cardStyles from '@tdn/shared/styles/card-item.module.css';
 import ReactMarkdown from 'react-markdown';
-import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
+import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
 import { DashboardSettingsContext } from '../../../../contexts/DashboardSettingsContext';
 
 interface ItemCardProps {

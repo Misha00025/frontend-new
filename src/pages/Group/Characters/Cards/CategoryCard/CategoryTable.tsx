@@ -4,7 +4,7 @@ import { CategoryData } from '../../../../../utils/characterFields';
 import styles from './CategoryTable.module.css';
 import { TemplateEditContext } from '../../../../../contexts/TemplateEditContext';
 import { DashboardSettingsContext } from '../../../../../contexts/DashboardSettingsContext';
-import DropdownMenu, { MenuItem } from '../../../../../components/commons/DropdownMenu/DropdownMenu';
+import DropdownMenu, { MenuItem } from '@tdn/shared/ui/DropdownMenu/DropdownMenu';
 import FieldRow from '../FieldCard/FieldRow';
 
 interface CategoryTableProps {

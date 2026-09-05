@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { CharacterField } from '../../../../../types/characters';
 import styles from './FieldRow.module.css';
-import DropdownMenu, { MenuItem } from '../../../../../components/commons/DropdownMenu/DropdownMenu';
-import EvaluatedInput from '../../../../../components/commons/EvaluatedInput/EvaluatedInput';
+import DropdownMenu, { MenuItem } from '@tdn/shared/ui/DropdownMenu/DropdownMenu';
+import EvaluatedInput from '@tdn/shared/ui/EvaluatedInput/EvaluatedInput';
 
 interface FieldRowProps {
   field: CharacterField;

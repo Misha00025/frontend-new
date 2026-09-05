@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import inputStyles from '../../../../styles/components/Input.module.css';
-import modalStyles from '../../../../styles/modal.module.css';
-import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
 import MDEditor from '@uiw/react-md-editor';
-import { useTheme, getEditorColorMode } from '../../../../contexts/ThemeContext';
+import { useTheme, getEditorColorMode } from '@tdn/shared/theme/ThemeContext';
 import { usePlatform } from '../../../../hooks/usePlatform';
 import type {
   QuestStatus,
@@ -15,7 +15,7 @@ import type {
   PatchGroupQuestRequest,
 } from '../../../../types/groupQuests';
 import viewStyles from './QuestViewModal.module.css';
-import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
+import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
 
 interface QuestViewModalProps {
   quest: GroupQuest | null;

@@ -1,7 +1,7 @@
 // src/hooks/useProfile.ts
 import { useState, useCallback, useEffect } from 'react';
-import { WhoAmIResponse, UserProfile } from '../types/auth';
-import { makeAuthenticatedRequest } from '../services/api';
+import { WhoAmIResponse, UserProfile } from './types';
+import { makeAuthenticatedRequest } from './api';
 
 export const useProfile = (fetchOnMount: boolean = false) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);

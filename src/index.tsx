@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import './styles/globals.css';
-import { loadConfig } from './config';
+import '@tdn/shared/styles/globals.css';
+import { loadConfig } from '@tdn/shared/config';
 
 async function bootstrap() {
   await loadConfig();

@@ -1,9 +1,9 @@
 // components/Modals/SkillModal/CharacterSkillModal.tsx
 import React, { useState, useEffect } from 'react';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import modalStyles from '../../../../styles/modal.module.css';
-import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
-import SearchBar from '../../../../components/commons/Search/SearchBar';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
+import SearchBar from '@tdn/shared/ui/Search/SearchBar';
 import { GroupSkill } from '../../../../types/groupSkills';
 import SkillCard from '../../Cards/SkillCard/SkillCard';
 import { CharacterSkill } from '../../../../types/characterSkills';

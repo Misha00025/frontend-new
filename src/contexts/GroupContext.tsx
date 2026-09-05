@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Group } from '../types/group';
 import { groupAPI } from '../services/api';
-import { storage } from '../utils/storage';
-import { useAuth } from './AuthContext';
+import { storage } from '@tdn/shared/utils/storage';
+import { useAuth } from '@tdn/shared/auth/AuthContext';
 
 interface GroupContextType {
   selectedGroup: Group | null;

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { characterCommandsAPI } from '../../../../services/api';
-import commonStyles from '../../../../styles/common.module.css';
-import modalStyles from '../../../../styles/modal.module.css';
+import commonStyles from '@tdn/shared/styles/common.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
 import uiStyles from './Character.module.css';
 import { TemplateField } from '../../../../types/characterTemplates';
 import CharacterTableView from '../CharacterTableView/CharacterTableView';
 import { CategoryData } from '../../../../utils/characterFields';
-import { MenuItem } from '../../../../components/commons/DropdownMenu/DropdownMenu';
+import { MenuItem } from '@tdn/shared/ui/DropdownMenu/DropdownMenu';
 import { useActionPermissions } from '../../../../hooks/useActionPermissions';
 import { TemplateEditContext, TemplateEditContextType } from '../../../../contexts/TemplateEditContext';
 import TemplateFieldModal from '../Modals/CharacterFieldModal/TemplateFieldModal';

@@ -1,7 +1,7 @@
 // GroupCard.tsx
 import React from 'react';
 import { Group } from '../../types/group';
-import buttonStyles from '../../styles/components/Button.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import styles from './GroupCard.module.css';
 
 interface GroupCardProps {

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { TokenResponse, WhoAmIResponse } from '../types/auth';
-import { authAPI, makeAuthenticatedRequest } from '../services/api';
-import tokenManager from '../services/tokenManager';
+import { TokenResponse, WhoAmIResponse } from './types';
+import { authAPI, makeAuthenticatedRequest } from './api';
+import tokenManager from './tokenManager';
 
 interface AuthContextType {
   accessToken: string | null;

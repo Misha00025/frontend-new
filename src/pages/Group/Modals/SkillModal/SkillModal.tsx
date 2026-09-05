@@ -1,14 +1,14 @@
 // components/Modals/SkillModal.tsx
 import React, { useState, useEffect, useRef } from 'react';
-import buttonStyles from '../../../../styles/components/Button.module.css';
-import inputStyles from '../../../../styles/components/Input.module.css';
-import modalStyles from '../../../../styles/modal.module.css';
-import ModalPortal from '../../../../components/commons/ModalPortal/ModalPortal';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
 import styles from './SkillModal.module.css';
 import MDEditor from '@uiw/react-md-editor';
-import { useTheme, getEditorColorMode } from '../../../../contexts/ThemeContext';
-import { generateKey } from '../../../../utils/generateKey';
-import IconButton from '../../../../components/commons/Buttons/IconButton/IconButton';
+import { useTheme, getEditorColorMode } from '@tdn/shared/theme/ThemeContext';
+import { generateKey } from '@tdn/shared/utils/generateKey';
+import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
 import { CreateGroupSkillRequest, GroupSkill, SkillAttribute, SkillAttributeDefinition, UpdateGroupSkillRequest } from '../../../../types/groupSkills';
 
 interface SkillModalProps {

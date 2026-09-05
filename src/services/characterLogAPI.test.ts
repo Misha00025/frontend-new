@@ -1,7 +1,7 @@
 import { characterLogAPI, makeAuthenticatedRequest } from './api';
 import type { Mock, Mocked } from 'vitest';
 
-vi.mock('./tokenManager', () => ({
+vi.mock('@tdn/shared/auth/tokenManager', () => ({
   __esModule: true,
   default: {
     ensureToken: vi.fn(),
@@ -10,7 +10,7 @@ vi.mock('./tokenManager', () => ({
   },
 }));
 
-import tokenManager from './tokenManager';
+import tokenManager from '@tdn/shared/auth/tokenManager';
 
 describe('characterLogAPI.getLog', () => {
   const mockFetch = vi.fn();

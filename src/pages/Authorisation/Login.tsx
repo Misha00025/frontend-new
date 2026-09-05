@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import buttonStyles from '../../styles/components/Button.module.css';
-import inputStyles from '../../styles/components/Input.module.css';
-import modalStyles from '../../styles/modal.module.css';
-import { useAuth } from '../../contexts/AuthContext';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import { useAuth } from '@tdn/shared/auth/AuthContext';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');

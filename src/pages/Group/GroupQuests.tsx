@@ -5,16 +5,16 @@ import { groupQuestsAPI, charactersAPI } from '../../services/api';
 import { User } from '../../types/groupUsers';
 import { useGroupUsers } from '../../contexts/GroupUsersContext';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
-import List from '../../components/List/List';
-import SearchBar from '../../components/commons/Search/SearchBar';
+import List from '@tdn/shared/ui/List/List';
+import SearchBar from '@tdn/shared/ui/Search/SearchBar';
 import QuestCard from './Cards/QuestCard/QuestCard';
 import QuestViewModal from './Modals/QuestModal/QuestViewModal';
-import commonStyles from '../../styles/common.module.css';
-import buttonStyles from '../../styles/components/Button.module.css';
-import inputStyles from '../../styles/components/Input.module.css';
-import modalStyles from '../../styles/modal.module.css';
-import collapsibleStyles from '../../components/commons/CollapsibleGroup/CollapsibleGroup.module.css';
-import ModalPortal from '../../components/commons/ModalPortal/ModalPortal';
+import commonStyles from '@tdn/shared/styles/common.module.css';
+import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
+import inputStyles from '@tdn/shared/styles/components/Input.module.css';
+import modalStyles from '@tdn/shared/styles/modal.module.css';
+import collapsibleStyles from '@tdn/shared/ui/CollapsibleGroup/CollapsibleGroup.module.css';
+import ModalPortal from '@tdn/shared/ui/ModalPortal/ModalPortal';
 
 const CollapsibleSection: React.FC<{
   title: string;

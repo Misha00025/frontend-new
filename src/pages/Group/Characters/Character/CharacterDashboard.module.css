@@ -27,16 +27,16 @@
 }
 
 .sectionTitle {
-  composes: sectionTitle from '../../../../styles/character-table.module.css';
+  composes: sectionTitle from '@tdn/shared/styles/character-table.module.css';
   margin: 0;
 }
 
 .table {
-  composes: table from '../../../../styles/character-table.module.css';
+  composes: table from '@tdn/shared/styles/character-table.module.css';
 }
 
 .row {
-  composes: row from '../../../../styles/character-table.module.css';
+  composes: row from '@tdn/shared/styles/character-table.module.css';
 }
 
 .row:last-child {
@@ -44,15 +44,15 @@
 }
 
 .nameCell {
-  composes: nameCell from '../../../../styles/character-table.module.css';
+  composes: nameCell from '@tdn/shared/styles/character-table.module.css';
 }
 
 .fieldName {
-  composes: fieldName from '../../../../styles/character-table.module.css';
+  composes: fieldName from '@tdn/shared/styles/character-table.module.css';
 }
 
 .valueCell {
-  composes: valueCell from '../../../../styles/character-table.module.css';
+  composes: valueCell from '@tdn/shared/styles/character-table.module.css';
 }
 
 .resourceValue {
@@ -60,7 +60,7 @@
 }
 
 .editableValue {
-  composes: editableValue from '../../../../styles/character-table.module.css';
+  composes: editableValue from '@tdn/shared/styles/character-table.module.css';
 }
 
 .editableValue:hover {
@@ -68,7 +68,7 @@
 }
 
 .editInput {
-  composes: editInput from '../../../../styles/character-table.module.css';
+  composes: editInput from '@tdn/shared/styles/character-table.module.css';
 }
 
 .itemControls {
@@ -137,15 +137,15 @@
 }
 
 .progressContainer {
-  composes: progressContainer from '../../../../styles/character-table.module.css';
+  composes: progressContainer from '@tdn/shared/styles/character-table.module.css';
 }
 
 .progressBar {
-  composes: progressBar from '../../../../styles/character-table.module.css';
+  composes: progressBar from '@tdn/shared/styles/character-table.module.css';
 }
 
 .progressText {
-  composes: progressText from '../../../../styles/character-table.module.css';
+  composes: progressText from '@tdn/shared/styles/character-table.module.css';
 }
 
 .skillAttr {

@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { groupUsersAPI } from '../../services/api';
 import { useGroupUsers } from '../../contexts/GroupUsersContext';
-import styles from '../../styles/common.module.css';
+import styles from '@tdn/shared/styles/common.module.css';
 import { useActionPermissions } from '../../hooks/useActionPermissions';
 import UserSearch from '../../components/UsersManagement/UserSearch';
 import UsersList from '../../components/UsersManagement/UsersList';
