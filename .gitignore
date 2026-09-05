@@ -10,6 +10,10 @@
 
 # production
 /build
+/dist
+
+# typescript project references
+*.tsbuildinfo
 
 # misc
 .DS_Store
