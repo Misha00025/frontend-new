@@ -3,32 +3,12 @@ import { render, screen } from '@testing-library/react';
 import SkillModal from './SkillModal';
 import type { GroupSkill } from '../../../../types/groupSkills';
 
-jest.mock('../../../../styles/components/Button.module.css', () => ({ button: 'button' }));
-jest.mock('../../../../styles/components/Input.module.css', () => ({ input: 'input' }));
-jest.mock('../../../../styles/modal.module.css', () => ({
-  overlay: 'overlay',
-  modal: 'modal',
-  modalBody: 'modalBody',
-  formGroup: 'formGroup',
-  attributesSection: 'attributesSection',
-  attributeItem: 'attributeItem',
-  attributeContent: 'attributeContent',
-  attributeHeader: 'attributeHeader',
-  attributeName: 'attributeName',
-  attributeValueContainer: 'attributeValueContainer',
-  addAttribute: 'addAttribute',
-  attributeActions: 'attributeActions',
-  buttons: 'buttons',
-  error: 'error',
-  customInputContainer: 'customInputContainer',
-}));
-jest.mock('./SkillModal.module.css', () => ({}));
-jest.mock('../../../../components/commons/ModalPortal/ModalPortal', () => {
+vi.mock('../../../../components/commons/ModalPortal/ModalPortal', () => {
   const ModalPortal = ({ children, isOpen }: { isOpen: boolean; children: React.ReactNode }) =>
     isOpen ? <div data-testid="modal-content">{children}</div> : null;
-  return ModalPortal;
+  return { __esModule: true, default: ModalPortal };
 });
-jest.mock('@uiw/react-md-editor', () => ({
+vi.mock('@uiw/react-md-editor', () => ({
   __esModule: true,
   default: ({ value, onChange }: { value: string; onChange?: (v?: string) => void }) => (
     <textarea
@@ -38,19 +18,19 @@ jest.mock('@uiw/react-md-editor', () => ({
     />
   ),
 }));
-jest.mock('../../../../contexts/ThemeContext', () => ({
+vi.mock('../../../../contexts/ThemeContext', () => ({
   useTheme: () => ({
     themeConfig: { type: 'preset', name: 'clean' },
-    setThemeConfig: jest.fn(),
-    setPreset: jest.fn(),
-    setCustomColors: jest.fn(),
-    getCurrentColors: jest.fn(),
-    pushThemeToServer: jest.fn(),
-    syncThemeFromServer: jest.fn(),
+    setThemeConfig: vi.fn(),
+    setPreset: vi.fn(),
+    setCustomColors: vi.fn(),
+    getCurrentColors: vi.fn(),
+    pushThemeToServer: vi.fn(),
+    syncThemeFromServer: vi.fn(),
     themeSyncing: false,
     themeSyncError: null,
   }),
-  getEditorColorMode: jest.fn(() => 'light'),
+  getEditorColorMode: vi.fn(() => 'light'),
 }));
 
 const createMockSkill = (overrides?: Partial<GroupSkill>): GroupSkill => ({
@@ -64,7 +44,7 @@ const createMockSkill = (overrides?: Partial<GroupSkill>): GroupSkill => ({
   ...overrides,
 });
 
-const mockOnSave = jest.fn();
+const mockOnSave = vi.fn();
 
 const renderModal = (editingSkill?: GroupSkill | null) => {
   render(
@@ -82,7 +62,7 @@ const renderModal = (editingSkill?: GroupSkill | null) => {
 
 describe('SkillModal – required attribute value input regression', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('input в секции "Добавить атрибут" имеет required=false когда newAttribute пустой (isNew=true)', () => {

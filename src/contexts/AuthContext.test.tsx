@@ -1,22 +1,23 @@
 import React from 'react';
+import type { Mock, Mocked } from 'vitest';
 import { render, screen, act, waitFor } from '@testing-library/react';
 import { AuthProvider, useAuth } from './AuthContext';
 
-jest.mock('../services/api', () => ({
+vi.mock('../services/api', () => ({
   authAPI: {
-    login: jest.fn(),
-    register: jest.fn(),
+    login: vi.fn(),
+    register: vi.fn(),
   },
-  makeAuthenticatedRequest: jest.fn(),
+  makeAuthenticatedRequest: vi.fn(),
 }));
 
-jest.mock('../services/tokenManager', () => ({
+vi.mock('../services/tokenManager', () => ({
   __esModule: true,
   default: {
-    ensureToken: jest.fn(),
-    setTokens: jest.fn(),
-    getAccessToken: jest.fn(),
-    clear: jest.fn(),
+    ensureToken: vi.fn(),
+    setTokens: vi.fn(),
+    getAccessToken: vi.fn(),
+    clear: vi.fn(),
   },
 }));
 
@@ -52,13 +53,13 @@ const renderProvider = () =>
 
 describe('AuthContext', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
-    (tokenManager.getAccessToken as jest.Mock).mockReturnValue(null);
+    (tokenManager.getAccessToken as Mock).mockReturnValue(null);
   });
 
   it('инициализируется без userId когда нет токена', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue(null);
+    (tokenManager.ensureToken as Mock).mockResolvedValue(null);
 
     renderProvider();
 
@@ -68,11 +69,11 @@ describe('AuthContext', () => {
   });
 
   it('инициализирует userId через whoami когда токен есть', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('valid-token');
-    (makeAuthenticatedRequest as jest.Mock).mockResolvedValueOnce(
+    (tokenManager.ensureToken as Mock).mockResolvedValue('valid-token');
+    (makeAuthenticatedRequest as Mock).mockResolvedValueOnce(
       createMockResponse(200, { id: 7 })
     );
-    (tokenManager.getAccessToken as jest.Mock).mockReturnValue('valid-token');
+    (tokenManager.getAccessToken as Mock).mockReturnValue('valid-token');
 
     renderProvider();
 
@@ -82,8 +83,8 @@ describe('AuthContext', () => {
   });
 
   it('очищает токен при ошибке whoami', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('bad-token');
-    (makeAuthenticatedRequest as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+    (tokenManager.ensureToken as Mock).mockResolvedValue('bad-token');
+    (makeAuthenticatedRequest as Mock).mockRejectedValueOnce(new Error('Network error'));
 
     renderProvider();
 
@@ -94,12 +95,12 @@ describe('AuthContext', () => {
   });
 
   it('login вызывает authAPI.login и whoami', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue(null);
-    (authAPI.login as jest.Mock).mockResolvedValue({
+    (tokenManager.ensureToken as Mock).mockResolvedValue(null);
+    (authAPI.login as Mock).mockResolvedValue({
       access_token: 'login-token',
       refresh_token: 'login-refresh',
     });
-    (makeAuthenticatedRequest as jest.Mock).mockResolvedValueOnce(
+    (makeAuthenticatedRequest as Mock).mockResolvedValueOnce(
       createMockResponse(200, { id: 10 })
     );
 
@@ -118,8 +119,8 @@ describe('AuthContext', () => {
   });
 
   it('login пробрасывает ошибку при неудаче', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue(null);
-    (authAPI.login as jest.Mock).mockRejectedValue(new Error('Invalid credentials'));
+    (tokenManager.ensureToken as Mock).mockResolvedValue(null);
+    (authAPI.login as Mock).mockRejectedValue(new Error('Invalid credentials'));
 
     renderProvider();
 
@@ -140,12 +141,12 @@ describe('AuthContext', () => {
   });
 
   it('register вызывает authAPI.register и whoami', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue(null);
-    (authAPI.register as jest.Mock).mockResolvedValue({
+    (tokenManager.ensureToken as Mock).mockResolvedValue(null);
+    (authAPI.register as Mock).mockResolvedValue({
       access_token: 'reg-token',
       refresh_token: 'reg-refresh',
     });
-    (makeAuthenticatedRequest as jest.Mock).mockResolvedValueOnce(
+    (makeAuthenticatedRequest as Mock).mockResolvedValueOnce(
       createMockResponse(200, { id: 20 })
     );
 
@@ -164,7 +165,7 @@ describe('AuthContext', () => {
   });
 
   it('logout очищает userId и токены', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue(null);
+    (tokenManager.ensureToken as Mock).mockResolvedValue(null);
 
     renderProvider();
 

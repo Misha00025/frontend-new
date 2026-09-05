@@ -1,14 +1,15 @@
 import React from 'react';
+import type { Mock, Mocked } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { PermissionsProvider, usePermissions } from './PermissionsContext';
 
-jest.mock('./AuthContext', () => ({
-  useAuth: jest.fn(),
+vi.mock('./AuthContext', () => ({
+  useAuth: vi.fn(),
 }));
 
-jest.mock('./GroupUsersContext', () => ({
-  useGroupUsers: jest.fn(),
+vi.mock('./GroupUsersContext', () => ({
+  useGroupUsers: vi.fn(),
 }));
 
 import { useAuth } from './AuthContext';
@@ -18,12 +19,12 @@ const defaultMock = {
   groupUsers: [],
   groupUsersLoading: false,
   characterUsers: {} as Record<number, any[]>,
-  ensureGroupUsers: jest.fn(),
-  ensureCharacterUsers: jest.fn(),
-  refreshGroupUsers: jest.fn(),
-  refreshCharacterUsers: jest.fn(),
-  invalidateGroupUsers: jest.fn(),
-  invalidateCharacterUsers: jest.fn(),
+  ensureGroupUsers: vi.fn(),
+  ensureCharacterUsers: vi.fn(),
+  refreshGroupUsers: vi.fn(),
+  refreshCharacterUsers: vi.fn(),
+  invalidateGroupUsers: vi.fn(),
+  invalidateCharacterUsers: vi.fn(),
   error: null,
 };
 
@@ -44,7 +45,7 @@ const renderAtPath = (
   groupUsers: any[] = [],
   characterUsers: Record<number, any[]> = {}
 ) => {
-  (useGroupUsers as jest.Mock).mockReturnValue({
+  (useGroupUsers as Mock).mockReturnValue({
     ...defaultMock,
     groupUsers,
     characterUsers,
@@ -60,11 +61,11 @@ const renderAtPath = (
 
 describe('PermissionsContext', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
-    (useAuth as jest.Mock).mockReturnValue({ accessToken: 'token' });
+    (useAuth as Mock).mockReturnValue({ accessToken: 'token' });
     localStorage.setItem('userId', '1');
-    (useGroupUsers as jest.Mock).mockReturnValue(defaultMock);
+    (useGroupUsers as Mock).mockReturnValue(defaultMock);
   });
 
   it('устанавливает isGroupAdmin когда пользователь admin группы', async () => {
@@ -124,7 +125,7 @@ describe('PermissionsContext', () => {
   });
 
   it('при отсутствии accessToken все права false', async () => {
-    (useAuth as jest.Mock).mockReturnValue({ accessToken: null });
+    (useAuth as Mock).mockReturnValue({ accessToken: null });
 
     renderAtPath('/group/5');
 

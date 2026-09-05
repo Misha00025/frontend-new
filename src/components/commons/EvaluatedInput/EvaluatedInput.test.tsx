@@ -16,7 +16,7 @@ describe('EvaluatedInput', () => {
   });
 
   it('calls onCommit with computed expression on Enter', async () => {
-    const onCommit = jest.fn();
+    const onCommit = vi.fn();
     render(<EvaluatedInput initialValue="" onCommit={onCommit} />);
     const input = screen.getByRole('textbox');
 
@@ -26,7 +26,7 @@ describe('EvaluatedInput', () => {
   });
 
   it('calls onCommit with raw text on Enter if expression is invalid', async () => {
-    const onCommit = jest.fn();
+    const onCommit = vi.fn();
     render(<EvaluatedInput initialValue="" onCommit={onCommit} />);
     const input = screen.getByRole('textbox');
 
@@ -36,7 +36,7 @@ describe('EvaluatedInput', () => {
   });
 
   it('calls onCommit on blur', () => {
-    const onCommit = jest.fn();
+    const onCommit = vi.fn();
     render(<EvaluatedInput initialValue="10" onCommit={onCommit} />);
     const input = screen.getByRole('textbox');
 
@@ -46,8 +46,8 @@ describe('EvaluatedInput', () => {
   });
 
   it('calls onCancel and resets value on Escape', async () => {
-    const onCancel = jest.fn();
-    const onCommit = jest.fn();
+    const onCancel = vi.fn();
+    const onCommit = vi.fn();
     render(<EvaluatedInput initialValue="initial" onCommit={onCommit} onCancel={onCancel} />);
     const input = screen.getByRole('textbox');
 

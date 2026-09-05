@@ -1,11 +1,11 @@
 import { authAPI } from './api';
 
 describe('authAPI.login', () => {
-  const mockFetch = jest.fn();
+  const mockFetch = vi.fn();
 
   beforeAll(() => { global.fetch = mockFetch; });
   afterAll(() => { delete (global as any).fetch; });
-  beforeEach(() => { jest.clearAllMocks(); });
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('успешный логин возвращает TokenResponse', async () => {
     mockFetch.mockResolvedValueOnce({
@@ -38,11 +38,11 @@ describe('authAPI.login', () => {
 });
 
 describe('authAPI.register', () => {
-  const mockFetch = jest.fn();
+  const mockFetch = vi.fn();
 
   beforeAll(() => { global.fetch = mockFetch; });
   afterAll(() => { delete (global as any).fetch; });
-  beforeEach(() => { jest.clearAllMocks(); });
+  beforeEach(() => { vi.clearAllMocks(); });
 
   it('успешная регистрация делает login и возвращает TokenResponse', async () => {
     mockFetch

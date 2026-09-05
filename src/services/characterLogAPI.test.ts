@@ -1,26 +1,27 @@
 import { characterLogAPI, makeAuthenticatedRequest } from './api';
+import type { Mock, Mocked } from 'vitest';
 
-jest.mock('./tokenManager', () => ({
+vi.mock('./tokenManager', () => ({
   __esModule: true,
   default: {
-    ensureToken: jest.fn(),
-    invalidateAccessToken: jest.fn(),
-    clear: jest.fn(),
+    ensureToken: vi.fn(),
+    invalidateAccessToken: vi.fn(),
+    clear: vi.fn(),
   },
 }));
 
 import tokenManager from './tokenManager';
 
 describe('characterLogAPI.getLog', () => {
-  const mockFetch = jest.fn();
+  const mockFetch = vi.fn();
 
   beforeAll(() => {
     global.fetch = mockFetch;
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('fake-token');
+    vi.clearAllMocks();
+    (tokenManager.ensureToken as Mock).mockResolvedValue('fake-token');
   });
 
   afterAll(() => {

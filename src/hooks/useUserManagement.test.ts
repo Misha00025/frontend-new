@@ -11,7 +11,7 @@ describe('useUserManagement', () => {
 
   it('sets success on successful operation', async () => {
     const { result } = renderHook(() => useUserManagement());
-    const operation = jest.fn().mockResolvedValue(undefined);
+    const operation = vi.fn().mockResolvedValue(undefined);
 
     await act(async () => {
       await result.current.executeOperation(operation, 'Success!');
@@ -78,7 +78,7 @@ describe('useUserManagement', () => {
       result.current.setError('Previous error');
     });
 
-    const operation = jest.fn().mockResolvedValue(undefined);
+    const operation = vi.fn().mockResolvedValue(undefined);
     await act(async () => {
       await result.current.executeOperation(operation, 'Success!');
     });

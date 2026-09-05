@@ -1,25 +1,26 @@
 import { userSettingsAPI } from './api';
+import type { Mock, Mocked } from 'vitest';
 
-jest.mock('./tokenManager', () => ({
+vi.mock('./tokenManager', () => ({
   __esModule: true,
   default: {
-    ensureToken: jest.fn(),
-    invalidateAccessToken: jest.fn(),
-    clear: jest.fn(),
+    ensureToken: vi.fn(),
+    invalidateAccessToken: vi.fn(),
+    clear: vi.fn(),
   },
 }));
 
 import tokenManager from './tokenManager';
 
 describe('userSettingsAPI', () => {
-  const mockFetch = jest.fn();
+  const mockFetch = vi.fn();
 
   beforeAll(() => {
     global.fetch = mockFetch;
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterAll(() => {
@@ -27,7 +28,7 @@ describe('userSettingsAPI', () => {
   });
 
   it('getSettings without keys calls correct endpoint', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('my-token');
+    (tokenManager.ensureToken as Mock).mockResolvedValue('my-token');
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -44,7 +45,7 @@ describe('userSettingsAPI', () => {
   });
 
   it('getSettings with keys appends keys query param', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('my-token');
+    (tokenManager.ensureToken as Mock).mockResolvedValue('my-token');
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -58,7 +59,7 @@ describe('userSettingsAPI', () => {
   });
 
   it('updateSettings sends PUT with JSON body', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('my-token');
+    (tokenManager.ensureToken as Mock).mockResolvedValue('my-token');
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -79,7 +80,7 @@ describe('userSettingsAPI', () => {
   });
 
   it('getSettings throws on error response', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('my-token');
+    (tokenManager.ensureToken as Mock).mockResolvedValue('my-token');
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 404,
@@ -90,7 +91,7 @@ describe('userSettingsAPI', () => {
   });
 
   it('getSettings throws with generic message when error body is empty', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('my-token');
+    (tokenManager.ensureToken as Mock).mockResolvedValue('my-token');
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 500,
@@ -101,7 +102,7 @@ describe('userSettingsAPI', () => {
   });
 
   it('updateSettings throws on error response', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('my-token');
+    (tokenManager.ensureToken as Mock).mockResolvedValue('my-token');
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 422,

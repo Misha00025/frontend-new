@@ -1,25 +1,26 @@
 import { makeAuthenticatedRequest } from './api';
+import type { Mock, Mocked } from 'vitest';
 
-jest.mock('./tokenManager', () => ({
+vi.mock('./tokenManager', () => ({
   __esModule: true,
   default: {
-    ensureToken: jest.fn(),
-    invalidateAccessToken: jest.fn(),
-    clear: jest.fn(),
+    ensureToken: vi.fn(),
+    invalidateAccessToken: vi.fn(),
+    clear: vi.fn(),
   },
 }));
 
 import tokenManager from './tokenManager';
 
 describe('makeAuthenticatedRequest', () => {
-  const mockFetch = jest.fn();
+  const mockFetch = vi.fn();
 
   beforeAll(() => {
     global.fetch = mockFetch;
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterAll(() => {
@@ -27,7 +28,7 @@ describe('makeAuthenticatedRequest', () => {
   });
 
   it('adds Bearer token to request', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('my-token');
+    (tokenManager.ensureToken as Mock).mockResolvedValue('my-token');
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -41,7 +42,7 @@ describe('makeAuthenticatedRequest', () => {
   });
 
   it('retries after refresh on 401', async () => {
-    (tokenManager.ensureToken as jest.Mock)
+    (tokenManager.ensureToken as Mock)
       .mockResolvedValueOnce('expired-token')
       .mockResolvedValueOnce('new-token');
 
@@ -55,7 +56,7 @@ describe('makeAuthenticatedRequest', () => {
   });
 
   it('throws when refresh fails after 401', async () => {
-    (tokenManager.ensureToken as jest.Mock)
+    (tokenManager.ensureToken as Mock)
       .mockResolvedValueOnce('expired-token')
       .mockResolvedValueOnce(null);
 
@@ -66,13 +67,13 @@ describe('makeAuthenticatedRequest', () => {
   });
 
   it('throws when ensureToken returns null initially', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue(null);
+    (tokenManager.ensureToken as Mock).mockResolvedValue(null);
 
     await expect(makeAuthenticatedRequest('/test')).rejects.toThrow('Session expired');
   });
 
   it('sends request without Content-Type when contentType is null', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('token');
+    (tokenManager.ensureToken as Mock).mockResolvedValue('token');
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -85,7 +86,7 @@ describe('makeAuthenticatedRequest', () => {
   });
 
   it('includes additional headers from options', async () => {
-    (tokenManager.ensureToken as jest.Mock).mockResolvedValue('token');
+    (tokenManager.ensureToken as Mock).mockResolvedValue('token');
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,

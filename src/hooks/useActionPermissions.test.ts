@@ -1,19 +1,20 @@
 import { renderHook } from '@testing-library/react';
+import type { Mock, Mocked } from 'vitest';
 import { useActionPermissions } from './useActionPermissions';
 
-jest.mock('../contexts/PermissionsContext', () => ({
-  usePermissions: jest.fn(),
+vi.mock('../contexts/PermissionsContext', () => ({
+  usePermissions: vi.fn(),
 }));
 
 import { usePermissions } from '../contexts/PermissionsContext';
 
 describe('useActionPermissions', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('даёт все права когда isGroupAdmin=true', () => {
-    (usePermissions as jest.Mock).mockReturnValue({
+    (usePermissions as Mock).mockReturnValue({
       isGroupAdmin: true,
       canEditCharacter: false,
       canDeleteCharacter: false,
@@ -39,7 +40,7 @@ describe('useActionPermissions', () => {
   });
 
   it('canEditThisCharacter=true когда canEditCharacter=true (но не admin)', () => {
-    (usePermissions as jest.Mock).mockReturnValue({
+    (usePermissions as Mock).mockReturnValue({
       isGroupAdmin: false,
       canEditCharacter: true,
       canDeleteCharacter: false,
@@ -55,7 +56,7 @@ describe('useActionPermissions', () => {
   });
 
   it('canEditThisCharacter=false когда canEditCharacter=false и не admin', () => {
-    (usePermissions as jest.Mock).mockReturnValue({
+    (usePermissions as Mock).mockReturnValue({
       isGroupAdmin: false,
       canEditCharacter: false,
       canDeleteCharacter: false,
@@ -70,7 +71,7 @@ describe('useActionPermissions', () => {
   });
 
   it('admin перекрывает canEditCharacter — можно удалять персонажа', () => {
-    (usePermissions as jest.Mock).mockReturnValue({
+    (usePermissions as Mock).mockReturnValue({
       isGroupAdmin: true,
       canEditCharacter: false,
       canDeleteCharacter: false,

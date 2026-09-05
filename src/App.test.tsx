@@ -2,47 +2,47 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-jest.mock('react-markdown', () => ({
+vi.mock('react-markdown', () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
-jest.mock('@uiw/react-md-editor', () => ({
+vi.mock('@uiw/react-md-editor', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('./contexts/AuthContext', () => ({
+vi.mock('./contexts/AuthContext', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useAuth: () => ({
     accessToken: 'mock-token',
     userId: 1,
-    login: jest.fn(),
-    register: jest.fn(),
-    logout: jest.fn(),
+    login: vi.fn(),
+    register: vi.fn(),
+    logout: vi.fn(),
   }),
 }));
 
-jest.mock('./contexts/GroupContext', () => ({
+vi.mock('./contexts/GroupContext', () => ({
   GroupProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('./contexts/VisitedContext', () => ({
+vi.mock('./contexts/VisitedContext', () => ({
   VisitedProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('./contexts/PermissionsContext', () => ({
+vi.mock('./contexts/PermissionsContext', () => ({
   PermissionsProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('./contexts/SidebarContext', () => ({
+vi.mock('./contexts/SidebarContext', () => ({
   SidebarProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('./contexts/DashboardSettingsContext', () => ({
+vi.mock('./contexts/DashboardSettingsContext', () => ({
   DashboardSettingsProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('./contexts/TemplateEditContext', () => ({
+vi.mock('./contexts/TemplateEditContext', () => ({
   TemplateEditProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 

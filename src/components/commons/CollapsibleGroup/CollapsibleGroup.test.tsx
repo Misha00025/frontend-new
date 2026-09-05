@@ -2,16 +2,6 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import CollapsibleGroup from './CollapsibleGroup';
 
-jest.mock('./CollapsibleGroup.module.css', () => ({
-  container: 'collapsibleGroupContainer',
-  header: 'header',
-  groupName: 'groupName',
-  caret: 'caret',
-  caretCollapsed: 'caretCollapsed',
-  content: 'content',
-  itemsContainer: 'itemsContainer',
-}));
-
 const mockItemComponent: React.FC<{ item: { id: number; name: string } }> = ({ item }) => (
   <div data-testid={`skill-${item.id}`} data-id={item.id}>
     {item.name}

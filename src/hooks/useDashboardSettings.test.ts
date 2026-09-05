@@ -1,29 +1,30 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
+import type { Mock, Mocked } from 'vitest';
 import { useDashboardSettings } from './useDashboardSettings';
 
-jest.mock('../services/api', () => ({
+vi.mock('../services/api', () => ({
   groupAPI: {
-    getCharacterResources: jest.fn(),
+    getCharacterResources: vi.fn(),
   },
   characterEquipmentAPI: {
-    getEquipment: jest.fn(),
-    equipItem: jest.fn(),
-    unequipItem: jest.fn(),
-    putEquipment: jest.fn(),
+    getEquipment: vi.fn(),
+    equipItem: vi.fn(),
+    unequipItem: vi.fn(),
+    putEquipment: vi.fn(),
   },
 }));
 
 import { groupAPI, characterEquipmentAPI } from '../services/api';
 
-const mockGroupAPI = groupAPI as jest.Mocked<typeof groupAPI>;
-const mockEquipmentAPI = characterEquipmentAPI as jest.Mocked<typeof characterEquipmentAPI>;
+const mockGroupAPI = groupAPI as Mocked<typeof groupAPI>;
+const mockEquipmentAPI = characterEquipmentAPI as Mocked<typeof characterEquipmentAPI>;
 
 describe('useDashboardSettings', () => {
   const groupId = 1;
   const characterId = 42;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
   });
 

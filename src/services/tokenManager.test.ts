@@ -1,14 +1,14 @@
 import tokenManager from './tokenManager';
 
 describe('tokenManager', () => {
-  const mockFetch = jest.fn();
+  const mockFetch = vi.fn();
 
   beforeAll(() => {
     global.fetch = mockFetch;
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
     tokenManager.clear();
   });
