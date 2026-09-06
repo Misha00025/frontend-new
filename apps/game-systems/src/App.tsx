@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth, ThemeProvider, SidebarProvider } from '@tdn/shared';
 import Login from './pages/Login';
 import AppLayout from './layout/AppLayout';
+import SystemsList from './pages/SystemsList';
+import SystemLayout from './pages/SystemLayout';
+import SystemOverview from './pages/SystemOverview';
 import WorkInProgress from './pages/WorkInProgress';
 
 // Провайдеры: Auth → Theme → Sidebar → Router → AppContent.
@@ -17,10 +20,13 @@ const AppContent: React.FC = () => {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route path="/systems" element={<WorkInProgress />} />
-        <Route path="/content" element={<WorkInProgress />} />
-        <Route path="/versions" element={<WorkInProgress />} />
-        <Route path="/rules" element={<WorkInProgress />} />
+        <Route path="/systems" element={<SystemsList />} />
+        <Route path="/systems/:systemId" element={<SystemLayout />}>
+          <Route index element={<SystemOverview />} />
+          <Route path="content" element={<WorkInProgress />} />
+          <Route path="versions" element={<WorkInProgress />} />
+          <Route path="rules" element={<WorkInProgress />} />
+        </Route>
         <Route path="/profile" element={<WorkInProgress />} />
       </Route>
       <Route path="/login" element={<Navigate to="/systems" replace />} />
