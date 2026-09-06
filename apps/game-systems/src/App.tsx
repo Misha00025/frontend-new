@@ -1,5 +1,47 @@
-// @tdn/game-systems — приложение «Игровые системы» (системы, контент, версии, правила).
-// Каркас создан в подзадаче 3.1; наполнение — в 3.4+.
-export default function App() {
-  return <div>@tdn/game-systems — каркас</div>;
-}
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth, ThemeProvider, SidebarProvider } from '@tdn/shared';
+import Login from './pages/Login';
+import AppLayout from './layout/AppLayout';
+import WorkInProgress from './pages/WorkInProgress';
+
+// Провайдеры: Auth → Theme → Sidebar → Router → AppContent.
+// Порядок соответствует apps/campaign (AuthProvider снаружи, т.к. ThemeProvider зависит от useAuth).
+const AppContent: React.FC = () => {
+  const { accessToken } = useAuth();
+
+  if (!accessToken) {
+    return <Login />;
+  }
+
+  return (
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route path="/systems" element={<WorkInProgress />} />
+        <Route path="/content" element={<WorkInProgress />} />
+        <Route path="/versions" element={<WorkInProgress />} />
+        <Route path="/rules" element={<WorkInProgress />} />
+        <Route path="/profile" element={<WorkInProgress />} />
+      </Route>
+      <Route path="/login" element={<Navigate to="/systems" replace />} />
+      <Route path="/" element={<Navigate to="/systems" replace />} />
+      <Route path="*" element={<Navigate to="/systems" replace />} />
+    </Routes>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <ThemeProvider>
+        <SidebarProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </SidebarProvider>
+      </ThemeProvider>
+    </AuthProvider>
+  );
+};
+
+export default App;

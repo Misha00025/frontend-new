@@ -1,0 +1,13 @@
+services:
+  game-systems:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    container_name: game-systems-frontend
+    env_file:
+      - .env
+    # Чтобы подложить свой config.json (заменит ENV):
+    # volumes:
+    #   - ./config.json:/app/build/config.json:ro
