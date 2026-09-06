@@ -4,7 +4,7 @@ import type { NavItem } from '../navigation';
 
 interface GlobalSidebarProps {
   mode?: 'inline' | 'fixed';
-  navItems?: NavItem[];
+  navItems: NavItem[];
 }
 
 const GlobalSidebar: React.FC<GlobalSidebarProps> = ({ mode = 'fixed', navItems }) => {

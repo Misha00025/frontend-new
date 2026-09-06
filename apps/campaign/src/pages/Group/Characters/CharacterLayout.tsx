@@ -3,6 +3,7 @@ import { useParams, Outlet } from 'react-router-dom';
 import { usePlatform } from '../../../hooks/usePlatform';
 import { groupAPI } from '../../../services/api';
 import { Group } from '../../../types/group';
+import { useCampaignPath } from '../../../navigation';
 import PageLayout from '@tdn/shared/ui/PageLayout/PageLayout';
 import PageHeader from '@tdn/shared/ui/PageLayout/PageHeader';
 import { TabItem } from '@tdn/shared/ui/PageLayout/TabBar';
@@ -20,6 +21,7 @@ interface CharacterLayoutContentProps {
 const CharacterLayoutContent: React.FC<CharacterLayoutContentProps> = ({ group, dashboardSettings }) => {
   const { character, characterLoading, error, refreshCharacter } = useCharacter();
   const isMobile = usePlatform();
+  const campaignPath = useCampaignPath();
   const { groupId, characterId } = useParams<{ groupId: string; characterId: string }>();
 
   useEffect(() => {
@@ -43,9 +45,9 @@ const CharacterLayoutContent: React.FC<CharacterLayoutContentProps> = ({ group, 
   return (
     <PageLayout
       breadcrumbs={[
-        { label: 'Главная', path: '/dashboard' },
-        { label: 'Группы', path: '/groups' },
-        { label: group.name, path: `/group/${groupId}` },
+        { label: 'Главная', path: campaignPath('/dashboard') },
+        { label: 'Группы', path: campaignPath('/groups') },
+        { label: group.name, path: campaignPath(`/group/${groupId}`) },
         { label: character.name },
       ]}
       header={
@@ -55,7 +57,7 @@ const CharacterLayoutContent: React.FC<CharacterLayoutContentProps> = ({ group, 
         />
       }
       tabs={characterTabs}
-      tabBasePath={`/group/${groupId}/character/${characterId}`}
+      tabBasePath={campaignPath(`/group/${groupId}/character/${characterId}`)}
       tabOrientation={isMobile ? 'bottom' : 'top'}
     >
       <DashboardSettingsProvider value={dashboardSettings as DashboardSettingsContextType}>

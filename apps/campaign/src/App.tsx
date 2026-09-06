@@ -1,4 +1,18 @@
 // src/App.tsx
+// Кампания — remote-приложение микрофронтендов.
+//
+// Монтируется хабом под префиксом /campaign/* (модуль campaign/App) либо
+// автономно (standalone). Маршрутизация — у кампании (вложенные роутеры).
+// Собственной навигации/панели нет — её передаёт хаб.
+//
+// Сессия: хаб прокидывает её через пропс `session` (см. session.ts).
+// При автономном запуске (без хаба) сессия грузится из хранилища (fallback)
+// — см. session/SessionProvider.tsx.
+//
+// Провайдеры: Auth → Theme → Session → Group → Visited → Router → AppContent.
+// (AuthProvider/ThemeProvider — из @tdn/shared; при монтировании хабом они
+// уже есть в дереве, но здесь они идемпотентны и нужны для автономного запуска.)
+
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation, useParams, Outlet } from 'react-router-dom';
 import { GroupSchemasProvider } from './contexts/GroupSchemasContext';
@@ -29,9 +43,10 @@ import Profile from './pages/Profile';
 import '@tdn/shared/styles/globals.css';
 import { GroupUsersProvider } from './contexts/GroupUsersContext';
 import { PermissionsProvider } from './contexts/PermissionsContext';
-import { SidebarProvider } from '@tdn/shared/ui/SidebarContext';
 import GroupSkills from './pages/Group/GroupSkills';
 import Login from './pages/Authorisation/Login';
+import { SessionProvider, useCampaignSession } from './session/SessionProvider';
+import type { CampaignSession } from './session';
 
 const GroupSchemasBoundary: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -43,10 +58,6 @@ const GroupSchemasBoundary: React.FC = () => {
       <Outlet />
     </GroupSchemasProvider>
   );
-};
-
-const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <>{children}</>;
 };
 
 const AppContent: React.FC = () => {
@@ -83,58 +94,61 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <AppLayout>
-      <Routes>
-        <Route path="/complete-registration" element={<CompleteRegistration />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/groups" element={<Groups />} />
-        <Route path="/group/:groupId" element={<GroupSchemasBoundary />}>
-          <Route element={<GroupLayout />}>
-            <Route index element={<Navigate to="characters" replace />} />
-            <Route path="characters" element={<Characters />} />
-            <Route path="settings" element={<GroupSettings />} />
-            <Route path="users" element={<GroupUsers />} />
-            <Route path="templates" element={<CharacterTemplates />} />
-            <Route path="skills" element={<GroupSkills />} />
-            <Route path="items" element={<GroupItems />} />
-            <Route path="notes" element={<GroupNotes />} />
-            <Route path="quests" element={<GroupQuests />} />
-          </Route>
-          <Route path="character/:characterId" element={<CharacterLayout />}>
-            <Route index element={<CharacterDashboard />} />
-            <Route path="resources" element={<CharacterDashboard />} />
-            <Route path="stats" element={<Character />} />
-            <Route path="items" element={<CharacterItems />} />
-            <Route path="skills" element={<CharacterSkills />} />
-            <Route path="quests" element={<CharacterQuests />} />
-            <Route path="notes" element={<CharacterNotes />} />
-          </Route>
+    <Routes>
+      <Route path="/complete-registration" element={<CompleteRegistration />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/groups" element={<Groups />} />
+      <Route path="/group/:groupId" element={<GroupSchemasBoundary />}>
+        <Route element={<GroupLayout />}>
+          <Route index element={<Navigate to="characters" replace />} />
+          <Route path="characters" element={<Characters />} />
+          <Route path="settings" element={<GroupSettings />} />
+          <Route path="users" element={<GroupUsers />} />
+          <Route path="templates" element={<CharacterTemplates />} />
+          <Route path="skills" element={<GroupSkills />} />
+          <Route path="items" element={<GroupItems />} />
+          <Route path="notes" element={<GroupNotes />} />
+          <Route path="quests" element={<GroupQuests />} />
         </Route>
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/login" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </AppLayout>
+        <Route path="character/:characterId" element={<CharacterLayout />}>
+          <Route index element={<CharacterDashboard />} />
+          <Route path="resources" element={<CharacterDashboard />} />
+          <Route path="stats" element={<Character />} />
+          <Route path="items" element={<CharacterItems />} />
+          <Route path="skills" element={<CharacterSkills />} />
+          <Route path="quests" element={<CharacterQuests />} />
+          <Route path="notes" element={<CharacterNotes />} />
+        </Route>
+      </Route>
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   );
 };
 
-const App: React.FC = () => {
+interface AppProps {
+  /** Сессия, прокидываемая хабом (см. session.ts). */
+  session?: CampaignSession;
+}
+
+const App: React.FC<AppProps> = ({ session }) => {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <GroupProvider>
-          <VisitedProvider>
-          <Router basename={import.meta.env.BASE_URL}>
-            <GroupUsersProvider>
-              <PermissionsProvider>
-                <SidebarProvider>
-                  <AppContent />
-                </SidebarProvider>
-              </PermissionsProvider>
-            </GroupUsersProvider>
-          </Router>
-          </VisitedProvider>
-        </GroupProvider>
+        <SessionProvider session={session}>
+          <GroupProvider>
+            <VisitedProvider>
+              <Router basename={import.meta.env.BASE_URL}>
+                <GroupUsersProvider>
+                  <PermissionsProvider>
+                    <AppContent />
+                  </PermissionsProvider>
+                </GroupUsersProvider>
+              </Router>
+            </VisitedProvider>
+          </GroupProvider>
+        </SessionProvider>
       </ThemeProvider>
     </AuthProvider>
   );

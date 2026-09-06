@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import { useAuth } from '@tdn/shared/auth/AuthContext';
 import { useLocation } from 'react-router-dom';
-import { getGroupAndCharacterIds } from '@tdn/shared/utils/getGroupAndCharacterIds';
+import { getGroupAndCharacterIds } from '../utils/getGroupAndCharacterIds';
 import { groupUsersAPI, characterUsersAPI } from '../services/api';
 import { GroupUser } from '../types/groupUsers';
 import { CharacterUser } from '../types/characterUsers';

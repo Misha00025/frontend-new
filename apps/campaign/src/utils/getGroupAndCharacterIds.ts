@@ -1,3 +1,7 @@
+// utils/getGroupAndCharacterIds.ts
+// Доменная утилита кампании: парсит group/character из URL.
+// Перенесена из @tdn/shared (shared = только инфраструктура, ноль домена).
+
 export interface GroupCharacterIds {
   groupId?: number;
   characterId?: number;

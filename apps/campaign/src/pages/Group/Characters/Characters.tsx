@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { CharacterShort } from '../../../types/characters';
 import { CharacterTemplate } from '../../../types/characterTemplates';
 import { charactersAPI, characterTemplatesAPI } from '../../../services/api';
 import CharacterModal from './Modals/CharacterModal/CharacterModal';
+import { useCampaignNavigate } from '../../../navigation';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import commonStyles from '@tdn/shared/styles/common.module.css';
 import modalStyles from '@tdn/shared/styles/modal.module.css';
@@ -13,7 +14,7 @@ import { useActionPermissions } from '../../../hooks/useActionPermissions';
 
 const Characters: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
-  const navigate = useNavigate();
+  const navigate = useCampaignNavigate();
   const [characters, setCharacters] = useState<CharacterShort[]>([]);
   const [templates, setTemplates] = useState<CharacterTemplate[]>([]);
   const [loading, setLoading] = useState(false);

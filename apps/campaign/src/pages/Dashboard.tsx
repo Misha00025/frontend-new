@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import GlobalSidebar from '@tdn/shared/ui/GlobalSidebar/GlobalSidebar';
 import { useVisited } from '../contexts/VisitedContext';
 import { groupAPI, charactersAPI } from '../services/api';
 import { Group } from '../types/group';
 import { Character } from '../types/characters';
+import { useCampaignNavigate } from '../navigation';
 import styles from '@tdn/shared/styles/common.module.css';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import dashStyles from './Dashboard.module.css';
 
 const Dashboard: React.FC = () => {
   const { lastVisitedGroupId, lastVisitedCharacters } = useVisited();
-  const navigate = useNavigate();
+  const navigate = useCampaignNavigate();
 
   const [lastGroup, setLastGroup] = useState<Group | null | undefined>(undefined);
   const [lastCharactersData, setLastCharactersData] = useState<(Character | null)[] | undefined>(undefined);
@@ -161,13 +160,10 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div style={{ paddingTop: '60px' }}>
-      <GlobalSidebar />
-      <div className={styles.container}>
-        <div className={dashStyles.grid}>
-          {renderGroupBlock()}
-          {renderCharacterBlock()}
-        </div>
+    <div className={styles.container}>
+      <div className={dashStyles.grid}>
+        {renderGroupBlock()}
+        {renderCharacterBlock()}
       </div>
     </div>
   );

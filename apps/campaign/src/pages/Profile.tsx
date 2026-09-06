@@ -1,7 +1,6 @@
 // Profile.tsx
 import React, { useEffect, useState } from 'react';
 import { useProfile } from '@tdn/shared/auth/useProfile';
-import GlobalSidebar from '@tdn/shared/ui/GlobalSidebar/GlobalSidebar';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import inputStyles from '@tdn/shared/styles/components/Input.module.css';
 import styles from '@tdn/shared/styles/common.module.css';
@@ -99,13 +98,11 @@ const Profile: React.FC = () => {
     setFormData(prev => ({ ...prev, imageLink: 'none' }));
   };
 
-  if (loading) return <div style={{ paddingTop: '60px' }}><GlobalSidebar /><div className={styles.container}>Загрузка...</div></div>;
-  if (error) return <div style={{ paddingTop: '60px' }}><GlobalSidebar /><div className={styles.container}>Ошибка: {error}</div></div>;
+  if (loading) return <div className={styles.container}>Загрузка...</div>;
+  if (error) return <div className={styles.container}>Ошибка: {error}</div>;
 
   return (
-    <div style={{ paddingTop: '60px' }}>
-      <GlobalSidebar />
-      <div className={styles.container}>
+    <div className={styles.container}>
       <h1>Профиль пользователя</h1>
       
       {profile && (
@@ -216,7 +213,6 @@ const Profile: React.FC = () => {
           </>
         )}
       </div>
-    </div>
     </div>
   );
 };

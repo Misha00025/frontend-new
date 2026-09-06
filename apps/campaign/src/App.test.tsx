@@ -34,10 +34,6 @@ vi.mock('./contexts/PermissionsContext', () => ({
   PermissionsProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-vi.mock('@tdn/shared/ui/SidebarContext', () => ({
-  SidebarProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
-
 vi.mock('./contexts/DashboardSettingsContext', () => ({
   DashboardSettingsProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));

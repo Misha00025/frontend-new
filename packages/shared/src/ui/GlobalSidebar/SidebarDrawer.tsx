@@ -6,18 +6,12 @@ import ThemeToggle from '../Buttons/ThemeToggle/ThemeToggle';
 import type { NavItem } from '../navigation';
 import styles from './GlobalSidebar.module.css';
 
-const defaultNavItems: NavItem[] = [
-  { id: 'dashboard', label: 'Главная', icon: '🏠', path: '/dashboard' },
-  { id: 'groups', label: 'Группы', icon: '👥', path: '/groups' },
-  { id: 'profile', label: 'Профиль', icon: '👤', path: '/profile' },
-];
-
 interface SidebarDrawerProps {
   inline?: boolean;
-  navItems?: NavItem[];
+  navItems: NavItem[];
 }
 
-const SidebarDrawer: React.FC<SidebarDrawerProps> = ({ inline = false, navItems = defaultNavItems }) => {
+const SidebarDrawer: React.FC<SidebarDrawerProps> = ({ inline = false, navItems }) => {
   const { isOpen, open, close } = useSidebar();
   const { logout } = useAuth();
   const location = useLocation();

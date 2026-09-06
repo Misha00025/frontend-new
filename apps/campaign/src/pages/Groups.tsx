@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Group } from '../types/group';
 import { groupAPI } from '../services/api';
 import { useGroup } from '../contexts/GroupContext';
 import CreateGroupModal from '../components/Modals/CreateGroupModal/CreateGroupModal';
 import GroupCard from '../components/Cards/GroupCard';
-import GlobalSidebar from '@tdn/shared/ui/GlobalSidebar/GlobalSidebar';
+import { useCampaignNavigate } from '../navigation';
 import List from '@tdn/shared/ui/List/List';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import commonStyles from '@tdn/shared/styles/common.module.css';
@@ -16,7 +15,7 @@ const Groups: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const { setSelectedGroup } = useGroup();
-  const navigate = useNavigate();
+  const navigate = useCampaignNavigate();
 
   useEffect(() => {
     loadGroups();
@@ -46,13 +45,11 @@ const Groups: React.FC = () => {
     navigate(`/group/${newGroup.id}`);
   };
 
-  if (loading) return <div style={{ paddingTop: '60px' }}><GlobalSidebar /><div className={commonStyles.container}>Загрузка...</div></div>;
-  if (error) return <div style={{ paddingTop: '60px' }}><GlobalSidebar /><div className={commonStyles.container}>Ошибка: {error}</div></div>;
+  if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
+  if (error) return <div className={commonStyles.container}>Ошибка: {error}</div>;
 
   return (
-    <div style={{ paddingTop: '60px' }}>
-      <GlobalSidebar />
-      <div className={commonStyles.container}>
+    <div className={commonStyles.container}>
       <h1>Мои группы</h1>
 
       <div className={commonStyles.actions}>
@@ -79,7 +76,6 @@ const Groups: React.FC = () => {
         onClose={() => setIsCreateModalOpen(false)}
         onGroupCreated={handleGroupCreated}
       />
-    </div>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { useGroup } from '../../contexts/GroupContext';
 import { useVisited } from '../../contexts/VisitedContext';
 import { usePlatform } from '../../hooks/usePlatform';
 import { usePermissions } from '../../contexts/PermissionsContext';
+import { useCampaignPath } from '../../navigation';
 import PageLayout from '@tdn/shared/ui/PageLayout/PageLayout';
 import PageHeader from '@tdn/shared/ui/PageLayout/PageHeader';
 import { TabItem } from '@tdn/shared/ui/PageLayout/TabBar';
@@ -16,6 +17,7 @@ const GroupLayout: React.FC = () => {
   const { isGroupAdmin } = usePermissions();
   const { visitGroup } = useVisited();
   const isMobile = usePlatform();
+  const campaignPath = useCampaignPath();
   const [group, setGroup] = useState<Group | null>(null);
 
   useEffect(() => {
@@ -47,8 +49,8 @@ const GroupLayout: React.FC = () => {
   return (
     <PageLayout
       breadcrumbs={[
-        { label: 'Главная', path: '/dashboard' },
-        { label: 'Группы', path: '/groups' },
+        { label: 'Главная', path: campaignPath('/dashboard') },
+        { label: 'Группы', path: campaignPath('/groups') },
         { label: group.name },
       ]}
       header={
@@ -59,7 +61,7 @@ const GroupLayout: React.FC = () => {
         />
       }
       tabs={groupTabs}
-      tabBasePath={`/group/${groupId}`}
+      tabBasePath={campaignPath(`/group/${groupId}`)}
       tabOrientation={isMobile ? 'bottom' : 'top'}
     >
       <Outlet />

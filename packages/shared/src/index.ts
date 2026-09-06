@@ -67,8 +67,6 @@ export { default as PersonalizeModal } from './ui/PersonalizeModal/PersonalizeMo
 export { evaluateExpression } from './utils/evaluateExpression';
 export { generateKey } from './utils/generateKey';
 export { storage } from './utils/storage';
-export { getGroupAndCharacterIds } from './utils/getGroupAndCharacterIds';
-export type { GroupCharacterIds } from './utils/getGroupAndCharacterIds';
 
 // --- config ---
 export { loadConfig, getApiBase } from './config';

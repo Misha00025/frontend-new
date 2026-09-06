@@ -79,7 +79,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
     <>
       <div ref={stickyRef} className={styles.stickyHeader}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <GlobalSidebar mode="inline" navItems={navItems} />
+          {navItems && <GlobalSidebar mode="inline" navItems={navItems} />}
           <Breadcrumbs items={breadcrumbs} />
         </div>
         {header && (
