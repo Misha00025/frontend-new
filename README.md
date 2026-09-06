@@ -50,9 +50,52 @@ npm run test:run   # Vitest (single run)
 
 ## Docker
 
-- **Dockerfile**: multi-stage — builder (node:20, `npm ci`, `npm run build`) → runtime (node:lts-alpine, `serve -s build -l 3000`). ENTRYPOINT `docker-entrypoint.sh`, CMD `serve`.
-- **docker-entrypoint.sh**: если нет `/app/build/config.json`, генерирует его из env `API_BASE` (по умолчанию `http://localhost:5000`).
-- **docker-compose.yaml**: сервис `frontend`, порт `3000:3000`, `container_name: frontend-v2`, `env_file: .env`.
-- **template.env**: `API_BASE=http://localhost:5000/`.
+Каждое приложение — **отдельный Docker-образ** и отдельный контейнер. Сборка идёт из **корня монорепо** (context: `.`), т.к. приложения зависят от `packages/shared`.
+
+### Образы
+
+| Приложение | Образ | Dockerfile |
+|---|---|---|
+| Кампания | `tdn-campaign` | `apps/campaign/Dockerfile` |
+| Игровые системы | `tdn-game-systems` | `apps/game-systems/Dockerfile` |
+
+Multi-stage: builder (`node:20`, `npm ci`, `npm run build --workspace <app>`) → runtime (`node:lts-alpine`, `serve -s build -l 3000`). ENTRYPOINT `docker-entrypoint.sh`, CMD `serve`.
+
+### Базовый путь (VITE_BASE)
+
+По умолчанию `'/'` — приложение деплоится на **отдельный поддомен**. Для деплоя **под путём** (например `/campaign`, `/game-systems`) передайте build-arg `VITE_BASE`:
+
+```bash
+docker build -f apps/campaign/Dockerfile --build-arg VITE_BASE=/campaign -t tdn-campaign .
+```
+
+`VITE_BASE` попадает в `base` Vite-конфига (см. `vite.config.ts` каждого приложения). Пути/поддомены **не хардкодятся** — конфигурацию сервера решает DevOps/пользователь.
+
+### docker-compose
+
+**Оба приложения сразу** (из корня монорепо):
+
+```bash
+cp apps/campaign/template.env .env.campaign
+cp apps/game-systems/template.env .env.game-systems
+docker compose up -d --build
+```
+
+- `campaign` → `tdn-campaign`, порт `3000:3000`
+- `game-systems` → `tdn-game-systems`, порт `3001:3000`
+- Порт и `VITE_BASE` настраиваются через переменные `CAMPAIGN_PORT` / `GAME_SYSTEMS_PORT` / `VITE_BASE_CAMPAIGN` / `VITE_BASE_GAME_SYSTEMS`.
+
+**Одно приложение отдельно** (compose-файл в каталоге приложения, context `../..`):
+
+```bash
+cd apps/campaign && cp template.env .env && docker compose up -d --build
+cd apps/game-systems && cp template.env .env && docker compose up -d --build
+```
+
+### config.json / API_BASE
+
+- `docker-entrypoint.sh` генерирует `/app/build/config.json` из env `API_BASE` (по умолчанию `http://localhost:5000`), если файла ещё нет.
+- Чтобы подложить свой `config.json` (заменит ENV): volume `./config.json:/app/build/config.json:ro`.
+- `template.env` в каждом приложении: `API_BASE=...` (+ закомментированный `VITE_BASE`).
 
 > Примечание: доменный код (группы, персонажи, игра) перенесён в `apps/campaign` (подзадача 3.3). Корневой монолит `src/` удалён; корневые `Dockerfile`/`docker-compose.yaml`/`index.html`/`vite.config.ts` переехали в `apps/campaign`. Сборка/тесты запускаются из `apps/campaign` (или через корневые npm-скрипты, делегирующие в `@tdn/campaign`).

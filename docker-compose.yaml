@@ -1,0 +1,45 @@
+# Docker Compose для обоих приложений монорепо tdn-frontend.
+# Запуск из КОРНЯ монорепо:
+#   cp apps/campaign/template.env .env.campaign
+#   cp apps/game-systems/template.env .env.game-systems
+#   docker compose up -d --build
+#
+# Каждое приложение — отдельный образ и отдельный контейнер.
+# Базовый путь (VITE_BASE) задаётся на этапе сборки образа (build.args),
+# по умолчанию '/' — отдельные поддомены. Для деплоя под путём раскомментируйте
+# build.args.VITE_BASE (например /campaign, /game-systems) и настройте reverse proxy.
+
+services:
+  campaign:
+    build:
+      context: .
+      dockerfile: apps/campaign/Dockerfile
+      args:
+        VITE_BASE: ${VITE_BASE_CAMPAIGN:-/}
+    image: tdn-campaign
+    container_name: tdn-campaign
+    ports:
+      - "${CAMPAIGN_PORT:-3000}:3000"
+    env_file:
+      - .env.campaign
+    restart: unless-stopped
+    # Чтобы подложить свой config.json (заменит ENV):
+    # volumes:
+    #   - ./config.campaign.json:/app/build/config.json:ro
+
+  game-systems:
+    build:
+      context: .
+      dockerfile: apps/game-systems/Dockerfile
+      args:
+        VITE_BASE: ${VITE_BASE_GAME_SYSTEMS:-/}
+    image: tdn-game-systems
+    container_name: tdn-game-systems
+    ports:
+      - "${GAME_SYSTEMS_PORT:-3001}:3000"
+    env_file:
+      - .env.game-systems
+    restart: unless-stopped
+    # Чтобы подложить свой config.json (заменит ENV):
+    # volumes:
+    #   - ./config.game-systems.json:/app/build/config.json:ro

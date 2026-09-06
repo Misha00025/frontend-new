@@ -12,6 +12,10 @@ npm run dev --workspace @tdn/game-systems   # dev-сервер на :3001
 npm run build --workspace @tdn/game-systems # сборка в build/
 ```
 
+## Docker
+
+Отдельный образ `tdn-game-systems` (Dockerfile в этом каталоге, сборка из корня монорепо). Базовый путь по умолчанию `'/'`; для деплоя под путём — build-arg `VITE_BASE=/game-systems`. Подробности — в корневом `README.md` (раздел Docker).
+
 ## Структура
 
 - `src/main.tsx` — bootstrap (loadConfig) + рендер.
