@@ -1,11 +1,12 @@
 // Profile.tsx
 import React, { useEffect, useState } from 'react';
 import { useProfile } from '@tdn/shared/auth/useProfile';
+import { userAPI } from '@tdn/shared';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import inputStyles from '@tdn/shared/styles/components/Input.module.css';
 import styles from '@tdn/shared/styles/common.module.css';
 import { useAuth } from '@tdn/shared/auth/AuthContext';
-import { uploadAPI, userAPI } from '../services/api';
+import { uploadAPI } from '../services/api';
 
 const Profile: React.FC = () => {
   const { profile, loading, error, fetchProfile } = useProfile();

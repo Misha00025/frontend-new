@@ -38,6 +38,7 @@
     "build:campaign": "npm run build --workspace @tdn/campaign",
     "build:game-systems": "npm run build --workspace @tdn/game-systems",
     "build:hub": "npm run build --workspace @tdn/hub",
+    "build:profile": "npm run build --workspace @tdn/profile",
     "test": "npm run test --workspace @tdn/campaign",
     "test:run": "npm run test:run --workspace @tdn/campaign"
   },

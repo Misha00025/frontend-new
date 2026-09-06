@@ -39,7 +39,6 @@ import CharacterQuests from './pages/Group/Characters/CharacterQuests';
 import GroupItems from './pages/Group/GroupItems';
 import GroupNotes from './pages/Group/GroupNotes';
 import GroupQuests from './pages/Group/GroupQuests';
-import Profile from './pages/Profile';
 import '@tdn/shared/styles/globals.css';
 import { GroupUsersProvider } from './contexts/GroupUsersContext';
 import { PermissionsProvider } from './contexts/PermissionsContext';
@@ -120,7 +119,6 @@ const AppContent: React.FC = () => {
           <Route path="notes" element={<CharacterNotes />} />
         </Route>
       </Route>
-      <Route path="/profile" element={<Profile />} />
       <Route path="/login" element={<Navigate to="/dashboard" replace />} />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
     </Routes>
