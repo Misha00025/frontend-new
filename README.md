@@ -55,4 +55,4 @@ npm run test:run   # Vitest (single run)
 - **docker-compose.yaml**: сервис `frontend`, порт `3000:3000`, `container_name: frontend-v2`, `env_file: .env`.
 - **template.env**: `API_BASE=http://localhost:5000/`.
 
-> Примечание: текущий монолит (src/, Dockerfile, docker-compose.yaml в корне) будет перенесён в `apps/campaign` в подзадачах 3.2/3.3. Каркасы `apps/*` и `packages/shared` созданы в подзадаче 3.1.
+> Примечание: доменный код (группы, персонажи, игра) перенесён в `apps/campaign` (подзадача 3.3). Корневой монолит `src/` удалён; корневые `Dockerfile`/`docker-compose.yaml`/`index.html`/`vite.config.ts` переехали в `apps/campaign`. Сборка/тесты запускаются из `apps/campaign` (или через корневые npm-скрипты, делегирующие в `@tdn/campaign`).

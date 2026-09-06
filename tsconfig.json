@@ -1,33 +1,8 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "types": ["vite/client", "vitest/globals"],
-    "baseUrl": ".",
-    "paths": {
-      "@tdn/shared": ["packages/shared/src/index.ts"],
-      "@tdn/shared/*": ["packages/shared/src/*"]
-    }
-  },
-  "include": [
-    "src",
-    "vite.config.ts"
+  "files": [],
+  "references": [
+    { "path": "./packages/shared" },
+    { "path": "./apps/campaign" },
+    { "path": "./apps/game-systems" }
   ]
 }

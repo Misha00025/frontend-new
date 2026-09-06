@@ -30,11 +30,12 @@
     "vitest": "^2.1.8"
   },
   "scripts": {
-    "start": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "test": "vitest",
-    "test:run": "vitest run"
+    "start": "npm run dev --workspace @tdn/campaign",
+    "dev": "npm run dev --workspace @tdn/campaign",
+    "build": "npm run build --workspace @tdn/campaign",
+    "preview": "npm run preview --workspace @tdn/campaign",
+    "test": "npm run test --workspace @tdn/campaign",
+    "test:run": "npm run test:run --workspace @tdn/campaign"
   },
   "browserslist": {
     "production": [
