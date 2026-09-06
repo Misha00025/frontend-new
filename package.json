@@ -24,16 +24,20 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "@originjs/vite-plugin-federation": "^1.4.1",
     "@vitejs/plugin-react": "^4.3.4",
     "jsdom": "^25.0.1",
     "vite": "^5.4.11",
     "vitest": "^2.1.8"
   },
   "scripts": {
-    "start": "npm run dev --workspace @tdn/campaign",
-    "dev": "npm run dev --workspace @tdn/campaign",
-    "build": "npm run build --workspace @tdn/campaign",
-    "preview": "npm run preview --workspace @tdn/campaign",
+    "start": "npm run dev --workspace @tdn/hub",
+    "dev": "npm run dev --workspace @tdn/hub",
+    "build": "npm run build --workspace @tdn/hub",
+    "preview": "npm run preview --workspace @tdn/hub",
+    "build:campaign": "npm run build --workspace @tdn/campaign",
+    "build:game-systems": "npm run build --workspace @tdn/game-systems",
+    "build:hub": "npm run build --workspace @tdn/hub",
     "test": "npm run test --workspace @tdn/campaign",
     "test:run": "npm run test:run --workspace @tdn/campaign"
   },

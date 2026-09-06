@@ -3,6 +3,7 @@
   "references": [
     { "path": "./packages/shared" },
     { "path": "./apps/campaign" },
-    { "path": "./apps/game-systems" }
+    { "path": "./apps/game-systems" },
+    { "path": "./apps/hub" }
   ]
 }
