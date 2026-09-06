@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import Breadcrumbs, { BreadcrumbItem } from './Breadcrumbs';
 import TabBar, { TabItem } from './TabBar';
 import GlobalSidebar from '../GlobalSidebar/GlobalSidebar';
+import type { NavItem } from '../navigation';
 import styles from './PageLayout.module.css';
 
 export interface PageLayoutProps {
@@ -10,6 +11,7 @@ export interface PageLayoutProps {
   tabs: TabItem[];
   tabBasePath: string;
   tabOrientation?: 'top' | 'bottom';
+  navItems?: NavItem[];
   children: React.ReactNode;
 }
 
@@ -19,6 +21,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   tabs,
   tabBasePath,
   tabOrientation = 'top',
+  navItems,
   children,
 }) => {
   const headerRef = useRef<HTMLDivElement>(null);
@@ -76,7 +79,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
     <>
       <div ref={stickyRef} className={styles.stickyHeader}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <GlobalSidebar mode="inline" />
+          <GlobalSidebar mode="inline" navItems={navItems} />
           <Breadcrumbs items={breadcrumbs} />
         </div>
         {header && (
