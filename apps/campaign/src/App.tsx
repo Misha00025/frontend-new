@@ -124,7 +124,7 @@ const App: React.FC = () => {
       <ThemeProvider>
         <GroupProvider>
           <VisitedProvider>
-          <Router>
+          <Router basename={import.meta.env.BASE_URL}>
             <GroupUsersProvider>
               <PermissionsProvider>
                 <SidebarProvider>

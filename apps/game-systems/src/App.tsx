@@ -41,7 +41,7 @@ const App: React.FC = () => {
     <AuthProvider>
       <ThemeProvider>
         <SidebarProvider>
-          <Router>
+          <Router basename={import.meta.env.BASE_URL}>
             <AppContent />
           </Router>
         </SidebarProvider>
