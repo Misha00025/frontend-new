@@ -1,19 +1,20 @@
 import React from 'react';
 import { useAuth } from '@tdn/shared';
-import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@tdn/shared';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import inputStyles from '@tdn/shared/styles/components/Input.module.css';
 import modalStyles from '@tdn/shared/styles/modal.module.css';
+import { useGameSystemsNavigate } from '../navigation';
 
 // Страница входа — переиспользует общий AuthContext из @tdn/shared.
+// Внутренняя навигация относительна к корню приложения (useGameSystemsNavigate).
 const Login: React.FC = () => {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const { login } = useAuth();
-  const navigate = useNavigate();
+  const navigate = useGameSystemsNavigate();
   const { setPreset } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
