@@ -43,7 +43,6 @@ import '@tdn/shared/styles/globals.css';
 import { GroupUsersProvider } from './contexts/GroupUsersContext';
 import { PermissionsProvider } from './contexts/PermissionsContext';
 import GroupSkills from './pages/Group/GroupSkills';
-import Login from './pages/Authorisation/Login';
 import { SessionProvider, useCampaignSession } from './session/SessionProvider';
 import type { CampaignSession } from './session';
 
@@ -85,7 +84,10 @@ const AppContent: React.FC = () => {
   }, [accessToken, fetchProfile]);
 
   if (!accessToken) {
-    return <Login />;
+    // Страница входа вынесена в отдельный remote-домен apps/login.
+    // Здесь (кампания) при отсутствии токена просто не рендерим домен —
+    // гейт «не залогинен» обрабатывает хаб, который показывает remote login.
+    return null;
   }
 
   if (loading) {

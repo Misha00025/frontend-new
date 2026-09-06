@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
+// src/pages/Login.tsx
+// Страница входа — отдельный remote-домен логина.
+//
+// Полностью независима от остальных приложений (не сшита с профилем и т.д.).
+// Переиспользует общий AuthContext из @tdn/shared: login() пишет токен в
+// общее хранилище сессии (shared-синглтон tokenManager), которое разделяют
+// все приложения. После успешного входа навигируем на корень приложения.
+import React from 'react';
+import { useAuth } from '@tdn/shared';
+import { useTheme } from '@tdn/shared';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import inputStyles from '@tdn/shared/styles/components/Input.module.css';
 import modalStyles from '@tdn/shared/styles/modal.module.css';
-import { useAuth } from '@tdn/shared/auth/AuthContext';
+import { useLoginNavigate } from '../navigation';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const { login } = useAuth();
+  const navigate = useLoginNavigate();
+  const { setPreset } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,6 +29,7 @@ const Login: React.FC = () => {
 
     try {
       await login(username, password);
+      navigate('/', { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
       setLoading(false);
@@ -25,14 +37,15 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      minHeight: '100vh',
-      background: 'var(--bg-primary)'
-    }}>
-      
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: 'var(--bg-primary)',
+      }}
+    >
       <form
         style={{
           display: 'flex',
@@ -49,7 +62,7 @@ const Login: React.FC = () => {
         <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           Вход в систему
         </h2>
-        
+
         {error && <div className={modalStyles.error}>{error}</div>}
 
         <input
@@ -71,6 +84,15 @@ const Login: React.FC = () => {
 
         <button className={buttonStyles.button} type="submit" disabled={loading}>
           {loading ? 'Загрузка...' : 'Войти'}
+        </button>
+
+        <button
+          type="button"
+          className={buttonStyles.button}
+          onClick={() => setPreset('dark')}
+          style={{ marginTop: '0.5rem' }}
+        >
+          Переключить тему (dark)
         </button>
       </form>
     </div>
