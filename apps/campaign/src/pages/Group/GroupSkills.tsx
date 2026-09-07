@@ -9,6 +9,7 @@ import { useActionPermissions } from '../../hooks/useActionPermissions';
 import ResourcePage from '../../components/commons/Pages/ResourcePage/ResourcePage';
 import SchemaModal from './Modals/ShcemaModal/SchemaModal';
 import SkillModal from './Modals/SkillModal/SkillModal';
+import { ThemeProvider } from '@tdn/shared/theme/ThemeContext';
 
 const SkillCardWrapper: React.FC<{
   item: GroupSkill;
@@ -146,7 +147,7 @@ const GroupSkills: React.FC = () => {
   };
 
   return (
-    <>
+    <ThemeProvider>
       <ResourcePage
         config={config}
         items={skills}
@@ -188,7 +189,7 @@ const GroupSkills: React.FC = () => {
         />
       </>
       )}
-    </>
+    </ThemeProvider>
   );
 };
 
