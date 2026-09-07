@@ -2,7 +2,8 @@
 // Публичный API пакета (barrel). Подключается через алиас @tdn/shared → packages/shared/src.
 
 // --- auth ---
-export { AuthProvider, useAuth } from './auth/AuthContext';
+export { AuthProvider, useAuth, RemoteAuthProvider, AuthContext } from './auth/AuthContext';
+export type { AuthContextType } from './auth/AuthContext';
 export { authAPI, makeAuthenticatedRequest, userAPI, userSettingsAPI } from './auth/api';
 export { default as tokenManager } from './auth/tokenManager';
 export type {

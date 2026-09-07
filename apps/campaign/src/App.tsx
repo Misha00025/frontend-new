@@ -15,7 +15,7 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation, useParams, Outlet } from 'react-router-dom';
 import { GroupSchemasProvider } from './contexts/GroupSchemasContext';
-import { useAuth } from '@tdn/shared/auth/AuthContext';
+import { useAuth, RemoteAuthProvider } from '@tdn/shared';
 import { setApiBase } from '@tdn/shared/config';
 import { GroupProvider } from './contexts/GroupContext';
 import { VisitedProvider } from './contexts/VisitedContext';
@@ -43,6 +43,7 @@ import '@tdn/shared/styles/globals.css';
 import { GroupUsersProvider } from './contexts/GroupUsersContext';
 import { PermissionsProvider } from './contexts/PermissionsContext';
 import GroupSkills from './pages/Group/GroupSkills';
+import type { AuthContextType } from '@tdn/shared';
 
 const GroupSchemasBoundary: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -126,7 +127,7 @@ const AppContent: React.FC = () => {
   );
 };
 
-const App: React.FC<{ apiBase?: string }> = ({ apiBase }) => {
+const App: React.FC<{ apiBase?: string; auth?: Partial<AuthContextType> }> = ({ apiBase, auth }) => {
   // В режиме хаба хаб прокидывает свой API_BASE — переопределяем фолбэк,
   // чтобы API-запросы шли на шлюз хаба, а не на localhost:5000.
   useEffect(() => {
@@ -134,15 +135,17 @@ const App: React.FC<{ apiBase?: string }> = ({ apiBase }) => {
   }, [apiBase]);
 
   return (
-    <GroupProvider>
-      <VisitedProvider>
-        <GroupUsersProvider>
-          <PermissionsProvider>
-            <AppContent />
-          </PermissionsProvider>
-        </GroupUsersProvider>
-      </VisitedProvider>
-    </GroupProvider>
+    <RemoteAuthProvider auth={auth}>
+      <GroupProvider>
+        <VisitedProvider>
+          <GroupUsersProvider>
+            <PermissionsProvider>
+              <AppContent />
+            </PermissionsProvider>
+          </GroupUsersProvider>
+        </VisitedProvider>
+      </GroupProvider>
+    </RemoteAuthProvider>
   );
 };
 

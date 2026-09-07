@@ -1,29 +1,27 @@
 // RemoteBoundary — каркас монтирования remote-модуля.
 //
 // Загружает remote-модуль (см. loadRemote.ts), показывает состояние
-// загрузки/ошибки и рендерит компонент, прокидывая в него сессию хаба.
-// Хаб не знает деталей домена remote — только контракт RemoteModule.
+// загрузки/ошибки и рендерит компонент, прокидывая в него auth, session
+// и apiBase хаба. Хаб не знает деталей домена remote — только контракт
+// RemoteModule / RemoteProps.
 
 import React, { useEffect, useState } from 'react';
 import { loadRemoteModule } from './loadRemote';
-import type { RemoteModule, RemoteDescriptor } from './types';
+import type { RemoteModule, RemoteProps } from './types';
 
-interface RemoteBoundaryProps {
+interface RemoteBoundaryProps extends RemoteProps {
   /** Имя remote (совпадает с ключом в remotes vite.config). */
-  name: RemoteDescriptor['name'];
+  name: 'campaign' | 'game-systems' | 'profile' | 'login';
   /** Имя экспонируемого модуля внутри remote. */
   module: string;
-  /** Сессия, прокидываемая хабом в remote. */
-  session?: RemoteDescriptor['session'];
-  /** Дополнительные пропсы, передаваемые в remote-компонент. */
-  [key: string]: unknown;
 }
 
 const RemoteBoundary: React.FC<RemoteBoundaryProps> = ({
   name,
   module,
+  auth,
   session,
-  ...rest
+  apiBase,
 }) => {
   const [mod, setMod] = useState<RemoteModule | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +59,13 @@ const RemoteBoundary: React.FC<RemoteBoundaryProps> = ({
   }
 
   const RemoteComponent = mod.default;
-  return <RemoteComponent session={session} apiBase={session?.apiBase} {...rest} />;
+  return (
+    <RemoteComponent
+      auth={auth}
+      session={session}
+      apiBase={apiBase ?? session?.apiBase}
+    />
+  );
 };
 
 export default RemoteBoundary;

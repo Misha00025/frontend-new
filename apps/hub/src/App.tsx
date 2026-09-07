@@ -9,20 +9,27 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, ThemeProvider, SidebarProvider } from '@tdn/shared';
+import { AuthProvider, ThemeProvider, SidebarProvider, useAuth } from '@tdn/shared';
 import { SessionProvider, useHubSession } from './session/SessionProvider';
 import HubSidebar from './components/HubSidebar/HubSidebar';
 import RemoteBoundary from './remote/RemoteBoundary';
 import Login from './pages/Login';
 
 // Гейт «не залогинен»: хаб решает, что пользователь не залогинен, и
-// показывает страницу входа (remote login). Сессия прокидывается в remotes.
+// показывает страницу входа (remote login). Сессия и auth прокидываются
+// в remotes.
 const AppContent: React.FC = () => {
-  const { accessToken } = useHubSession();
+  const session = useHubSession();
+  const { accessToken } = session;
+  const { login, logout, userId } = useAuth();
 
   if (!accessToken) {
     return <Login />;
   }
+
+  // Auth, который хаб прокидывает в remotes. Remotes используют его через
+  // RemoteAuthProvider (общий AuthContext), а не бандлят свой AuthProvider.
+  const auth = { accessToken, login, logout, userId };
 
   return (
     <>
@@ -34,28 +41,28 @@ const AppContent: React.FC = () => {
           <Route
             path="/"
             element={
-              <RemoteBoundary name="campaign" module="Home" />
+              <RemoteBoundary name="campaign" module="Home" auth={auth} session={session} />
             }
           />
           {/* Игровые системы — remote владеет своей маршрутизацией. */}
           <Route
             path="/systems/*"
             element={
-              <RemoteBoundary name="game-systems" module="App" />
+              <RemoteBoundary name="game-systems" module="App" auth={auth} session={session} />
             }
           />
           {/* Кампании — remote владеет своей маршрутизацией. */}
           <Route
             path="/campaign/*"
             element={
-              <RemoteBoundary name="campaign" module="App" />
+              <RemoteBoundary name="campaign" module="App" auth={auth} session={session} />
             }
           />
           {/* Профиль — remote. */}
           <Route
             path="/profile/*"
             element={
-              <RemoteBoundary name="profile" module="App" />
+              <RemoteBoundary name="profile" module="App" auth={auth} session={session} />
             }
           />
           {/* Настройки — пока заглушка (владелец настроек темы — хаб). */}

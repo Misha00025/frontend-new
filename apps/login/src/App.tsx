@@ -17,9 +17,10 @@
 
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '@tdn/shared/auth/AuthContext';
+import { useAuth, RemoteAuthProvider } from '@tdn/shared';
 import { setApiBase } from '@tdn/shared/config';
 import Login from './pages/Login';
+import type { AuthContextType } from '@tdn/shared';
 
 const AppContent: React.FC = () => {
   const { accessToken } = useAuth();
@@ -38,13 +39,17 @@ const AppContent: React.FC = () => {
   );
 };
 
-const App: React.FC<{ apiBase?: string }> = ({ apiBase }) => {
+const App: React.FC<{ apiBase?: string; auth?: Partial<AuthContextType> }> = ({ apiBase, auth }) => {
   // В режиме хаба хаб прокидывает свой API_BASE — переопределяем фолбэк.
   useEffect(() => {
     if (apiBase) setApiBase(apiBase);
   }, [apiBase]);
 
-  return <AppContent />;
+  return (
+    <RemoteAuthProvider auth={auth}>
+      <AppContent />
+    </RemoteAuthProvider>
+  );
 };
 
 export default App;
