@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 
 vi.mock('react-markdown', () => ({
@@ -44,7 +45,11 @@ vi.mock('./contexts/TemplateEditContext', () => ({
 
 describe('App', () => {
   it('renders without crashing', () => {
-    render(<App />);
+    render(
+      <MemoryRouter initialEntries={['/dashboard']}>
+        <App />
+      </MemoryRouter>
+    );
     expect(document.body).toBeInTheDocument();
   });
 });

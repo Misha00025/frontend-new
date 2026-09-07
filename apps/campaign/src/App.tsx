@@ -1,23 +1,21 @@
 // src/App.tsx
 // Кампания — remote-приложение микрофронтендов.
 //
-// Монтируется хабом под префиксом /campaign/* (модуль campaign/App) либо
-// автономно (standalone). Маршрутизация — у кампании (вложенные роутеры).
-// Собственной навигации/панели нет — её передаёт хаб.
+// НОВЫЙ КОНТРАКТ (тикет #19): роутером владеет хаб. Remote НЕ создаёт
+// собственный Router и НЕ рендерит общие провайдеры (Auth/Theme/Session) —
+// их даёт хаб. Здесь — только доменные провайдеры кампании + маршруты
+// через <Routes> (требует родительский Router от хаба).
 //
-// Сессия: хаб прокидывает её через пропс `session` (см. session.ts).
-// При автономном запуске (без хаба) сессия грузится из хранилища (fallback)
-// — см. session/SessionProvider.tsx.
+// Автономный запуск (standalone): main.tsx оборачивает этот же компонент
+// в свой Router + общие провайдеры (Auth/Theme/Session).
 //
-// Провайдеры: Auth → Theme → Session → Group → Visited → Router → AppContent.
-// (AuthProvider/ThemeProvider — из @tdn/shared; при монтировании хабом они
-// уже есть в дереве, но здесь они идемпотентны и нужны для автономного запуска.)
+// Провайдеры: Group → Visited → GroupUsers → Permissions → AppContent.
+// (GroupSchemasBoundary — внутри маршрутов, зависит от :groupId.)
 
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation, useParams, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useLocation, useParams, Outlet } from 'react-router-dom';
 import { GroupSchemasProvider } from './contexts/GroupSchemasContext';
-import { AuthProvider, useAuth } from '@tdn/shared/auth/AuthContext';
-import { ThemeProvider } from '@tdn/shared/theme/ThemeContext';
+import { useAuth } from '@tdn/shared/auth/AuthContext';
 import { GroupProvider } from './contexts/GroupContext';
 import { VisitedProvider } from './contexts/VisitedContext';
 import { useProfile } from '@tdn/shared/auth/useProfile';
@@ -43,9 +41,6 @@ import '@tdn/shared/styles/globals.css';
 import { GroupUsersProvider } from './contexts/GroupUsersContext';
 import { PermissionsProvider } from './contexts/PermissionsContext';
 import GroupSkills from './pages/Group/GroupSkills';
-import { SessionProvider, useCampaignSession } from './session/SessionProvider';
-import type { CampaignSession } from './session';
-import { getCampaignBase } from './navigation';
 
 const GroupSchemasBoundary: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -128,36 +123,17 @@ const AppContent: React.FC = () => {
   );
 };
 
-interface AppProps {
-  /** Сессия, прокидываемая хабом (см. session.ts). */
-  session?: CampaignSession;
-}
-
-const App: React.FC<AppProps> = ({ session }) => {
-  // basename роутера кампании считаем из реального URL в рантайме, а не из
-  // import.meta.env.BASE_URL. Кампания — remote: хаб монтирует её под своим
-  // префиксом (например /hub/campaign/*), который не совпадает с VITE_BASE
-  // кампании (/campaign/). Если basename не совпадает с реальным путём,
-  // location.pathname внутри роутера неверный → вкладки/навигация ломаются.
-  const base = getCampaignBase(window.location.pathname);
+const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <ThemeProvider>
-        <SessionProvider session={session}>
-          <GroupProvider>
-            <VisitedProvider>
-              <Router basename={base}>
-                <GroupUsersProvider>
-                  <PermissionsProvider>
-                    <AppContent />
-                  </PermissionsProvider>
-                </GroupUsersProvider>
-              </Router>
-            </VisitedProvider>
-          </GroupProvider>
-        </SessionProvider>
-      </ThemeProvider>
-    </AuthProvider>
+    <GroupProvider>
+      <VisitedProvider>
+        <GroupUsersProvider>
+          <PermissionsProvider>
+            <AppContent />
+          </PermissionsProvider>
+        </GroupUsersProvider>
+      </VisitedProvider>
+    </GroupProvider>
   );
 };
 

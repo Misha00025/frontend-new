@@ -53,7 +53,7 @@ const AppContent: React.FC = () => {
           />
           {/* Профиль — remote. */}
           <Route
-            path="/profile"
+            path="/profile/*"
             element={
               <RemoteBoundary name="profile" module="App" />
             }
