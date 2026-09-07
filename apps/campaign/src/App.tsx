@@ -20,6 +20,7 @@ import { GroupProvider } from './contexts/GroupContext';
 import { VisitedProvider } from './contexts/VisitedContext';
 import { useProfile } from '@tdn/shared/auth/useProfile';
 import CompleteRegistration from './pages/Authorisation/CompleteRegistration';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Groups from './pages/Groups';
 import GroupLayout from './pages/Group/GroupLayout';
@@ -80,10 +81,11 @@ const AppContent: React.FC = () => {
   }, [accessToken, fetchProfile]);
 
   if (!accessToken) {
-    // Страница входа вынесена в отдельный remote-домен apps/login.
-    // Здесь (кампания) при отсутствии токена просто не рендерим домен —
-    // гейт «не залогинен» обрабатывает хаб, который показывает remote login.
-    return null;
+    // В режиме хаба гейт «не залогинен» обрабатывает хаб, который показывает
+    // remote login (apps/login). Здесь (кампания) при отсутствии токена
+    // рендерим собственную страницу входа — это фолбэк для автономного
+    // запуска (standalone), чтобы вместо пустой страницы был экран входа.
+    return <Login />;
   }
 
   if (loading) {
