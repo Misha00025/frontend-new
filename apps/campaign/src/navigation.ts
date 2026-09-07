@@ -20,17 +20,31 @@ const CAMPAIGN_ROUTE_SEGMENTS = [
 
 /**
  * Возвращает базовый префикс кампании в текущем pathname.
- * Например: '/groups' (под хабом) или '' (standalone).
+ * Например: '/hub' (под хабом на /hub/groups/*) или '' (кампания в корне
+ * роутера — хаб на /groups/* либо standalone на /).
  *
  * Если в pathname нет ни одного сегмента маршрута кампании — значит, весь
- * путь и есть базовый префикс (например '/groups' или '/hub/groups').
+ * путь и есть базовый префикс (например '/hub').
  * Это нужно для вычисления basename роутера при монтировании хабом.
+ *
+ * ВАЖНО: когда кампания смонтирована в корне роутера (idx === 0 или путь
+ * пуст), возвращаем '' (пустую строку), а НЕ '/'. Иначе склейка base + to
+ * даёт двойной слэш '//groups' вместо '/groups' (тикет #28).
  */
 export const getCampaignBase = (pathname: string): string => {
   const parts = pathname.split('/').filter(Boolean);
   const idx = parts.findIndex((p) => CAMPAIGN_ROUTE_SEGMENTS.includes(p));
-  if (idx === -1) return '/' + parts.join('/');
-  return '/' + parts.slice(0, idx).join('/');
+  const prefix = idx === -1 ? parts : parts.slice(0, idx);
+  return prefix.length ? '/' + prefix.join('/') : '';
+};
+
+/**
+ * Склеивает базовый префикс кампании с абсолютным путём внутри кампании
+ * без двойного слэша. Если base пустой или '/', возвращаем просто `to`.
+ */
+const joinCampaignPath = (base: string, to: string): string => {
+  if (!base || base === '/') return to;
+  return `${base}${to}`;
 };
 
 /**
@@ -43,7 +57,7 @@ export const useCampaignNavigate = () => {
   const location = useLocation();
   const base = getCampaignBase(location.pathname);
   return (to: string, opts?: { replace?: boolean }) =>
-    navigate(`${base}${to}`, opts);
+    navigate(joinCampaignPath(base, to), opts);
 };
 
 /**
@@ -55,5 +69,5 @@ export const useCampaignNavigate = () => {
 export const useCampaignPath = () => {
   const location = useLocation();
   const base = getCampaignBase(location.pathname);
-  return (to: string) => `${base}${to}`;
+  return (to: string) => joinCampaignPath(base, to);
 };
