@@ -100,9 +100,13 @@ const AppContent: React.FC = () => {
       {/* Кампания = группы, единый префикс /groups/* (тикет #26).
           Маршруты — ОТНОСИТЕЛЬНЫЕ к префиксу /groups, чтобы корректно
           держаться в нём при монтировании хабом (хаб монтирует под /groups/*)
-          и в автономном запуске (basename ''). */}
-      <Route path="/groups" element={<Groups />} />
-      <Route path="/groups/:groupId" element={<GroupSchemasBoundary />}>
+          и в автономном запуске (basename ''). Вложенный <Routes> видит
+          location ОТНОСИТЕЛЬНО родительского пути /groups/*, поэтому
+          абсолютные пути (/groups, /groups/:groupId) здесь НЕ матчатся —
+          нужны относительные: index → список групп, :groupId → группа,
+          :groupId/character/:characterId → персонаж. */}
+      <Route index element={<Groups />} />
+      <Route path=":groupId" element={<GroupSchemasBoundary />}>
         <Route element={<GroupLayout />}>
           <Route index element={<Navigate to="characters" replace />} />
           <Route path="characters" element={<Characters />} />
@@ -135,9 +139,14 @@ const AppContent: React.FC = () => {
 const App: React.FC<{ apiBase?: string; auth?: Partial<AuthContextType> }> = ({ apiBase, auth }) => {
   // В режиме хаба хаб прокидывает свой API_BASE — переопределяем фолбэк,
   // чтобы API-запросы шли на шлюз хаба, а не на localhost:5000.
-  useEffect(() => {
-    if (apiBase) setApiBase(apiBase);
-  }, [apiBase]);
+  // Вызываем СИНХРОННО во время рендера (а не в useEffect): React выполняет
+  // эффекты снизу вверх (сначала дочерние), поэтому дочерние страницы
+  // (Groups/GroupLayout/CharacterLayout) делают API-запросы в своих useEffect
+  // РАНЬШЕ, чем сработал бы эффект App. Если setApiBase отложить в эффект,
+  // первый запрос уйдёт на фолбэк localhost:5000 → «Failed to load group users».
+  // Синхронный вызов гарантирует, что apiBase уже установлен до любых
+  // дочерних эффектов. setApiBase идемпотентен и не вызывает ре-рендер.
+  if (apiBase) setApiBase(apiBase);
 
   return (
     <RemoteAuthProvider auth={auth}>
