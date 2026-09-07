@@ -37,9 +37,13 @@ const AppContent: React.FC = () => {
       <main style={{ padding: '1rem' }}>
         <Routes>
           {/* Главная — общая вкладка. Подгружает ТОЛЬКО страницу «Главная»
-              из campaign как готовый модуль (хаб не тянет домен кампании). */}
+              из campaign как готовый модуль (хаб не тянет домен кампании).
+              path="*" (splat) вместо "/": иначе вложенные <Routes> remotes
+              (campaign/game-systems/profile) не матчатся под своими префиксами
+              и react-router выдаёт предупреждение «parent route path has no
+              trailing "*"». Splat также служит catch-all для неизвестных путей. */}
           <Route
-            path="/"
+            path="*"
             element={
               <RemoteBoundary name="campaign" module="Home" auth={auth} session={session} />
             }

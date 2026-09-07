@@ -121,8 +121,8 @@ const AppContent: React.FC = () => {
           <Route path="notes" element={<CharacterNotes />} />
         </Route>
       </Route>
-      <Route path="/login" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/login" element={<Navigate to="dashboard" replace />} />
+      <Route path="/" element={<Navigate to="dashboard" replace />} />
     </Routes>
   );
 };
