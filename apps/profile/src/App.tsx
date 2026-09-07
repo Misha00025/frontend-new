@@ -11,7 +11,7 @@
 // Автономный запуск (standalone): main.tsx оборачивает этот же компонент
 // в свой Router (basename '/profile') + общие провайдеры (Auth/Theme/Session).
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth, RemoteAuthProvider } from '@tdn/shared';
 import { setApiBase } from '@tdn/shared/config';
@@ -37,9 +37,13 @@ const AppContent: React.FC = () => {
 
 const App: React.FC<{ apiBase?: string; auth?: Partial<AuthContextType> }> = ({ apiBase, auth }) => {
   // В режиме хаба хаб прокидывает свой API_BASE — переопределяем фолбэк.
-  useEffect(() => {
-    if (apiBase) setApiBase(apiBase);
-  }, [apiBase]);
+  // Вызываем СИНХРОННО во время рендера (а не в useEffect): React выполняет
+  // эффекты снизу вверх (сначала дочерние), поэтому Profile.tsx вызывает
+  // fetchProfile() в своём useEffect РАНЬШЕ, чем сработал бы эффект App.
+  // Если setApiBase отложить в эффект, первый запрос /whoami уйдёт на фолбэк
+  // localhost:5000 → «Failed to fetch». Синхронный вызов гарантирует, что
+  // apiBase уже установлен до любых дочерних эффектов.
+  if (apiBase) setApiBase(apiBase);
 
   return (
     <RemoteAuthProvider auth={auth}>
