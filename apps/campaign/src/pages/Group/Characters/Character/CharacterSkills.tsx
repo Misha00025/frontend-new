@@ -11,6 +11,7 @@ import CharacterSkillModal from '../../Modals/SkillModal/CharacterSkillModal';
 import SkillModal from '../../Modals/SkillModal/SkillModal';
 import { useCharacter } from '../../../../contexts/CharacterContext';
 import { useGroupSchemas } from '../../../../contexts/GroupSchemasContext';
+import { ThemeProvider } from '@tdn/shared/theme/ThemeContext';
 
 const SkillCardWrapper: React.FC<{
   item: CharacterSkill;
@@ -156,7 +157,7 @@ const CharacterSkills: React.FC = () => {
   }
 
   return (
-    <>
+    <ThemeProvider>
       <ResourcePage
         config={config}
         items={skills as CharacterSkill[]}
@@ -192,7 +193,7 @@ const CharacterSkills: React.FC = () => {
           title={editingSkill ? 'Редактирование навыка' : 'Создание навыка'}
         />
       )}
-    </>
+    </ThemeProvider>
   );
 };
 
