@@ -9,6 +9,7 @@ import List from '@tdn/shared/ui/List/List';
 import SearchBar from '@tdn/shared/ui/Search/SearchBar';
 import QuestCard from './Cards/QuestCard/QuestCard';
 import QuestViewModal from './Modals/QuestModal/QuestViewModal';
+import { ThemeProvider } from '@tdn/shared/theme/ThemeContext';
 import commonStyles from '@tdn/shared/styles/common.module.css';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import inputStyles from '@tdn/shared/styles/components/Input.module.css';
@@ -151,6 +152,7 @@ const GroupQuests: React.FC = () => {
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
 
   return (
+    <ThemeProvider>
     <div className={commonStyles.container}>
 
       {error && <div style={{ color: 'var(--danger-color)', marginBottom: '1rem' }}>{error}</div>}
@@ -414,6 +416,7 @@ const GroupQuests: React.FC = () => {
         </ModalPortal>
       )}
     </div>
+    </ThemeProvider>
   );
 };
 

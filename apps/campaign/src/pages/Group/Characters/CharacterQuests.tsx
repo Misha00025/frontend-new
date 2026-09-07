@@ -8,6 +8,7 @@ import List from '@tdn/shared/ui/List/List';
 import SearchBar from '@tdn/shared/ui/Search/SearchBar';
 import QuestCard from '../Cards/QuestCard/QuestCard';
 import QuestViewModal from '../Modals/QuestModal/QuestViewModal';
+import { ThemeProvider } from '@tdn/shared/theme/ThemeContext';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import inputStyles from '@tdn/shared/styles/components/Input.module.css';
 import modalStyles from '@tdn/shared/styles/modal.module.css';
@@ -104,6 +105,7 @@ const CharacterQuests: React.FC = () => {
   }
 
   return (
+    <ThemeProvider>
     <div>
 
       {error && <div style={{ color: 'var(--danger-color)', marginBottom: '1rem' }}>{error}</div>}
@@ -360,6 +362,7 @@ const CharacterQuests: React.FC = () => {
         </ModalPortal>
       )}
     </div>
+    </ThemeProvider>
   );
 };
 
