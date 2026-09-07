@@ -45,6 +45,7 @@ import { PermissionsProvider } from './contexts/PermissionsContext';
 import GroupSkills from './pages/Group/GroupSkills';
 import { SessionProvider, useCampaignSession } from './session/SessionProvider';
 import type { CampaignSession } from './session';
+import { getCampaignBase } from './navigation';
 
 const GroupSchemasBoundary: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -133,13 +134,19 @@ interface AppProps {
 }
 
 const App: React.FC<AppProps> = ({ session }) => {
+  // basename роутера кампании считаем из реального URL в рантайме, а не из
+  // import.meta.env.BASE_URL. Кампания — remote: хаб монтирует её под своим
+  // префиксом (например /hub/campaign/*), который не совпадает с VITE_BASE
+  // кампании (/campaign/). Если basename не совпадает с реальным путём,
+  // location.pathname внутри роутера неверный → вкладки/навигация ломаются.
+  const base = getCampaignBase(window.location.pathname);
   return (
     <AuthProvider>
       <ThemeProvider>
         <SessionProvider session={session}>
           <GroupProvider>
             <VisitedProvider>
-              <Router basename={import.meta.env.BASE_URL}>
+              <Router basename={base}>
                 <GroupUsersProvider>
                   <PermissionsProvider>
                     <AppContent />

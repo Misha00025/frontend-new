@@ -23,11 +23,15 @@ const CAMPAIGN_ROUTE_SEGMENTS = [
 /**
  * Возвращает базовый префикс кампании в текущем pathname.
  * Например: '/campaign' (под хабом) или '' (standalone).
+ *
+ * Если в pathname нет ни одного сегмента маршрута кампании — значит, весь
+ * путь и есть базовый префикс (например '/campaign' или '/hub/campaign').
+ * Это нужно для вычисления basename роутера при монтировании хабом.
  */
 export const getCampaignBase = (pathname: string): string => {
   const parts = pathname.split('/').filter(Boolean);
   const idx = parts.findIndex((p) => CAMPAIGN_ROUTE_SEGMENTS.includes(p));
-  if (idx === -1) return '';
+  if (idx === -1) return '/' + parts.join('/');
   return '/' + parts.slice(0, idx).join('/');
 };
 
