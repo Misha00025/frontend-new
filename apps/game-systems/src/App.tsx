@@ -11,9 +11,10 @@
 // Автономный запуск (standalone): main.tsx оборачивает этот же компонент
 // в свой Router (basename '/systems') + общие провайдеры (Auth/Theme/Session).
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@tdn/shared/auth/AuthContext';
+import { setApiBase } from '@tdn/shared/config';
 import Login from './pages/Login';
 import AppLayout from './layout/AppLayout';
 import SystemsList from './pages/SystemsList';
@@ -45,7 +46,12 @@ const AppContent: React.FC = () => {
   );
 };
 
-const App: React.FC = () => {
+const App: React.FC<{ apiBase?: string }> = ({ apiBase }) => {
+  // В режиме хаба хаб прокидывает свой API_BASE — переопределяем фолбэк.
+  useEffect(() => {
+    if (apiBase) setApiBase(apiBase);
+  }, [apiBase]);
+
   return <AppContent />;
 };
 

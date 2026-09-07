@@ -19,3 +19,12 @@ export async function loadConfig(): Promise<void> {
 export function getApiBase(): string {
   return config?.API_BASE || 'http://localhost:5000';
 }
+
+/**
+ * Переопределяет API_BASE извне (например, хаб прокидывает свой API_BASE
+ * в remotes при монтировании). Используется, когда приложение работает
+ * внутри хаба и не грузит собственный config.json (main.tsx не вызывается).
+ */
+export function setApiBase(base: string): void {
+  config = { API_BASE: base };
+}

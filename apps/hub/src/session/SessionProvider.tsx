@@ -6,7 +6,7 @@
 // (см. session.ts) для передачи в remote-модули.
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useAuth } from '@tdn/shared';
+import { useAuth, getApiBase } from '@tdn/shared';
 import type { HubSession } from '../session';
 
 const SessionContext = createContext<HubSession | null>(null);
@@ -14,7 +14,7 @@ const SessionContext = createContext<HubSession | null>(null);
 export const SessionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { accessToken, userId } = useAuth();
 
-  const session: HubSession = { accessToken, userId };
+  const session: HubSession = { accessToken, userId, apiBase: getApiBase() };
 
   return (
     <SessionContext.Provider value={session}>

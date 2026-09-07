@@ -61,7 +61,7 @@ const RemoteBoundary: React.FC<RemoteBoundaryProps> = ({
   }
 
   const RemoteComponent = mod.default;
-  return <RemoteComponent session={session} {...rest} />;
+  return <RemoteComponent session={session} apiBase={session?.apiBase} {...rest} />;
 };
 
 export default RemoteBoundary;

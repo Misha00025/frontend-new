@@ -11,4 +11,7 @@ export interface HubSession {
   accessToken: string | null;
   /** Идентификатор пользователя (null, если не залогинен). */
   userId: number | null;
+  /** API_BASE из config.json хаба — прокидывается в remotes, чтобы они
+   *  стучались на тот же шлюз, а не на фолбэк localhost:5000. */
+  apiBase: string;
 }

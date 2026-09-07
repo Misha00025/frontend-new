@@ -6,11 +6,17 @@
 // Модуль самодостаточен: предоставляет нужные доменные провайдеры
 // (VisitedProvider для Dashboard). Роутер и сессия — от хаба.
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Dashboard from './pages/Dashboard';
 import { VisitedProvider } from './contexts/VisitedContext';
+import { setApiBase } from '@tdn/shared/config';
 
-const Home: React.FC = () => {
+const Home: React.FC<{ apiBase?: string }> = ({ apiBase }) => {
+  // В режиме хаба хаб прокидывает свой API_BASE — переопределяем фолбэк.
+  useEffect(() => {
+    if (apiBase) setApiBase(apiBase);
+  }, [apiBase]);
+
   return (
     <VisitedProvider>
       <Dashboard />

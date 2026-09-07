@@ -10,15 +10,22 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import tokenManager from '@tdn/shared/auth/tokenManager';
+import { setApiBase } from '@tdn/shared/config';
 import type { ProfileSession } from '../session';
 
 const SessionContext = createContext<ProfileSession | null>(null);
 
 export const SessionProvider: React.FC<{
   session?: ProfileSession;
+  apiBase?: string;
   children: ReactNode;
-}> = ({ session, children }) => {
+}> = ({ session, apiBase, children }) => {
   const [fallback, setFallback] = useState<ProfileSession | null>(null);
+
+  // В режиме хаба хаб прокидывает свой API_BASE — переопределяем фолбэк.
+  useEffect(() => {
+    if (apiBase) setApiBase(apiBase);
+  }, [apiBase]);
 
   useEffect(() => {
     if (session) return;
@@ -31,13 +38,14 @@ export const SessionProvider: React.FC<{
       setFallback({
         accessToken: token,
         userId: userIdRaw ? parseInt(userIdRaw, 10) : null,
+        apiBase: apiBase || '',
       });
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [session]);
+  }, [session, apiBase]);
 
   const value = session ?? fallback;
 

@@ -16,6 +16,7 @@ import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation, useParams, Outlet } from 'react-router-dom';
 import { GroupSchemasProvider } from './contexts/GroupSchemasContext';
 import { useAuth } from '@tdn/shared/auth/AuthContext';
+import { setApiBase } from '@tdn/shared/config';
 import { GroupProvider } from './contexts/GroupContext';
 import { VisitedProvider } from './contexts/VisitedContext';
 import { useProfile } from '@tdn/shared/auth/useProfile';
@@ -125,7 +126,13 @@ const AppContent: React.FC = () => {
   );
 };
 
-const App: React.FC = () => {
+const App: React.FC<{ apiBase?: string }> = ({ apiBase }) => {
+  // В режиме хаба хаб прокидывает свой API_BASE — переопределяем фолбэк,
+  // чтобы API-запросы шли на шлюз хаба, а не на localhost:5000.
+  useEffect(() => {
+    if (apiBase) setApiBase(apiBase);
+  }, [apiBase]);
+
   return (
     <GroupProvider>
       <VisitedProvider>
