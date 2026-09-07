@@ -1,7 +1,7 @@
 // src/navigation.ts
 // Навигация кампании.
 //
-// Кампания — remote: монтируется хабом под префиксом (/campaign/*) либо
+// Кампания — remote: монтируется хабом под префиксом (/groups/*) либо
 // автономно (standalone, префикс ''). Внутренняя навигация должна быть
 // относительной к корню кампании, чтобы работать в обоих случаях.
 // Здесь — хелпер, который вычисляет базовый префикс кампании из текущего
@@ -12,9 +12,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 // Первые сегменты маршрутов кампании (верхний уровень). По ним определяем,
 // где начинается корень кампании в текущем pathname.
 const CAMPAIGN_ROUTE_SEGMENTS = [
-  'dashboard',
   'groups',
-  'group',
   'profile',
   'complete-registration',
   'login',
@@ -22,10 +20,10 @@ const CAMPAIGN_ROUTE_SEGMENTS = [
 
 /**
  * Возвращает базовый префикс кампании в текущем pathname.
- * Например: '/campaign' (под хабом) или '' (standalone).
+ * Например: '/groups' (под хабом) или '' (standalone).
  *
  * Если в pathname нет ни одного сегмента маршрута кампании — значит, весь
- * путь и есть базовый префикс (например '/campaign' или '/hub/campaign').
+ * путь и есть базовый префикс (например '/groups' или '/hub/groups').
  * Это нужно для вычисления basename роутера при монтировании хабом.
  */
 export const getCampaignBase = (pathname: string): string => {
@@ -51,7 +49,7 @@ export const useCampaignNavigate = () => {
 /**
  * useCampaignPath — возвращает функцию, которая превращает абсолютный путь
  * внутри кампании (например '/groups') в путь с учётом базового префикса
- * кампании ('/campaign/groups' под хабом, '/groups' standalone).
+ * кампании ('/groups/groups' под хабом, '/groups' standalone).
  * Полезно для ссылок (breadcrumbs, табы).
  */
 export const useCampaignPath = () => {

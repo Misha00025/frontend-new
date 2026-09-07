@@ -45,9 +45,8 @@ const CharacterLayoutContent: React.FC<CharacterLayoutContentProps> = ({ group, 
   return (
     <PageLayout
       breadcrumbs={[
-        { label: 'Главная', path: campaignPath('/dashboard') },
         { label: 'Группы', path: campaignPath('/groups') },
-        { label: group.name, path: campaignPath(`/group/${groupId}`) },
+        { label: group.name, path: campaignPath(`/groups/${groupId}`) },
         { label: character.name },
       ]}
       header={
@@ -57,7 +56,7 @@ const CharacterLayoutContent: React.FC<CharacterLayoutContentProps> = ({ group, 
         />
       }
       tabs={characterTabs}
-      tabBasePath={campaignPath(`/group/${groupId}/character/${characterId}`)}
+      tabBasePath={campaignPath(`/groups/${groupId}/character/${characterId}`)}
       tabOrientation={isMobile ? 'bottom' : 'top'}
     >
       <DashboardSettingsProvider value={dashboardSettings as DashboardSettingsContextType}>

@@ -108,13 +108,13 @@ const GroupSettings: React.FC = () => {
               </button>
             )}
             <Link
-              to={`/group/${groupId}/users`}
+              to={`/groups/${groupId}/users`}
               className={`${commonStyles.link}`}
             >
               Пользователи
             </Link>
             <Link
-              to={`/group/${groupId}/templates`}
+              to={`/groups/${groupId}/templates`}
               className={`${commonStyles.link}`}
             >
               Шаблоны

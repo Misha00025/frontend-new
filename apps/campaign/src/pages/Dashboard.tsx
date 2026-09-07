@@ -76,7 +76,7 @@ const Dashboard: React.FC = () => {
     return (
       <div>
         {header}
-        <div className={dashStyles.card} onClick={() => navigate(`/group/${lastGroup.id}`)}>
+        <div className={dashStyles.card} onClick={() => navigate(`/groups/${lastGroup.id}`)}>
           {lastGroup.icon ? (
             <img src={lastGroup.icon} alt="" className={dashStyles.avatar} />
           ) : (
@@ -86,7 +86,7 @@ const Dashboard: React.FC = () => {
             <h3 className={dashStyles.title}>{lastGroup.name}</h3>
           </div>
           <div className={dashStyles.action}>
-            <button className={buttonStyles.button} onClick={(e) => { e.stopPropagation(); navigate(`/group/${lastGroup.id}`); }}>
+            <button className={buttonStyles.button} onClick={(e) => { e.stopPropagation(); navigate(`/groups/${lastGroup.id}`); }}>
               →
             </button>
           </div>
@@ -136,7 +136,7 @@ const Dashboard: React.FC = () => {
               <div
                 key={character.id}
                 className={dashStyles.card}
-                onClick={() => navigate(`/group/${lastVisitedCharacters[index]?.groupId}/character/${character.id}`)}
+                onClick={() => navigate(`/groups/${lastVisitedCharacters[index]?.groupId}/character/${character.id}`)}
               >
                 <div className={dashStyles.avatarPlaceholder}>C</div>
                 <div className={dashStyles.info}>
@@ -146,7 +146,7 @@ const Dashboard: React.FC = () => {
                 <div className={dashStyles.action}>
                   <button
                     className={buttonStyles.button}
-                    onClick={(e) => { e.stopPropagation(); navigate(`/group/${lastVisitedCharacters[index]?.groupId}/character/${character.id}`); }}
+                    onClick={(e) => { e.stopPropagation(); navigate(`/groups/${lastVisitedCharacters[index]?.groupId}/character/${character.id}`); }}
                   >
                     →
                   </button>

@@ -13,7 +13,7 @@ export const getGroupAndCharacterIds = (pathname: string): GroupCharacterIds => 
   let groupId: number | undefined;
   let characterId: number | undefined;
 
-  const groupIndex = pathParts.indexOf('group');
+  const groupIndex = pathParts.indexOf('groups');
   if (groupIndex !== -1 && pathParts.length > groupIndex + 1) {
     const parsed = parseInt(pathParts[groupIndex + 1], 10);
     if (!isNaN(parsed)) {

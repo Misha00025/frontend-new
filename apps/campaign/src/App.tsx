@@ -97,9 +97,12 @@ const AppContent: React.FC = () => {
   return (
     <Routes>
       <Route path="/complete-registration" element={<CompleteRegistration />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      {/* Кампания = группы, единый префикс /groups/* (тикет #26).
+          Маршруты — ОТНОСИТЕЛЬНЫЕ к префиксу /groups, чтобы корректно
+          держаться в нём при монтировании хабом (хаб монтирует под /groups/*)
+          и в автономном запуске (basename ''). */}
       <Route path="/groups" element={<Groups />} />
-      <Route path="/group/:groupId" element={<GroupSchemasBoundary />}>
+      <Route path="/groups/:groupId" element={<GroupSchemasBoundary />}>
         <Route element={<GroupLayout />}>
           <Route index element={<Navigate to="characters" replace />} />
           <Route path="characters" element={<Characters />} />
@@ -121,8 +124,10 @@ const AppContent: React.FC = () => {
           <Route path="notes" element={<CharacterNotes />} />
         </Route>
       </Route>
-      <Route path="/login" element={<Navigate to="dashboard" replace />} />
-      <Route path="/" element={<Navigate to="dashboard" replace />} />
+      {/* Дашборд живёт только на «Главной» (/) — маршрут /dashboard убран. */}
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

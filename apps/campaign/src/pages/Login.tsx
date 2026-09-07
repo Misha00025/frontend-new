@@ -33,7 +33,7 @@ const Login: React.FC = () => {
 
     try {
       await login(username, password);
-      navigate('/dashboard', { replace: true });
+      navigate('/', { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
       setLoading(false);

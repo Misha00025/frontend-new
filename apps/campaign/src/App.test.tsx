@@ -46,7 +46,7 @@ vi.mock('./contexts/TemplateEditContext', () => ({
 describe('App', () => {
   it('renders without crashing', () => {
     render(
-      <MemoryRouter initialEntries={['/dashboard']}>
+      <MemoryRouter initialEntries={['/']}>
         <App />
       </MemoryRouter>
     );

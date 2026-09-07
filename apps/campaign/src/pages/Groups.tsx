@@ -36,13 +36,13 @@ const Groups: React.FC = () => {
 
   const handleSelectGroup = (group: Group) => {
     setSelectedGroup(group);
-    navigate(`/group/${group.id}`);
+    navigate(`/groups/${group.id}`);
   };
 
   const handleGroupCreated = (newGroup: Group) => {
     setGroups(prev => [...prev, newGroup]);
     setSelectedGroup(newGroup);
-    navigate(`/group/${newGroup.id}`);
+    navigate(`/groups/${newGroup.id}`);
   };
 
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;

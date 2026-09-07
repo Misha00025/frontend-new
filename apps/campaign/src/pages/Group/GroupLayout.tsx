@@ -49,7 +49,6 @@ const GroupLayout: React.FC = () => {
   return (
     <PageLayout
       breadcrumbs={[
-        { label: 'Главная', path: campaignPath('/dashboard') },
         { label: 'Группы', path: campaignPath('/groups') },
         { label: group.name },
       ]}
@@ -61,7 +60,7 @@ const GroupLayout: React.FC = () => {
         />
       }
       tabs={groupTabs}
-      tabBasePath={campaignPath(`/group/${groupId}`)}
+      tabBasePath={campaignPath(`/groups/${groupId}`)}
       tabOrientation={isMobile ? 'bottom' : 'top'}
     >
       <Outlet />

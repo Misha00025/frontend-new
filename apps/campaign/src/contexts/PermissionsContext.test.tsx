@@ -69,7 +69,7 @@ describe('PermissionsContext', () => {
   });
 
   it('устанавливает isGroupAdmin когда пользователь admin группы', async () => {
-    renderAtPath('/group/5', [
+    renderAtPath('/groups/5', [
       { user: { id: 1, nickname: 'me' }, isAdmin: true },
     ]);
 
@@ -79,7 +79,7 @@ describe('PermissionsContext', () => {
   });
 
   it('isGroupAdmin=false когда пользователь не admin', async () => {
-    renderAtPath('/group/5', [
+    renderAtPath('/groups/5', [
       { user: { id: 1, nickname: 'me' }, isAdmin: false },
     ]);
 
@@ -90,7 +90,7 @@ describe('PermissionsContext', () => {
 
   it('устанавливает canEditCharacter когда пользователь canWrite', async () => {
     renderAtPath(
-      '/group/5/character/10',
+      '/groups/5/character/10',
       [{ user: { id: 1, nickname: 'me' }, isAdmin: false }],
       { 10: [{ user: { id: 1 }, canWrite: true }] }
     );
@@ -102,7 +102,7 @@ describe('PermissionsContext', () => {
 
   it('canEditCharacter=false когда canWrite=false', async () => {
     renderAtPath(
-      '/group/5/character/10',
+      '/groups/5/character/10',
       [{ user: { id: 1, nickname: 'me' }, isAdmin: false }],
       { 10: [{ user: { id: 1 }, canWrite: false }] }
     );
@@ -114,7 +114,7 @@ describe('PermissionsContext', () => {
 
   it('canDeleteCharacter=true когда пользователь admin группы', async () => {
     renderAtPath(
-      '/group/5/character/10',
+      '/groups/5/character/10',
       [{ user: { id: 1, nickname: 'me' }, isAdmin: true }],
       { 10: [{ user: { id: 1 }, canWrite: true }] }
     );
@@ -127,7 +127,7 @@ describe('PermissionsContext', () => {
   it('при отсутствии accessToken все права false', async () => {
     (useAuth as Mock).mockReturnValue({ accessToken: null });
 
-    renderAtPath('/group/5');
+    renderAtPath('/groups/5');
 
     await waitFor(() => {
       expect(screen.getByTestId('isGroupAdmin').textContent).toBe('false');
@@ -136,7 +136,7 @@ describe('PermissionsContext', () => {
   });
 
   it('при пути без group все права false', async () => {
-    renderAtPath('/dashboard');
+    renderAtPath('/');
 
     await waitFor(() => {
       expect(screen.getByTestId('isGroupAdmin').textContent).toBe('false');
@@ -144,7 +144,7 @@ describe('PermissionsContext', () => {
   });
 
   it('при пустых данных права false', async () => {
-    renderAtPath('/group/5', [], {});
+    renderAtPath('/groups/5', [], {});
 
     await waitFor(() => {
       expect(screen.getByTestId('isGroupAdmin').textContent).toBe('false');

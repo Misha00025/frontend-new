@@ -53,7 +53,7 @@ const Characters: React.FC = () => {
   const handleCreateCharacter = async (characterData: any) => {
     try {
       const newCharacter = await charactersAPI.createCharacter(parseInt(groupId!), characterData);
-      navigate(`/group/${groupId}/character/${newCharacter.id}`);
+      navigate(`/groups/${groupId}/character/${newCharacter.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create character');
       throw err;
@@ -61,7 +61,7 @@ const Characters: React.FC = () => {
   };
 
   const handleSelectCharacter = (characterId: number) => {
-    navigate(`/group/${groupId}/character/${characterId}`);
+    navigate(`/groups/${groupId}/character/${characterId}`);
   };
 
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
