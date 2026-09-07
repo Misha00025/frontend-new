@@ -11,6 +11,7 @@ import SearchBar from '@tdn/shared/ui/Search/SearchBar';
 import commonStyles from '@tdn/shared/styles/common.module.css';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import styles from '../../components/commons/Pages/ResourcePage/ResourcePage.module.css';
+import { ThemeProvider } from '@tdn/shared/theme/ThemeContext';
 
 const GroupNotes: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -91,110 +92,112 @@ const GroupNotes: React.FC = () => {
   if (loading) return <div className={commonStyles.container}>Загрузка...</div>;
 
   return (
-    <div className={commonStyles.container}>
-      <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Заметки</h1>
-        <div className={styles.headerButtons}>
-          {canEditGroup && (
-            <button
-              className={`${buttonStyles.button} ${styles.createButton}`}
-              onClick={handleCreate}
-              type="button"
-            >
-              <span className={styles.plusIcon}>+</span>
-              <span className={styles.createText}>Создать</span>
-            </button>
-          )}
+    <ThemeProvider>
+      <div className={commonStyles.container}>
+        <div className={styles.pageHeader}>
+          <h1 className={styles.pageTitle}>Заметки</h1>
+          <div className={styles.headerButtons}>
+            {canEditGroup && (
+              <button
+                className={`${buttonStyles.button} ${styles.createButton}`}
+                onClick={handleCreate}
+                type="button"
+              >
+                <span className={styles.plusIcon}>+</span>
+                <span className={styles.createText}>Создать</span>
+              </button>
+            )}
+          </div>
         </div>
-      </div>
 
-      {error && <div style={{ color: 'var(--danger-color)', marginBottom: '1rem' }}>{error}</div>}
+        {error && <div style={{ color: 'var(--danger-color)', marginBottom: '1rem' }}>{error}</div>}
 
-      <div className={styles.headerControls}>
-        <div className={styles.searchContainer}>
-          <SearchBar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            placeholder="Поиск по заголовку, описанию или ключевым словам..."
-            onClear={handleClearSearch}
+        <div className={styles.headerControls}>
+          <div className={styles.searchContainer}>
+            <SearchBar
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              placeholder="Поиск по заголовку, описанию или ключевым словам..."
+              onClear={handleClearSearch}
+            />
+          </div>
+        </div>
+
+        <List layout="start-grid" gap="medium" gridSize="large">
+          {filteredNotes.map(note => (
+            <NoteCard
+              key={note.id}
+              note={note}
+              onView={() => handleViewNote(note)}
+            />
+          ))}
+        </List>
+
+        {filteredNotes.length === 0 && !loading && (
+          <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
+            <p>
+              {searchTerm
+                ? `По запросу "${searchTerm}" ничего не найдено`
+                : 'Нет заметок'}
+            </p>
+            {searchTerm && (
+              <button
+                className={buttonStyles.button}
+                onClick={handleClearSearch}
+                type="button"
+              >
+                Очистить поиск
+              </button>
+            )}
+          </div>
+        )}
+
+        {canEditGroup && (
+          <GroupNoteModal
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              setEditingNote(null);
+            }}
+            onSave={handleSaveNote}
+            editingNote={editingNote}
+            title={editingNote ? 'Редактирование заметки' : 'Создание заметки'}
           />
-        </div>
-      </div>
+        )}
 
-      <List layout="start-grid" gap="medium" gridSize="large">
-        {filteredNotes.map(note => (
-          <NoteCard
-            key={note.id}
-            note={note}
-            onView={() => handleViewNote(note)}
-          />
-        ))}
-      </List>
-
-      {filteredNotes.length === 0 && !loading && (
-        <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-secondary)' }}>
-          <p>
-            {searchTerm
-              ? `По запросу "${searchTerm}" ничего не найдено`
-              : 'Нет заметок'}
-          </p>
-          {searchTerm && (
-            <button
-              className={buttonStyles.button}
-              onClick={handleClearSearch}
-              type="button"
-            >
-              Очистить поиск
-            </button>
-          )}
-        </div>
-      )}
-
-      {canEditGroup && (
-        <GroupNoteModal
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setEditingNote(null);
-          }}
-          onSave={handleSaveNote}
-          editingNote={editingNote}
-          title={editingNote ? 'Редактирование заметки' : 'Создание заметки'}
-        />
-      )}
-
-      {viewModalOpen && (
-        <GroupNoteViewModal
-          note={viewingNoteData}
-          onClose={() => {
-            setViewModalOpen(false);
-            setViewingNoteData(null);
-          }}
-          onEdit={() => {
-            setViewModalOpen(false);
-            setViewingNoteData(null);
-            if (viewingNoteData) {
-              setEditingNote(viewingNoteData);
-              setIsModalOpen(true);
-            }
-          }}
-          onDelete={async () => {
-            if (viewingNoteData && window.confirm('Вы уверены, что хотите удалить эту заметку?')) {
-              try {
-                await groupNotesAPI.deleteNote(parseInt(groupId!), viewingNoteData.id);
-                setViewModalOpen(false);
-                setViewingNoteData(null);
-                loadNotes();
-              } catch (err) {
-                setError(err instanceof Error ? err.message : 'Failed to delete note');
+        {viewModalOpen && (
+          <GroupNoteViewModal
+            note={viewingNoteData}
+            onClose={() => {
+              setViewModalOpen(false);
+              setViewingNoteData(null);
+            }}
+            onEdit={() => {
+              setViewModalOpen(false);
+              setViewingNoteData(null);
+              if (viewingNoteData) {
+                setEditingNote(viewingNoteData);
+                setIsModalOpen(true);
               }
-            }
-          }}
-          canEdit={canEditGroup}
-          canDelete={canEditGroup}
-        />
-      )}
-    </div>
+            }}
+            onDelete={async () => {
+              if (viewingNoteData && window.confirm('Вы уверены, что хотите удалить эту заметку?')) {
+                try {
+                  await groupNotesAPI.deleteNote(parseInt(groupId!), viewingNoteData.id);
+                  setViewModalOpen(false);
+                  setViewingNoteData(null);
+                  loadNotes();
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : 'Failed to delete note');
+                }
+              }
+            }}
+            canEdit={canEditGroup}
+            canDelete={canEditGroup}
+          />
+        )}
+      </div>
+    </ThemeProvider>
   );
 };
 
