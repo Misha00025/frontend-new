@@ -55,18 +55,10 @@ const HubSidebar: React.FC = () => {
         </nav>
 
         <div className={styles.drawerFooter}>
-          <Link
-            to="/settings"
-            className={styles.footerBtn}
-            onClick={close}
-          >
-            <span className={styles.icon}>⚙️</span>
-            <span className={styles.label}>Настройки</span>
-          </Link>
           <div className={styles.footerRow}>
             <button className={styles.footerBtn} onClick={handleLogout}>
               <span className={styles.icon}>🚪</span>
-              <span className={styles.label}>Выход</span>
+              <span className={styles.label}>Выйти</span>
             </button>
             <ThemeToggle />
           </div>
