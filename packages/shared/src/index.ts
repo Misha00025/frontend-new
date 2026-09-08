@@ -70,6 +70,6 @@ export { generateKey } from './utils/generateKey';
 export { storage } from './utils/storage';
 
 // --- config ---
-export { loadConfig, getApiBase, setApiBase } from './config';
+export { loadConfig, getApiBase, setApiBase, joinApiUrl } from './config';
 export { names } from './config/names';
 export type { NamesConfig } from './config/names';

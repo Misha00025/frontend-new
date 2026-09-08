@@ -1,4 +1,4 @@
-import { getApiBase } from '../config';
+import { getApiBase, joinApiUrl } from '../config';
 import { LoginRequest, RegisterRequest, TokenResponse, UserProfile } from './types';
 import tokenManager from './tokenManager';
 import { UserSettingsResponse, UserSettingsValue } from './userSettings';
@@ -6,7 +6,7 @@ import { UserSettingsResponse, UserSettingsValue } from './userSettings';
 export const authAPI = {
   login: async (credentials: LoginRequest): Promise<TokenResponse> => {
     const API_BASE = getApiBase();
-    const response = await fetch(`${API_BASE}/auth/token`, {
+    const response = await fetch(joinApiUrl(API_BASE, '/auth/token'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -26,7 +26,7 @@ export const authAPI = {
 
   refresh: async (refreshToken: string): Promise<TokenResponse> => {
     const API_BASE = getApiBase();
-    const response = await fetch(`${API_BASE}/auth/token`, {
+    const response = await fetch(joinApiUrl(API_BASE, '/auth/token'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -45,7 +45,7 @@ export const authAPI = {
 
   register: async (credentials: RegisterRequest): Promise<TokenResponse> => {
     const API_BASE = getApiBase();
-    const response = await fetch(`${API_BASE}/auth/register`, {
+    const response = await fetch(joinApiUrl(API_BASE, '/auth/register'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials),
@@ -60,7 +60,7 @@ export const authAPI = {
     }
 
     // After registration, log in automatically
-    const loginResponse = await fetch(`${API_BASE}/auth/token`, {
+    const loginResponse = await fetch(joinApiUrl(API_BASE, '/auth/token'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -99,7 +99,7 @@ export const makeAuthenticatedRequest = async (
     : { ...options.headers as Record<string, string>, ...authHeaders };
 
   const execute = (): Promise<Response> =>
-    fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+    fetch(joinApiUrl(API_BASE, endpoint), { ...options, headers });
 
   let response = await execute();
 
