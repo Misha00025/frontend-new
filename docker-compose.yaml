@@ -1,13 +1,13 @@
-# Docker Compose для обоих приложений монорепо tdn-frontend.
-# Запуск из КОРНЯ монорепо:
-#   cp apps/campaign/template.env .env.campaign
-#   cp apps/game-systems/template.env .env.game-systems
-#   docker compose up -d --build
+# Docker Compose для всех приложений монорепо tdn-frontend.
+# Запуск из КОРНЯ монорепо (отдельный compose не требуется):
+#   cp template.env .env              # runtime-конфиг (API_BASE)
+#   cp template.env.build .env.build  # параметры сборки (VITE_BASE_*, VITE_REMOTE_*)
+#   docker compose --env-file .env.build up -d --build
 #
 # Каждое приложение — отдельный образ и отдельный контейнер.
-# Базовый путь (VITE_BASE) задаётся на этапе сборки образа (build.args),
-# по умолчанию '/' — отдельные поддомены. Для деплоя под путём раскомментируйте
-# build.args.VITE_BASE (например /campaign, /game-systems) и настройте reverse proxy.
+# Базовый путь (VITE_BASE) и URL remotes (VITE_REMOTE_*) задаются на этапе
+# сборки через build.args (подставляются из .env.build).
+# Runtime-конфиг (API_BASE) — общий .env для всех сервисов.
 
 services:
   campaign:
@@ -21,28 +21,29 @@ services:
     ports:
       - "${CAMPAIGN_PORT:-3000}:3000"
     env_file:
-      - .env.campaign
+      - .env
     restart: unless-stopped
     # Чтобы подложить свой config.json (заменит ENV):
     # volumes:
     #   - ./config.campaign.json:/app/build/config.json:ro
 
-  game-systems:
-    build:
-      context: .
-      dockerfile: apps/game-systems/Dockerfile
-      args:
-        VITE_BASE: ${VITE_BASE_GAME_SYSTEMS:-/}
-    image: tdn-game-systems
-    container_name: tdn-game-systems
-    ports:
-      - "${GAME_SYSTEMS_PORT:-3001}:3000"
-    env_file:
-      - .env.game-systems
-    restart: unless-stopped
-    # Чтобы подложить свой config.json (заменит ENV):
-    # volumes:
-    #   - ./config.game-systems.json:/app/build/config.json:ro
+  # game-systems — отключён (не используется). Раскомментировать при необходимости.
+  # game-systems:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/game-systems/Dockerfile
+  #     args:
+  #       VITE_BASE: ${VITE_BASE_GAME_SYSTEMS:-/}
+  #   image: tdn-game-systems
+  #   container_name: tdn-game-systems
+  #   ports:
+  #     - "${GAME_SYSTEMS_PORT:-3001}:3000"
+  #   env_file:
+  #     - .env
+  #   restart: unless-stopped
+  #   # Чтобы подложить свой config.json (заменит ENV):
+  #   # volumes:
+  #   #   - ./config.game-systems.json:/app/build/config.json:ro
 
   hub:
     build:
@@ -51,7 +52,6 @@ services:
       args:
         VITE_BASE: ${VITE_BASE_HUB:-/}
         VITE_REMOTE_CAMPAIGN: ${VITE_REMOTE_CAMPAIGN:-http://localhost:3000/assets/remoteEntry.js}
-        VITE_REMOTE_GAME_SYSTEMS: ${VITE_REMOTE_GAME_SYSTEMS:-http://localhost:3001/assets/remoteEntry.js}
         VITE_REMOTE_PROFILE: ${VITE_REMOTE_PROFILE:-http://localhost:3002/assets/remoteEntry.js}
         VITE_REMOTE_LOGIN: ${VITE_REMOTE_LOGIN:-http://localhost:3003/assets/remoteEntry.js}
     image: tdn-hub
@@ -59,8 +59,42 @@ services:
     ports:
       - "${HUB_PORT:-3004}:3000"
     env_file:
-      - .env.hub
+      - .env
     restart: unless-stopped
     # Чтобы подложить свой config.json (заменит ENV):
     # volumes:
     #   - ./config.hub.json:/app/build/config.json:ro
+
+  profile:
+    build:
+      context: .
+      dockerfile: apps/profile/Dockerfile
+      args:
+        VITE_BASE: ${VITE_BASE_PROFILE:-/}
+    image: tdn-profile
+    container_name: tdn-profile
+    ports:
+      - "${PROFILE_PORT:-3002}:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    # Чтобы подложить свой config.json (заменит ENV):
+    # volumes:
+    #   - ./config.profile.json:/app/build/config.json:ro
+
+  login:
+    build:
+      context: .
+      dockerfile: apps/login/Dockerfile
+      args:
+        VITE_BASE: ${VITE_BASE_LOGIN:-/}
+    image: tdn-login
+    container_name: tdn-login
+    ports:
+      - "${LOGIN_PORT:-3003}:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    # Чтобы подложить свой config.json (заменит ENV):
+    # volumes:
+    #   - ./config.login.json:/app/build/config.json:ro
