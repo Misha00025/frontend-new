@@ -1,46 +1,101 @@
-# Getting Started with Create React App
+# The Dungeon Notebook — Frontend (монорепо)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+SPA-фронтенд для The Dungeon Notebook (управление настольными ролевыми играми: группы, персонажи, предметы, навыки, заметки, квесты).
 
-## Available Scripts
+## Структура монорепо
 
-In the project directory, you can run:
+```
+tdn-frontend/
+├── package.json                 # npm workspaces: ["apps/*", "packages/*"]
+├── tsconfig.base.json           # общие compilerOptions
+├── packages/
+│   └── shared/                  # @tdn/shared — общий код (auth, theme, ui, utils, config)
+├── apps/
+│   ├── campaign/                # @tdn/campaign — группы, персонажи, игра
+│   └── game-systems/            # @tdn/game-systems — системы, контент, версии, правила
+└── README.md
+```
 
-### `npm start`
+- **npm workspaces** — единый `node_modules` в корне, общие зависимости.
+- **`@tdn/shared`** подключается через алиас `@tdn/shared` в `vite.config.ts` на исходники `packages/shared/src` (без отдельной сборки пакета; HMR работает).
+- **`tsconfig.base.json`** — общие настройки; каждый app/package расширяет его через `extends`.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Стек
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- **React 19** + **TypeScript** (strict)
+- **Vite 5** (`@vitejs/plugin-react`) — сборка и dev-сервер
+- **react-router-dom 7** (BrowserRouter, вложенные маршруты)
+- **react-markdown 10** + **@uiw/react-md-editor 4** — рендер/редактирование markdown
+- **CSS Modules** (`.module.css`) + глобальные стили
+- Тесты: **Vitest + React Testing Library**
 
-### `npm test`
+## Доступные скрипты (корень)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npm install        # установка зависимостей (все workspaces)
+npm start          # dev-сервер (Vite), http://localhost:3000, hot reload
+npm run build      # tsc + продакшен-сборка в build/
+npm run preview    # предпросмотр продакшен-сборки
+npm test           # Vitest (watch)
+npm run test:run   # Vitest (single run)
+```
 
-### `npm run build`
+Скрипты конкретного приложения запускаются из его каталога (`cd apps/campaign && npm run dev`) или через `npm run <script> --workspace @tdn/campaign`.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Конфигурация API
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- Базовый URL API читается из `/config.json` (файл `src/config/index.ts` → `getApiBase()`).
+- `loadConfig()` вызывается до рендера; при ошибке фолбэк `http://localhost:5000`.
+- В dev-режиме `config.json` отсутствует → используется фолбэк. В Docker `docker-entrypoint.sh` генерирует `config.json` из env `API_BASE`.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Docker
 
-### `npm run eject`
+Каждое приложение — **отдельный Docker-образ** и отдельный контейнер. Сборка идёт из **корня монорепо** (context: `.`), т.к. приложения зависят от `packages/shared`.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Образы
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+| Приложение | Образ | Dockerfile |
+|---|---|---|
+| Кампания | `tdn-campaign` | `apps/campaign/Dockerfile` |
+| Игровые системы | `tdn-game-systems` | `apps/game-systems/Dockerfile` |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Multi-stage: builder (`node:20`, `npm ci`, `npm run build --workspace <app>`) → runtime (`node:lts-alpine`, `serve -s build -l 3000`). ENTRYPOINT `docker-entrypoint.sh`, CMD `serve`.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Базовый путь (VITE_BASE)
 
-## Learn More
+По умолчанию `'/'` — приложение деплоится на **отдельный поддомен**. Для деплоя **под путём** (например `/campaign`, `/game-systems`) передайте build-arg `VITE_BASE`:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+docker build -f apps/campaign/Dockerfile --build-arg VITE_BASE=/campaign -t tdn-campaign .
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+`VITE_BASE` попадает в `base` Vite-конфига (см. `vite.config.ts` каждого приложения). Пути/поддомены **не хардкодятся** — конфигурацию сервера решает DevOps/пользователь.
+
+### docker-compose
+
+**Оба приложения сразу** (из корня монорепо):
+
+```bash
+cp apps/campaign/template.env .env.campaign
+cp apps/game-systems/template.env .env.game-systems
+docker compose up -d --build
+```
+
+- `campaign` → `tdn-campaign`, порт `3000:3000`
+- `game-systems` → `tdn-game-systems`, порт `3001:3000`
+- Порт и `VITE_BASE` настраиваются через переменные `CAMPAIGN_PORT` / `GAME_SYSTEMS_PORT` / `VITE_BASE_CAMPAIGN` / `VITE_BASE_GAME_SYSTEMS`.
+
+**Одно приложение отдельно** (compose-файл в каталоге приложения, context `../..`):
+
+```bash
+cd apps/campaign && cp template.env .env && docker compose up -d --build
+cd apps/game-systems && cp template.env .env && docker compose up -d --build
+```
+
+### config.json / API_BASE
+
+- `docker-entrypoint.sh` генерирует `/app/build/config.json` из env `API_BASE` (по умолчанию `http://localhost:5000`), если файла ещё нет.
+- Чтобы подложить свой `config.json` (заменит ENV): volume `./config.json:/app/build/config.json:ro`.
+- `template.env` в каждом приложении: `API_BASE=...` (+ закомментированный `VITE_BASE`).
+
+> Примечание: доменный код (группы, персонажи, игра) перенесён в `apps/campaign` (подзадача 3.3). Корневой монолит `src/` удалён; корневые `Dockerfile`/`docker-compose.yaml`/`index.html`/`vite.config.ts` переехали в `apps/campaign`. Сборка/тесты запускаются из `apps/campaign` (или через корневые npm-скрипты, делегирующие в `@tdn/campaign`).

@@ -28,8 +28,8 @@ jobs:
       - name: TypeScript type check
         run: npx tsc --noEmit
 
-      - name: Run tests with coverage
-        run: npx react-scripts test --watchAll=false --ci --coverage
+      - name: Run tests (vitest)
+        run: npm run test:run
 
       - name: Build project
         run: npm run build
