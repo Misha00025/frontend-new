@@ -17,6 +17,9 @@ export default defineConfig({
   // Базовый путь приложения. По умолчанию '/' (отдельный поддомен).
   // Для деплоя под путём (например /campaign) задайте VITE_BASE (build-arg / env).
   base: process.env.VITE_BASE || '/',
+  // Публичные ассеты (favicon, logo, manifest, robots) — общие для всего
+  // проекта, лежат в корневом public/ монорепо.
+  publicDir: '../../public',
   plugins: [
     react(),
     federation({
