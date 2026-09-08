@@ -24,6 +24,16 @@ vi.mock('@tdn/shared/auth/AuthContext', () => ({
   }),
 }));
 
+vi.mock('@tdn/shared/auth/useProfile', () => ({
+  useProfile: () => ({
+    profile: null,
+    loading: false,
+    error: null,
+    profileNotFound: false,
+    fetchProfile: vi.fn(),
+  }),
+}));
+
 vi.mock('./contexts/GroupContext', () => ({
   GroupProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useGroup: () => ({ selectedGroup: null, setSelectedGroup: vi.fn() }),
@@ -72,6 +82,10 @@ vi.mock('./contexts/DashboardSettingsContext', () => ({
 
 vi.mock('./contexts/TemplateEditContext', () => ({
   TemplateEditProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('./pages/Groups', () => ({
+  default: () => <div>Groups</div>,
 }));
 
 describe('App', () => {
