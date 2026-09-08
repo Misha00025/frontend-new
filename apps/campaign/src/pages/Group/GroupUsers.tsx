@@ -12,7 +12,7 @@ import CharacterUsersTable from '../../components/UsersManagement/CharacterUsers
 
 const GroupUsers: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
-  const { groupUsers, ensureGroupUsers, invalidateGroupUsers } = useGroupUsers();
+  const { groupUsers, ensureGroupUsers, refreshGroupUsers } = useGroupUsers();
   const { canManageGroupUsers } = useActionPermissions();
   const { loading, error, success, executeOperation } = useUserManagement();
 
@@ -27,7 +27,7 @@ const GroupUsers: React.FC = () => {
       () => groupUsersAPI.addUserToGroup(parseInt(groupId!), user.id, isAdmin),
       `Пользователь ${user.nickname} успешно добавлен в группу`
     );
-    invalidateGroupUsers();
+    await refreshGroupUsers();
   };
 
   const handleRemoveUser = async (userId: number) => {
@@ -35,7 +35,7 @@ const GroupUsers: React.FC = () => {
       () => groupUsersAPI.removeUserFromGroup(parseInt(groupId!), userId),
       `Пользователь успешно удален из группы`
     );
-    invalidateGroupUsers();
+    await refreshGroupUsers();
   };
 
   if (loading) return <div className={styles.container}>Загрузка...</div>;
