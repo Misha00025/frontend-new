@@ -20,9 +20,6 @@ const loaders: Record<string, Record<string, () => Promise<RemoteModule>>> = {
     App: () => import('campaign/App'),
     Home: () => import('campaign/Home'),
   },
-  'game-systems': {
-    App: () => import('game-systems/App'),
-  },
   profile: {
     App: () => import('profile/App'),
   },

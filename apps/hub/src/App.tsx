@@ -48,13 +48,6 @@ const AppContent: React.FC = () => {
               <RemoteBoundary name="campaign" module="Home" auth={auth} session={session} />
             }
           />
-          {/* Игровые системы — remote владеет своей маршрутизацией. */}
-          <Route
-            path="/systems/*"
-            element={
-              <RemoteBoundary name="game-systems" module="App" auth={auth} session={session} />
-            }
-          />
           {/* Группы (кампания) — remote владеет своей маршрутизацией.
               Кампания = группы, единый префикс /groups/* (тикет #26). */}
           <Route

@@ -12,7 +12,6 @@ import type { NavItem } from '@tdn/shared';
 
 export const hubNavItems: NavItem[] = [
   { id: 'home', label: 'Главная', icon: '🏠', path: '/' },
-  { id: 'systems', label: 'Игровые системы', icon: '📚', path: '/systems' },
   { id: 'groups', label: 'Группы', icon: '👥', path: '/groups' },
   { id: 'profile', label: 'Профиль', icon: '👤', path: '/profile' },
 ];

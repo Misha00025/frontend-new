@@ -25,7 +25,6 @@ export default defineConfig({
       // Хаб — host: сам ничего не экспонирует, но объявляет remotes.
       remotes: {
         campaign: remoteUrl('VITE_REMOTE_CAMPAIGN', 'http://localhost:3000/assets/remoteEntry.js'),
-        'game-systems': remoteUrl('VITE_REMOTE_GAME_SYSTEMS', 'http://localhost:3001/assets/remoteEntry.js'),
         profile: remoteUrl('VITE_REMOTE_PROFILE', 'http://localhost:3002/assets/remoteEntry.js'),
         login: remoteUrl('VITE_REMOTE_LOGIN', 'http://localhost:3003/assets/remoteEntry.js'),
       },
