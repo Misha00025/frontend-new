@@ -26,14 +26,44 @@ vi.mock('@tdn/shared/auth/AuthContext', () => ({
 
 vi.mock('./contexts/GroupContext', () => ({
   GroupProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useGroup: () => ({ selectedGroup: null, setSelectedGroup: vi.fn() }),
 }));
 
 vi.mock('./contexts/VisitedContext', () => ({
   VisitedProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useVisited: () => ({
+    lastVisitedGroupId: null,
+    lastVisitedCharacters: [],
+    visitGroup: vi.fn(),
+    visitCharacter: vi.fn(),
+    clearVisited: vi.fn(),
+  }),
 }));
 
 vi.mock('./contexts/PermissionsContext', () => ({
   PermissionsProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  usePermissions: () => ({
+    isGroupAdmin: false,
+    canEditCharacter: false,
+    canDeleteCharacter: false,
+    loading: false,
+  }),
+}));
+
+vi.mock('./contexts/GroupUsersContext', () => ({
+  GroupUsersProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useGroupUsers: () => ({
+    groupUsers: [],
+    groupUsersLoading: false,
+    characterUsers: {},
+    error: null,
+    ensureGroupUsers: vi.fn(),
+    ensureCharacterUsers: vi.fn(),
+    refreshGroupUsers: vi.fn(),
+    refreshCharacterUsers: vi.fn(),
+    invalidateGroupUsers: vi.fn(),
+    invalidateCharacterUsers: vi.fn(),
+  }),
 }));
 
 vi.mock('./contexts/DashboardSettingsContext', () => ({
