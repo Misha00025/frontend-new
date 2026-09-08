@@ -14,6 +14,7 @@ vi.mock('@uiw/react-md-editor', () => ({
 
 vi.mock('@tdn/shared/auth/AuthContext', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  RemoteAuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useAuth: () => ({
     accessToken: 'mock-token',
     userId: 1,
