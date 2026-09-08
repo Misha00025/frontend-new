@@ -3,6 +3,7 @@ import { GroupQuest } from '../../../../types/groupQuests';
 import { User } from '../../../../types/groupUsers';
 import cardStyles from '@tdn/shared/styles/card-item.module.css';
 import styles from './QuestCard.module.css';
+import defaultAvatar from '../../../../assets/default-avatar.png';
 
 interface QuestCardProps {
   quest: GroupQuest;
@@ -90,7 +91,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
           {(users.length > 3 ? users.slice(0, 2) : users).map(user => (
             <div key={user.id} className={styles.avatarCircle} title={user.visibleName || user.nickname}>
               {user.imageLink ? (
-                <img src={user.imageLink} alt={user.nickname} className={styles.avatarImage} />
+                <img src={user.imageLink} alt={user.nickname} className={styles.avatarImage} onError={(e) => { e.currentTarget.src = defaultAvatar; }} />
               ) : (
                 (user.visibleName || user.nickname).charAt(0).toUpperCase()
               )}

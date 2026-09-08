@@ -3,6 +3,7 @@ import React from 'react';
 import { Group } from '../../types/group';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import styles from './GroupCard.module.css';
+import defaultAvatar from '../../assets/default-avatar.png';
 
 interface GroupCardProps {
   group: Group;
@@ -25,6 +26,7 @@ const GroupCard: React.FC<GroupCardProps> = ({
             src={group.icon} 
             alt={group.name} 
             className={styles.avatar}
+            onError={(e) => { e.currentTarget.src = defaultAvatar; }}
           />
         ) : (
           <div className={styles.avatarPlaceholder}>

@@ -7,6 +7,7 @@ import { useCampaignNavigate } from '../navigation';
 import styles from '@tdn/shared/styles/common.module.css';
 import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import dashStyles from './Dashboard.module.css';
+import defaultAvatar from '../assets/default-avatar.png';
 
 const Dashboard: React.FC = () => {
   const { lastVisitedGroupId, lastVisitedCharacters } = useVisited();
@@ -78,7 +79,7 @@ const Dashboard: React.FC = () => {
         {header}
         <div className={dashStyles.card} onClick={() => navigate(`/groups/${lastGroup.id}`)}>
           {lastGroup.icon ? (
-            <img src={lastGroup.icon} alt="" className={dashStyles.avatar} />
+            <img src={lastGroup.icon} alt="" className={dashStyles.avatar} onError={(e) => { e.currentTarget.src = defaultAvatar; }} />
           ) : (
             <div className={dashStyles.avatarPlaceholder}>G</div>
           )}

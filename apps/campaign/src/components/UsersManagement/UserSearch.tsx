@@ -59,7 +59,7 @@ const UserSearch: React.FC<UserSearchProps> = ({
           <h3>Результаты поиска:</h3>
           {searchResults.map(user => (
             <div key={user.id} className={stylesUi.userCard}>
-              <img src={user.imageLink || defaultAvatar} alt={user.nickname} className={stylesUi.avatar} />
+              <img src={user.imageLink || defaultAvatar} alt={user.nickname} className={stylesUi.avatar} onError={(e) => { e.currentTarget.src = defaultAvatar; }} />
               <div className={stylesUi.userInfo}>
                 <h4>{user.visibleName}</h4>
                 <p>@{user.nickname}</p>
