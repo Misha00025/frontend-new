@@ -9,9 +9,9 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, ThemeProvider, SidebarProvider, useAuth } from '@tdn/shared';
+import { AuthProvider, ThemeProvider, SidebarProvider, useAuth, GlobalSidebar, names } from '@tdn/shared';
 import { SessionProvider, useHubSession } from './session/SessionProvider';
-import HubSidebar from './components/HubSidebar/HubSidebar';
+import { hubNavItems } from './navigation';
 import RemoteBoundary from './remote/RemoteBoundary';
 import Login from './pages/Login';
 
@@ -33,8 +33,8 @@ const AppContent: React.FC = () => {
 
   return (
     <>
-      <HubSidebar />
-      <main style={{ padding: '1rem' }}>
+      <GlobalSidebar navItems={hubNavItems} brand={names.title} />
+      <main className="app-content">
         <Routes>
           {/* Главная — общая вкладка. Подгружает ТОЛЬКО страницу «Главная»
               из campaign как готовый модуль (хаб не тянет домен кампании).

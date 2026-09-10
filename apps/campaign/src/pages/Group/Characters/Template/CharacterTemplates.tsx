@@ -45,18 +45,18 @@ const CharacterTemplates: React.FC = () => {
 
   useEffect(() => {
     if (groupId) {
-      loadFromContext();
+      // Синхронизируем "сохранённую" ссылку всегда.
+      setOriginalTemplate(template);
+      setOriginalSchema(templateSchema || { categories: [] });
+      // Редактируемые копии заполняем из контекста только вне режима
+      // редактирования, чтобы не затирать незавершённые правки пользователя.
+      if (!editMode) {
+        setEditingTemplate(template);
+        setEditingSchema(templateSchema || { categories: [] });
+      }
+      setCurrentCategoryKey(null);
     }
-    setCurrentCategoryKey(null);
-  }, [groupId, editMode]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const loadFromContext = () => {
-    setOriginalTemplate(template);
-    setEditingTemplate(template);
-    setOriginalSchema(templateSchema || { categories: [] });
-    setEditingSchema(templateSchema || { categories: [] });
-    setCurrentCategoryKey(null);
-  };
+  }, [groupId, editMode, template, templateSchema]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCreateTemplate = async () => {
     try {

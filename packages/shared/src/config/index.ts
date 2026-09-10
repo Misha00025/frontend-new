@@ -21,6 +21,21 @@ export function getApiBase(): string {
 }
 
 /**
+ * Склеивает API_BASE (может иметь хвостовой слэш, например
+ * 'http://host/api/') с endpoint (обычно с ведущим слэшем, например
+ * '/groups/3/users/3') БЕЗ двойного слэша.
+ *
+ * Двойной слэш в пути (http://host/api//groups/...) заставляет некоторые
+ * серверы/прокси отвечать редиректом, из-за чего браузер обрывает
+ * in-flight запрос (net::ERR_ABORTED), хотя операция на сервере уже
+ * выполнена. Нормализация склейки устраняет это.
+ */
+export function joinApiUrl(base: string, endpoint: string): string {
+  if (!base) return endpoint;
+  return `${base.replace(/\/+$/, '')}/${endpoint.replace(/^\/+/, '')}`;
+}
+
+/**
  * Переопределяет API_BASE извне (например, хаб прокидывает свой API_BASE
  * в remotes при монтировании). Используется, когда приложение работает
  * внутри хаба и не грузит собственный config.json (main.tsx не вызывается).

@@ -4,6 +4,7 @@ import buttonStyles from '@tdn/shared/styles/components/Button.module.css';
 import inputStyles from '@tdn/shared/styles/components/Input.module.css';
 import styles from '@tdn/shared/styles/common.module.css';
 import stylesUi from '@tdn/shared/styles/ui.module.css';
+import defaultAvatar from '../../assets/default-avatar.png';
 
 interface UserSearchProps {
   onSearch: (nickname: string) => Promise<User[]>;
@@ -58,7 +59,7 @@ const UserSearch: React.FC<UserSearchProps> = ({
           <h3>Результаты поиска:</h3>
           {searchResults.map(user => (
             <div key={user.id} className={stylesUi.userCard}>
-              <img src={user.imageLink || '/default-avatar.png'} alt={user.nickname} className={stylesUi.avatar} />
+              <img src={user.imageLink || defaultAvatar} alt={user.nickname} className={stylesUi.avatar} onError={(e) => { e.currentTarget.src = defaultAvatar; }} />
               <div className={stylesUi.userInfo}>
                 <h4>{user.visibleName}</h4>
                 <p>@{user.nickname}</p>

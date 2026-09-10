@@ -3,6 +3,7 @@ import { User } from '../../types/groupUsers';
 import stylesUi from '@tdn/shared/styles/ui.module.css';
 import IconButton from '@tdn/shared/ui/Buttons/IconButton/IconButton';
 import List from '@tdn/shared/ui/List/List';
+import defaultAvatar from '../../assets/default-avatar.png';
 
 interface UsersListProps {
   users: {
@@ -32,7 +33,7 @@ const UsersList: React.FC<UsersListProps> = ({
     <List layout={layout}>
       {users.map(item => (
         <div key={item.user.id} className={stylesUi.userCard}>
-          <img src={item.user.imageLink || '/default-avatar.png'} alt={item.user.nickname} className={stylesUi.avatar} />
+          <img src={item.user.imageLink || defaultAvatar} alt={item.user.nickname} className={stylesUi.avatar} onError={(e) => { e.currentTarget.src = defaultAvatar; }} />
           <div className={stylesUi.userInfo}>
             <h4>{item.user.visibleName}</h4>
             <p>@{item.user.nickname} {formatPermission(item.permission)}</p>

@@ -14,9 +14,9 @@ const tokenManager = {
 
     refreshPromise = (async () => {
       try {
-        const { getApiBase } = await import('../config');
+        const { getApiBase, joinApiUrl } = await import('../config');
         const API_BASE = getApiBase();
-        const response = await fetch(`${API_BASE}/auth/token`, {
+        const response = await fetch(joinApiUrl(API_BASE, '/auth/token'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
