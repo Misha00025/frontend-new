@@ -6,7 +6,7 @@
 //   - Игровые системы → /systems/*
 //   - Группы (кампания) → /groups/*
 //   - Профиль   → /profile
-// Внизу панели — Настройки и Выход (см. HubSidebar).
+// Панель рендерит общий GlobalSidebar из @tdn/shared (рейл + drawer).
 
 import type { NavItem } from '@tdn/shared';
 

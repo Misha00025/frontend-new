@@ -8,6 +8,19 @@
     --text-shadow: none;
     --progress-bar-from: #e53935;
     --progress-bar-to: #66bb6a;
+
+    /* Каркас боковой панели (тикет #36) */
+    --rail-width: 60px;
+    --drawer-width: 300px;
+    --topbar-height: 52px;
+
+    /* Hover/active — производные от текста, а не от чёрного фолбэка.
+       Раньше --bg-hover/--bg-active нигде не были объявлены, поэтому
+       в тёмных темах hover/active получались чёрными и почти невидимыми.
+       color-mix резолвит var(--text-primary) в контексте элемента-потребителя,
+       поэтому работает в любой теме. */
+    --bg-hover: color-mix(in srgb, var(--text-primary) 8%, transparent);
+    --bg-active: color-mix(in srgb, var(--text-primary) 14%, transparent);
   }
   
 
@@ -67,6 +80,21 @@ html, body {
   overflow-x: clip;
   max-width: 100%;
   width: 100%;
+}
+
+/* Рабочая область приложения (обёртка <main>).
+   ПК: занимает остаток окна справа от постоянного рейла.
+   Мобильный: рейл скрыт, сверху липкая плашка — контент получает padding-top. */
+.app-content {
+  padding: 20px;
+  margin-left: var(--rail-width);
+}
+
+@media (max-width: 768px) {
+  .app-content {
+    margin-left: 0;
+    padding-top: calc(var(--topbar-height) + 16px);
+  }
 }
 
 .container {
